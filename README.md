@@ -8,20 +8,19 @@ We wanted to build something that did a little more than augur though, which mea
 
 
 # Quickstart
-Get the latest GISAID data (full length and high coverage) in a single fasta file, e.g. `gisaid.fa`
 
-Then you can trim the UTRs like this:
+1. Get the latest GISAID data (full length and high coverage) in a single fasta file, e.g. `gisaid.fa`
+
+2. Trim the UTRs like this:
+
 `sh trim_seqs.sh -i gisaid.fa -o trimmed.fa -t 8`
 
-Following that, you can align the K most dissimilar sequences (after disregarding any with >10 ambiguities after trimming) like this:
+3. Align the K most dissimilar sequences:
+
 `sh align_k_dissimilar.sh -i trimmed.fa -o aln_k.fa -k 100`
 
-Excluding sequences with ambiguities helps build a higher-quality alignment of the k most dissimilar sequences. Otherwise we end up selecting the lower quality sequences.
+In the final step we first exclude GISAID sequence with >10 ambiguities, because this helps build a higher-quality alignment of the k most dissimilar sequences. Otherwise we end up selecting the lower quality sequences.
 
-So far this should:
-
-* rapidly trim the UTRs from all the sequences (`trimmed.fa`)
-* create an alignment of the k=100 most divergent sequences (`aln_k.fa`)
 
 Next steps
 
