@@ -10,7 +10,13 @@ We wanted to build something that did a little more than augur though, which mea
 # Quickstart
 Get the latest GISAID data (full length and high coverage) in a single fasta file, e.g. `gisaid.fa`
 
-`sh anlaysis.sh -i gisaid.fa -o tree.phy -t 8 -k 100`
+Then you can trim the UTRs like this:
+`sh trim_seqs.sh -i gisaid.fa -o trimmed.fa -t 8`
+
+Following that, you can align the K most dissimilar sequences (after disregarding any with >10 ambiguities after trimming) like this:
+`sh align_k_dissimilar.sh -i trimmed.fa -o aln_k.fa -k 100`
+
+Excluding sequences with ambiguities helps build a higher-quality alignment of the k most dissimilar sequences. Otherwise we end up selecting the lower quality sequences.
 
 So far this should:
 

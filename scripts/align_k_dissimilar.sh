@@ -27,8 +27,14 @@ then
    helpFunction
 fi
 
+n=$(grep '>' $inputfasta | wc -l)
+echo "Filtering the $n initial input sequences to remove any with > 20 ambiguous bases"
+seqmagick quality-filter --max-ambiguous 10 --max-length 100000 --min-length 100 $inputfasta $inputfasta"_filtered.fa"
+inputfasta=$inputfasta"_filtered.fa"
+
 # how many sequences in the inputfasta
 n=$(grep '>' $inputfasta | wc -l)
+echo "$n sequences remain after filtering"
 
 #define a cutoff to switch to the quick & dirty method of choosing the seqs
 cutoff=50000
