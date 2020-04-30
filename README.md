@@ -14,10 +14,11 @@ Get the latest GISAID data (full length and high coverage) in a single fasta fil
 
 So far this should:
 
-* create an alignment of the k=100 most divergent sequences
+* rapidly trim the UTRs from all the sequences (`trimmed.fa`)
+* create an alignment of the k=100 most divergent sequences (`aln_k.fa`)
 
 Next steps
 
-* fix profile-alignment of the rest of the seuqences to this alignment 
+* fix profile-alignment of the rest of the seuqences to this alignment (currently semi-working in global_profile_alignment.sh)
 * filter the global alignment for bad sites and sequences
 * build a global tree
