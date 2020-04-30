@@ -34,3 +34,9 @@ This step aligns each of the sequences in `trimmed.fa` and **ADDS** them to `glo
 * filter the global alignment for bad sites and sequences 
 * build a global tree
 * implement global exclusion of sequences via excluded_sequences.tsv
+
+# How you can help
+
+* Have ideas for improving or adding to the methods: post on the issues and/or fork the repo and submit a pull request
+* Know of SARS-CoV-2 genomes in GISAID that are problematic for any reason: post the sequence name and the reason on the issue tracker and I'll add them to the excluded_sequences.tsv file
+ 
