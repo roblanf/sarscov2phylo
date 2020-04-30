@@ -29,8 +29,8 @@ In this step we first exclude GISAID sequences with >10 ambiguities, because thi
 
 This step aligns each of the sequences in `trimmed.fa` and **ADDS** them to `global.fa`. It's set up like this so that one can easily add new sequences to the global alignment as they are released on GISAID, without re-doing the whole process.  
 
-Next steps
+# Next steps under development
 
 * filter the global alignment for bad sites and sequences 
 * build a global tree
-* implement global exclusion of sequences via excluded_sequences.txt
+* implement global exclusion of sequences via excluded_sequences.tsv
