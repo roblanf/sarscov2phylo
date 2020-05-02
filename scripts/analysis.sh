@@ -50,29 +50,12 @@ global_aln="$inputdir/global_alignment.fa"
 sh $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $global_alignment -t 8 -r $aln_k
 
 
+###### ASSIGN LINEAGES ########
 
 
 
-##### CALCULATE A TREE #########
-
-# get a bionj tree of all the data
-
-# use it as a starting tree for IQ-TREE model selection
-
-# now update the tree and brlens using that model
 
 
 
-# now do a full IQ-TREE run on the K most dissimilar sequences
-# based on many previous analyses, we look at GTR models with a range of different rate parameterisations
-iqtree -s $global_aln -m MFP -nt $threads -merit AICc -mset "GTR" -mrate "E,I,G,I+G,R,I+R" -pre k_aligned -bb 10000
-
-# get the best model, we'll use this later
-#iqfile="k_aligned.iqtree"
-#bestmod=$(grep "Best-fit model according to" $iqfile | cut -d':' -f2 | cut -d' ' -f2)
-
-
-
-#### ADD THE REST OF THE SEQUENCES TO THE TREE ####
-
+##### CALCULATE PER-LINEAGE TREES #########
 
