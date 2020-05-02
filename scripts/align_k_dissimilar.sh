@@ -28,7 +28,11 @@ then
 fi
 
 n=$(grep '>' $inputfasta | wc -l)
+echo ""
+echo ""
 echo "Filtering the $n initial input sequences to remove any with > 10 ambiguous bases"
+echo ""
+echo ""
 seqmagick quality-filter --max-ambiguous 10 --max-length 100000 --min-length 100 $inputfasta $inputfasta"_filtered.fa"
 inputfasta=$inputfasta"_filtered.fa"
 
@@ -137,3 +141,5 @@ echo "Aligning K most dissimilar sequences"
 mafft --auto "$inputdir/k_unaligned.fa" > $outputfasta
 
 rm "$inputdir/k_unaligned.fa"
+rm $inputfasta"_filtered.fa"
+
