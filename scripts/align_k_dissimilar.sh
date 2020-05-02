@@ -30,7 +30,7 @@ fi
 n=$(grep '>' $inputfasta | wc -l)
 echo ""
 echo ""
-echo "Filtering the $n initial input sequences to remove any with > 10 ambiguous bases"
+echo "Filtering the $n initial unaligned input sequences to remove any with > 10 ambiguous bases"
 echo ""
 echo ""
 seqmagick quality-filter --max-ambiguous 10 --max-length 100000 --min-length 100 $inputfasta $inputfasta"_filtered.fa"
