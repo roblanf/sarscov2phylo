@@ -32,7 +32,7 @@ input_seqs=$inputfasta
 output_seqs=$outputfasta
 
 # first we fix spaces in the fasta headers from GISAID
-sed 's/ /_/g' $input_seqs > "$input_seqs_namesfixed.fa"
+sed 's/ /_/g' $input_seqs > $input_seqs"_namesfixed.fa"
 input_seqs="$input_seqs_namesfixed.fa"
 
 # Split GISAID data into individual sequences
@@ -72,7 +72,7 @@ trim_a_seq()
 	esl-reformat stockholm $alfile > $stofile
 
 	# rename the reference to '#=GC RF'
-	sed -i  '' 's/reference_sequence/#=GC RF/g' $stofile	
+	sed -i.bak  's/reference_sequence/#=GC RF/g' $stofile
 
 	# trim and return to fasta format (ref gets ignored in conversion)
 	# also trims out gaps from focal seq during fasta conversion
