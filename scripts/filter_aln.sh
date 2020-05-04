@@ -5,22 +5,20 @@ helpFunction()
    echo "Usage: $0 -i fasta_alignment -o output_fasta -t threads"
    echo "\t-i Full path to aligned fasta file of SARS-CoV-2 sequences"
    echo "\t-o Output file path for filtered fasta"
-   echo "\t-t number of threads to use"
    exit 1 # Exit script after printing help
 }
 
-while getopts "i:o:t:" opt
+while getopts "i:o:" opt
 do
    case "$opt" in
       i ) inputfasta="$OPTARG" ;;
       o ) outputfasta="$OPTARG" ;;
-      t ) threads="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$inputfasta" ] || [ -z "$outputfasta" ] || [ -z "$threads" ]
+if [ -z "$inputfasta" ] || [ -z "$outputfasta" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
