@@ -50,16 +50,24 @@ profile_align()
 
 	seqfile=$1
 	alfile=$seqfile"_profile_aligned.fa"
-	final=$seqfile"_ind_aligned.fa"
+	stofile=$alfile".sto"
+   final=$seqfile"_ind_aligned.fa"
 
 	mafft --thread 1 --quiet --keeplength --add $seqfile "$REFERENCE_ALN" > $alfile
 
 	name=$(grep ">" $seqfile | tr -d ">")
 
+
+   #esl-reformat stockholm $alfile > $stofile
+   #$name | esl-alimanip --seq-k /dev/stdin $stofile
+
+
+
+
 	echo "$name" | faSomeRecords $alfile /dev/stdin $final
 
-	rm $seqfile
-	rm $alfile
+	#rm $seqfile
+	#rm $alfile
 
 }
 
@@ -71,9 +79,11 @@ ls $inputdir | grep individual_seq | parallel -j $threads --bar "profile_align {
 # join it all together and clean up
 # note that here we *APPEND* to the global alignment, which allows us to add small batches of new stuff whenever we like
 find $inputdir -name \*.fa_ind_aligned.fa -exec cat {} \; >> $outputfasta
-find $inputdir -maxdepth 1 -name "individual_seq*" -delete
+#find $inputdir -maxdepth 1 -name "individual_seq*" -delete
 
 #finally, remove duplicates by name - can occur if a seq. exists in the reference alignment
 faFilter -uniq $outputfasta $outputfasta"_deduped.fa"
+
+# overwite the output with the deduplicated file
 rm $outputfasta
 mv $outputfasta"_deduped.fa" $outputfasta
