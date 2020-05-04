@@ -37,6 +37,8 @@ This runs a number of the auxilliary scripts, roughly doing the following things
 * excludes any sequences listed in `exclude_sequences.tsv`
 * makes a reference alignment from the k (100 in the above example) most dissimilar sequences
 * filters that alignment for bad sequences and sites
+
+CURRENTLY NOT WORKING BUT SHOULD WORK SOON...
 * profile aligns every sequence in the input fasta file to the reference alignment
 * filters that alignment for bad columns and sequences to produce `global.fa`
 
