@@ -36,13 +36,11 @@ This runs a number of the auxilliary scripts, roughly doing the following things
 * fixes known issues with GISAID sequences
 * excludes any sequences listed in `exclude_sequences.tsv`
 * makes a reference alignment from the k (100 in the above example) most dissimilar sequences
-* filters that alignment for bad sequences and sites
-
-CURRENTLY NOT WORKING BUT SHOULD WORK SOON...
+* filters that alignment for bad sites
 * profile aligns every sequence in the input fasta file to the reference alignment
 * filters that alignment for bad columns and sequences to produce `global.fa`
 
-On my server (not too flash) with 40 threads, this takes about 10 minutes to align a gisaid file with about 10K sequences in it. 
+On my server (not too flash) with 40 threads, this takes about 20 minutes to align a gisaid file with about 10K sequences in it. 
 
 # Next steps under development
 
