@@ -29,7 +29,7 @@ echo "Filtering strains shorter than 29400 and/or with more than 20 ambiguities"
 echo "Filtering sites with more than 0.1% gaps"
 echo ""
 
-esl-alimanip --lmin 29400 --xambig 20 --informat afa --outformat afa --dna -o $inputfasta $inputfasta"_alimanip.fa" 
+esl-alimanip --lmin 29400 --xambig 20 --informat afa --outformat afa --dna -o $inputfasta"_alimanip.fa" $inputfasta 
 esl-alimask --gapthresh 0.001 --informat afa --outformat afa --dna -o $outputfasta -g  $inputfasta"_alimanip.fa"
 
 rm $inputfasta"_alimanip.fa"
