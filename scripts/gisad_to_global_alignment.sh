@@ -36,6 +36,10 @@ inputdir=$(dirname $inputfasta)
 
 cd $inputdir
 
+echo ""
+echo "Processing raw GISAID data and trimming UTRs "
+echo ""
+
 trimmed_gisaid="$inputdir/trimmed.fa"
 bash $DIR/trim_seqs.sh -i $inputfasta -o $trimmed_gisaid -t $threads
 
@@ -43,13 +47,22 @@ bash $DIR/trim_seqs.sh -i $inputfasta -o $trimmed_gisaid -t $threads
 
 # first align the k most dissimilar sequences, a low k is sensible here
 # e.g. 100. Higher numbers slow down the global alignment step
+echo ""
+echo "Making alignment of $k most dissimilar sequences"
+echo ""
 aln_k="$inputdir/aln_k.fa"
 bash $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k -t $threads
 
+echo ""
+echo "Filtering sites with >10% gaps k most dissimilar sequence alignment"
+echo ""
 aln_k_filtered="$inputdir/aln_k_filtered.fa"
 esl-alimask --gapthresh 0.1 --informat afa --outformat afa --dna -o $aln_k_filtered -g  $aln_k
 
 
+echo ""
+echo "Making global profile alignment"
+echo ""
 aln_global="$inputdir/aln_global_unfiltered.fa"
 bash $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
-esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o "$inputdir/aln_global.fa" -g $aln_global 
+esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o $outputfasta -g $aln_global 
