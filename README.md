@@ -40,6 +40,8 @@ This runs a number of the auxilliary scripts, roughly doing the following things
 * profile aligns every sequence in the input fasta file to the reference alignment
 * filters that alignment for bad columns and sequences to produce `global.fa`
 
+On my server (not too flash) with 40 threads, this takes about 10 minutes to align a gisaid file with about 10K sequences in it. 
+
 # Next steps under development
 
 * build a global tree

@@ -49,8 +49,8 @@ bash $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k -t $threads
 aln_k_filtered="$inputdir/aln_k_filtered.fa"
 bash $DIR/filter_aln.sh -i $aln_k -o $aln_k_filtered
 
-aln_global="$inputdir/aln_global.fa"
+aln_global="$inputdir/aln_global_unfiltered.fa"
 bash $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
 
-bash $DIR/filter_aln.sh -i $aln_k -o $outputfasta
+bash $DIR/filter_aln.sh -i $aln_global -o $outputfasta
 
