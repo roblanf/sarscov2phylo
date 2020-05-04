@@ -3,7 +3,7 @@
 helpFunction()
 {
    echo "Align the K most dissimilar sequences from a file"
-   echo "Usage: $0 -i unaligned_fasta_path -k num_seqs -o output_file"
+   echo "Usage: $0 -i unaligned_fasta_path -k num_seqs -o output_file -t threads"
    echo "\t-i Full path to unaligned fasta file of alignable sequences"
    echo "\t-k Number of most dissimilar sequences to align"
    echo "\t-o Output file path"
@@ -11,7 +11,7 @@ helpFunction()
    exit 1 # Exit script after printing help
 }
 
-while getopts "i:k:o:t" opt
+while getopts "i:k:o:t:" opt
 do
    case "$opt" in
       i ) inputfasta="$OPTARG" ;;
