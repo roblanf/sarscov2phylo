@@ -121,7 +121,7 @@ else
 fi
 
 
-rm "$inputdir/K_names_long.txt"
+rm "$inputdir/k_names_long.txt"
 rm "$inputdir/guide1.tree"
 rm "$inputdir/guide2.tree"
 rm "$inputdir/guide3.tree"
@@ -144,4 +144,4 @@ mafft --thread $threads --auto "$inputdir/k_unaligned.fa" > $outputfasta
 
 rm "$inputdir/k_unaligned.fa"
 rm $inputfasta
-
+rm "$inputdir/k_names.txt"
