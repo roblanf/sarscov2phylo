@@ -37,20 +37,20 @@ inputdir=$(dirname $inputfasta)
 cd $inputdir
 
 trimmed_gisaid="$inputdir/trimmed.fa"
-sh $DIR/trim_seqs.sh -i $inputfasta -o $trimmed_gisaid -t $threads
+bash $DIR/trim_seqs.sh -i $inputfasta -o $trimmed_gisaid -t $threads
 
 #### BUILD THE GLOBAL ALIGNMENT ######
 
 # first align the k most dissimilar sequences, a low k is sensible here
 # e.g. 100. Higher numbers slow down the global alignment step
 aln_k="$inputdir/aln_k.fa"
-sh $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k -t $threads
+bash $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k -t $threads
 
 aln_k_filtered="$inputdir/aln_k_filtered.fa"
-sh $DIR/filter_aln.sh -i $aln_k -o $aln_k_filtered -t $threads
+bash $DIR/filter_aln.sh -i $aln_k -o $aln_k_filtered -t $threads
 
 aln_global="$inputdir/aln_global.fa"
-sh $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
+bash $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
 
-sh $DIR/filter_aln.sh -i $aln_k -o $outputfasta
+bash $DIR/filter_aln.sh -i $aln_k -o $outputfasta
 
