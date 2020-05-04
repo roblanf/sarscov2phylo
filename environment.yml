@@ -1,4 +1,4 @@
-name: hcovphylo
+name: sarscov2phylo
 channels:
   - conda-forge
   - bioconda
