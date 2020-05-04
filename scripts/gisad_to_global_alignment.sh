@@ -52,13 +52,5 @@ sh $DIR/filter_aln.sh -i $aln_k -o $aln_k_filtered -t $threads
 aln_global="$inputdir/aln_global.fa"
 sh $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
 
-aln_global_filtered="$inputdir/aln_global_filtered.fa"
-sh $DIR/filter_aln.sh -i $aln_k -o $aln_global_filtered
-
-
-###### ASSIGN LINEAGES ########
-
-
-
-##### CALCULATE PER-LINEAGE TREES #########
+sh $DIR/filter_aln.sh -i $aln_k -o $outputfasta
 

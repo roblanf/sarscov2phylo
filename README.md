@@ -27,21 +27,9 @@ conda activate sarscov2phylo``
 
 1. Get the latest GISAID data (full length and high coverage) in a single fasta file, e.g. `gisaid.fa`, you can do this via the batch download feature on GISAID.
 
-2. Trim the UTRs like this:
+2. Create the global alignment 
 
-`bash trim_seqs.sh -i gisaid.fa -o trimmed.fa -t 8`
-
-where `t` is the number of threads you have
-
-3. Align the K most dissimilar sequences:
-
-`bash align_k_dissimilar.sh -i trimmed.fa -o aln_k.fa -k 100`
-
-In this step we first exclude GISAID sequences with >10 ambiguities, because this helps build a higher-quality alignment of the k most dissimilar sequences. Otherwise we end up selecting the lower quality sequences. Alternatively at this step one would (probably preferably) choose a set of reliable and diverse genome sequences that you know, and that encompass most of the existing diversity in the SARS-CoV-2 data. Regardless, it is highly recommended to check that `aln_k.fa` is a good alignment before proceeding and edit it by hand if it needs any adjustment. The accuracy of all downstream steps depends completely on the accuracy of `aln_k.fa`.
-
-4. Create the global alignment using `aln_k.fa` as a reference alignment 
-
-`bash global_profile_alignment.sh -i trimmed.fa -r aln_k.fa -o global.fa -t 8`
+`bash gisaid_to_global_alignment.sh -i gisaid.fa -o global.fa -t 8`
 
 This step aligns each of the sequences in `trimmed.fa` and **ADDS** them to `global.fa`. It's set up like this so that one can easily add new sequences to the global alignment as they are released on GISAID, without re-doing the whole process.  
 
