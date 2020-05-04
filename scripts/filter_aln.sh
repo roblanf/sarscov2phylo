@@ -30,8 +30,6 @@ echo "Filtering sites with more than 0.1% gaps"
 echo ""
 
 esl-alimask --gapthresh 0.001 --informat afa --outformat afa --dna -o $inputfasta"_alimask.fa" -g  $inputfasta
-
-
 esl-alimanip --lmin 29400 --xambig 200 --informat afa --outformat afa --dna -o $outputfasta $inputfasta"_alimask.fa"
 
 rm $inputfasta"_alimask.fa"
