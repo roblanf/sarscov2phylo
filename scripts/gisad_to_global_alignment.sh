@@ -52,6 +52,4 @@ esl-alimask --gapthresh 0.1 --informat afa --outformat afa --dna -o $aln_k_filte
 
 aln_global="$inputdir/aln_global_unfiltered.fa"
 bash $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
-
-bash $DIR/filter_aln.sh -i $aln_global -o $outputfasta
-
+esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o "$inputdir/aln_global.fa" -g $aln_global 

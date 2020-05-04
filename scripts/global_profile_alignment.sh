@@ -61,9 +61,6 @@ profile_align()
    #esl-reformat stockholm $alfile > $stofile
    #$name | esl-alimanip --seq-k /dev/stdin $stofile
 
-
-
-
 	echo "$name" | faSomeRecords $alfile /dev/stdin $final
 
 	#rm $seqfile
