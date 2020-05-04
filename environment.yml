@@ -12,10 +12,10 @@ dependencies:
   - parallel
   - biopython=1.74
   - iqtree>2
-  - mafft
   - pip=19.3.1
   - python=3.6
   - snakemake-minimal=5.13
+  - seqmagick
   - pip:
     - pandas==1.0.1
     - pytools==2020.1
