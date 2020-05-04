@@ -47,6 +47,11 @@ sed -i.bak '/^$/d' $input_seqs
 sed -i.bak '/^>/s/ /_/g' $input_seqs
 rm $input_seqs'.bak'
 
+# now we replaces spaces in the sequences with N's
+# these occur in a number of PHE UK sequences
+sed -i.bak '/^[^>]/s/ /N/g' $input_seqs
+rm $input_seqs'.bak'
+
 
 # next we remove sequences in the excluded_sequences.tsv file
 
