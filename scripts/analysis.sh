@@ -43,17 +43,14 @@ sh $DIR/trim_seqs.sh -i $inputfasta -o $trimmed_gisaid -t $threads
 
 # first align the k most dissimilar sequences, a low k is sensible here
 # e.g. 100. Higher numbers slow down the global alignment step
-aln_k="$inputdir/k_aligned.fa"
-sh $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k
+aln_k="$inputdir/aln_k.fa"
+sh $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k -t $threads
 
-global_aln="$inputdir/global_alignment.fa"
-sh $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $global_alignment -t 8 -r $aln_k
+global_aln="$inputdir/aln_global.fa"
+sh $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $global_alignment -t $threads -r $aln_k
 
 
 ###### ASSIGN LINEAGES ########
-
-
-
 
 
 
