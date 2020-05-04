@@ -33,10 +33,10 @@ output_seqs=$outputfasta
 
 echo ""
 echo "Preprocessing GISAID data to fix known issues"
-echo ""
 
 
 # first let's fix cases where gisaid doesn't put a newline before the '>''
+echo "Making sure all records start with a new line before the '>'"
 sed 's/>/\'$'\n>/g' $input_seqs > $input_seqs"_namesfixed.fa"
 input_seqs=$input_seqs"_namesfixed.fa"
 
@@ -44,14 +44,16 @@ sed -i.bak '/^$/d' $input_seqs
 
 # now we fix spaces in the fasta headers from GISAID
 # we do this ONLY on header lines
+echo "Replacing spaces in sequence names with '_'"
 sed -i.bak '/^>/s/ /_/g' $input_seqs
-rm $input_seqs'.bak'
 
 # now we replaces spaces in the sequences with N's
 # these occur in a number of PHE UK sequences
+echo "Replacing spaces in sequences with 'N'"
 sed -i.bak '/^[^>]/s/ /N/g' $input_seqs
 rm $input_seqs'.bak'
 
+echo ""
 
 # next we remove sequences in the excluded_sequences.tsv file
 
