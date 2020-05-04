@@ -29,15 +29,23 @@ conda activate sarscov2phylo``
 
 2. Create the global alignment 
 
-`bash gisaid_to_global_alignment.sh -i gisaid.fa -o global.fa -t 8`
+`bash gisad_to_global_alignment.sh -i gisaid.fasta -o global.fa -t 20 -k 100`
 
-This step aligns each of the sequences in `trimmed.fa` and **ADDS** them to `global.fa`. It's set up like this so that one can easily add new sequences to the global alignment as they are released on GISAID, without re-doing the whole process.  
+This runs a number of the auxilliary scripts, roughly doing the following things in the following order:
+
+* fixes known issues with GISAID sequences
+* excludes any sequences listed in `exclude_sequences.tsv`
+* makes a reference alignment from the k (100 in the above example) most dissimilar sequences
+* filters that alignment for bad sequences and sites
+* profile aligns every sequence in the input fasta file to the reference alignment
+* filters that alignment for bad columns and sequences to produce `global.fa`
 
 # Next steps under development
 
-* filter the global alignment for bad sites and sequences 
 * build a global tree
-* implement global exclusion of sequences via excluded_sequences.tsv
+* assign lineages with pangolin
+* build lineage trees
+* build high-quality local trees for a set of focal input genomes
 
 # How you can help
 
