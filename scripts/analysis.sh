@@ -36,7 +36,7 @@ inputdir=$(dirname $inputfasta)
 
 cd $inputdir
 
-trimmed_gisaid="$inputdir/trimmed_gisaid.fa"
+trimmed_gisaid="$inputdir/trimmed.fa"
 sh $DIR/trim_seqs.sh -i $inputfasta -o $trimmed_gisaid -t $threads
 
 #### BUILD THE GLOBAL ALIGNMENT ######
@@ -46,8 +46,14 @@ sh $DIR/trim_seqs.sh -i $inputfasta -o $trimmed_gisaid -t $threads
 aln_k="$inputdir/aln_k.fa"
 sh $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k -t $threads
 
-global_aln="$inputdir/aln_global.fa"
-sh $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $global_alignment -t $threads -r $aln_k
+aln_k_filtered="$inputdir/aln_k_filtered.fa"
+sh $DIR/filter_aln.sh -i $aln_k -o $aln_k_filtered -t $threads
+
+aln_global="$inputdir/aln_global.fa"
+sh $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
+
+aln_global_filtered="$inputdir/aln_global_filtered.fa"
+sh $DIR/filter_aln.sh -i $aln_k -o $aln_global_filtered
 
 
 ###### ASSIGN LINEAGES ########
