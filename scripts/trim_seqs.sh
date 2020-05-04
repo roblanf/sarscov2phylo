@@ -34,13 +34,21 @@ output_seqs=$outputfasta
 echo ""
 echo "Preprocessing GISAID data to fix known issues"
 
-
 # first let's fix cases where gisaid doesn't put a newline before the '>''
 echo "Making sure all records start with a new line before the '>'"
 sed 's/>/\'$'\n>/g' $input_seqs > $input_seqs"_namesfixed.fa"
 input_seqs=$input_seqs"_namesfixed.fa"
 
 sed -i.bak '/^$/d' $input_seqs
+
+
+# next we remove sequences in the excluded_sequences.tsv file
+echo "Removing sequences in exluded_sequence.tsv"
+BASEDIR=$(dirname "$0")
+exseq=$BASEDIR/../excluded_sequences.tsv
+cut -f1 $exseq | faSomeRecords $input_seqs /dev/stdin $input_seqs"tmp.fa" -exclude
+rm $input_seqs
+mv $input_seqs"tmp.fa" $input_seqs
 
 # now we fix spaces in the fasta headers from GISAID
 # we do this ONLY on header lines
@@ -55,7 +63,6 @@ rm $input_seqs'.bak'
 
 echo ""
 
-# next we remove sequences in the excluded_sequences.tsv file
 
 
 # Split GISAID data into individual sequences
