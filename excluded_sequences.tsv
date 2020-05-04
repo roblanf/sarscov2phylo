@@ -1,5 +1,5 @@
 hCoV-19/England/20134024504/2020|EPI_ISL_423128|2020-03-23	excluded because it has an additional 't' around position 22K of the global alignment which which probably shouldn't be there
-hCoV-19/Australia/VIC555/2020|EPI_ISL_426816|2020-03-25 excluded because there's an entire missing codon around position 200 of the alignment. MAFFT fails to align the resulting sequence correctly (it could be corrected by hand, however), leading to a silly alignment with an apparently large number of substitutions
-hCoV-19/Wales/PHWC-26E28/2020|EPI_ISL_422159|2020-03-29 excluded because the sequence has a bunch of garbage (maybe it's alignable if you try, but MAFFT can't find a good alignment) and a large deletion around 27K of the global alignment
-hCoV-19/pangolin/Guangdong/1/2019|EPI_ISL_410721|2019 excluded because non-human
-hCoV-19/bat/Yunnan/RaTG13/2013|EPI_ISL_402131|2013-07-24 excluded because non-human
+hCoV-19/Australia/VIC555/2020|EPI_ISL_426816|2020-03-25	excluded because there's an entire missing codon around position 200 of the alignment. MAFFT fails to align the resulting sequence correctly (it could be corrected by hand, however), leading to a silly alignment with an apparently large number of substitutions
+hCoV-19/Wales/PHWC-26E28/2020|EPI_ISL_422159|2020-03-29	excluded because the sequence has a bunch of garbage (maybe it's alignable if you try, but MAFFT can't find a good alignment) and a large deletion around 27K of the global alignment
+hCoV-19/pangolin/Guangdong/1/2019|EPI_ISL_410721|2019	excluded because non-human
+hCoV-19/bat/Yunnan/RaTG13/2013|EPI_ISL_402131|2013-07-24	excluded because non-human
