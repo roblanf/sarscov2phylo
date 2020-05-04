@@ -7,21 +7,23 @@ helpFunction()
    echo "\t-i Full path to unaligned fasta file of alignable sequences"
    echo "\t-k Number of most dissimilar sequences to align"
    echo "\t-o Output file path"
+   echo "\t-t number of threads to use"
    exit 1 # Exit script after printing help
 }
 
-while getopts "i:k:o:" opt
+while getopts "i:k:o:t" opt
 do
    case "$opt" in
       i ) inputfasta="$OPTARG" ;;
       k ) k="$OPTARG" ;;
       o ) outputfasta="$OPTARG" ;;
+      t ) threads="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$inputfasta" ] || [ -z "$k" ] || [ -z "$outputfasta" ]
+if [ -z "$inputfasta" ] || [ -z "$k" ] || [ -z "$outputfasta" ] || [ -z "$threads" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
@@ -52,7 +54,7 @@ if (( $n > $cutoff )); then
 	echo "Using parttree distance method in MAFFT"
 
 	# use this method for maximum speed on v large datasets
-	mafft --retree 0 --treeout --parttree $inputfasta > /dev/null
+	mafft --thread $threads --retree 0 --treeout --parttree $inputfasta > /dev/null
 
 	# replace all newlines
 	tr -d '\n' < "$inputfasta.tree" > "$inputdir/guide1.tree"
@@ -68,7 +70,7 @@ else
 	echo "Using 6mer distance method in MAFFT"
 
 	# use this method if it's feasible, which calculates 6mer distances
-	mafft --retree 0 --treeout $inputfasta > /dev/null
+	mafft --thread $threads --retree 0 --treeout $inputfasta > /dev/null
 	# replace all newlines
 	tr -d '\n' < $inputfasta.tree > "$inputdir/guide3.tree"
 
@@ -138,8 +140,8 @@ faSomeRecords $inputfasta "$inputdir/k_names.txt" "$inputdir/k_unaligned.fa"
 echo "Aligning K most dissimilar sequences"
 
 # align the k most dissimilar sequences in MAFFT
-mafft --auto "$inputdir/k_unaligned.fa" > $outputfasta
+mafft --thread $threads --auto "$inputdir/k_unaligned.fa" > $outputfasta
 
 rm "$inputdir/k_unaligned.fa"
-rm $inputfasta"_filtered.fa"
+rm $inputfasta
 
