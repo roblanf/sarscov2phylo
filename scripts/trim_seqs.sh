@@ -33,7 +33,12 @@ output_seqs=$outputfasta
 
 # first we fix spaces in the fasta headers from GISAID
 sed 's/ /_/g' $input_seqs > $input_seqs"_namesfixed.fa"
-input_seqs="$input_seqs_namesfixed.fa"
+input_seqs=$input_seqs"_namesfixed.fa"
+
+# next we remove sequences in the excluded_sequences.tsv file
+sed -i.bak  's/>/\'$'\n>/g' $input_seqs
+sed -i.bak '/^$/d' $input_seqs
+rm $input_seqs'.bak'
 
 # Split GISAID data into individual sequences
 # fasplit
