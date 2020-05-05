@@ -9,7 +9,7 @@ helpFunction()
 }
 
 while getopts "i:o:" opt
-do
+do 
    case "$opt" in
       i ) inputfasta="$OPTARG" ;;
       o ) outputfasta="$OPTARG" ;;
