@@ -16,7 +16,7 @@ Here are the results. Methods are below.
 
 ## Results
 
-### Which method is fastest?
+### Which method is fastest? tl;dr rapidnj
 
 
 | Tree inference method  | threads | time (s) |
@@ -35,22 +35,34 @@ So, IQ-TREE with parsimony on one thread, and `rapidnj` however you like to run 
 I've never seen anything as fast as `rapidnj`!
 
 
-### Which method gives the best tree
+### Which method gives the best tree? tl;dr parsimony
 
-Here I just took the tree from each of the five approaches I tried, ran it in IQ-TREE with a GTR+I+R3 model and re-estimated the branch lengths. Since all the trees have the same number of parameters, the one with the best likelihood is the best tree.
 
-Out of interest (to see if any of the trees have branch lenghts that are a lot closer to the ML branch lengths) I repeated this *without* re-estimating branch lengths too. 
+Here I just took the tree from each of the five approaches I tried, ran it in IQ-TREE with a GTR and with/without re-estimating the branchlengths. The table shows the results parameters from each run. 
 
-| Tree inference method  | lnL (fixed brlen) | lnL (ML brlen)|
-|------------------------|-------------------|---------------|
-| quicktree default      | 			 	   	 | 				 |
-| MASH->quicktree        |			         | 				 |
-| IQ-TREE parsimony      |			         |				 |
-| IQ-TREE parsimony      |			         |				 |
-| rapidnj_k2p      		 |			         |				 |				
-| rapidnj_jc      		 |			         |				 |				
-| rapidnj_k2p      		 |			         |				 |				
-| rapidnj_jc      		 |			         |				 |				
+The result is fairly clear. The best method in both cases (with or without re-estimating branch lengths) is to estimate the tree with parsimony in IQ-TREE. This makes good sense - these are highly conserved genomes, and parsimony would be expected to do well. `rapidnj` also does very well, and the results are very close to those from the parsimony tree. The conclusion is that the best way to get a quick tree for large SARS-CoV-2 is to use parsimony. If you really need speed, then `rapidnj` is what you want. It will be worth keeping track of the relative speeds of parsimony and `rapidnj` as the dataset continues to increase in size. 
+
+It's encouraging to see that the model parameters are very consistent, even though the tree topologies differ a lot. This means we can likely re-use these in later analyses to speed things up.
+
+| method             | model | brlens       | lnL           | AICc        | delta_AICc  | tree_length | internal_brlen_pct | AC     | AG     | AT     | CG     | CT     | GT    |
+|--------------------|-------|--------------|---------------|-------------|-------------|-------------|--------------------|--------|--------|--------|--------|--------|-------|
+| quicktree default  | GTR   | fixed        | -217884.160   | 435784.331  | -175845.047 | 1.874       | 22.800             | 0.171  | 1.222  | 0.107  | 0.295  | 3.171  | 1.000 |
+| MASH->quicktree    | GTR   | fixed        | -142614.8586  | 285245.7221 | -25306.438  | 0.4288      | 18.3429            | 0.2207 | 1.0489 | 0.1342 | 0.2471 | 3.0507 | 1.000 |
+| IQ-TREE parsimony  | GTR   | fixed        | -129961.6397  | 259939.2843 | 0.000       | 0.288       | 20.769             | 0.217  | 0.981  | 0.139  | 0.196  | 3.002  | 1.000 |
+| rapidnj_k2p        | GTR   | fixed        | -130224.1103  | 260464.2256 | -524.941    | 0.272       | 19.449             | 0.209  | 0.976  | 0.136  | 0.193  | 2.978  | 1.000 |
+| rapidnj_jc         | GTR   | fixed        | -130231.2089  | 260478.4228 | -539.139    | 0.272       | 19.414             | 0.208  | 0.981  | 0.136  | 0.193  | 2.989  | 1.000 |
+| quicktree default  | GTR   | re-estimated | -182757.4812  | 520138.5145 | -105602.523 | 0.451       | 17.688             | 0.171  | 1.220  | 0.107  | 0.296  | 3.148  | 1.000 |
+| MASH->quicktree    | GTR   | re-estimated | -139291.3666  | 433206.2853 | -18670.294  | 0.318       | 19.842             | 0.220  | 1.050  | 0.134  | 0.247  | 3.053  | 1.000 |
+| IQ-TREE parsimony  | GTR   | re-estimated | -129956.2197  | 414535.9915 | 0.000       | 0.288       | 20.723             | 0.217  | 0.981  | 0.139  | 0.196  | 3.002  | 1.000 |
+| rapidnj_k2p        | GTR   | re-estimated | -129996.6322  | 414616.8164 | -80.825     | 0.288       | 21.016             | 0.211  | 0.987  | 0.138  | 0.193  | 3.010  | 1.000 |
+| rapidnj_jc         | GTR   | re-estimated | -129996.0928  | 414615.7376 | -79.746     | 0.288       | 21.007             | 0.209  | 0.987  | 0.136  | 0.194  | 3.004  | 1.000 |
+
+
+### Which model is best
+
+This is challenging, because estimating lots of parameters along with 22K branch lengths is going to be really hard. Nevertheless, it's worth it because if we can record the model parameters themselves, we can re-use these in later analyses since we don't expect them to change much as the trees change and the alignments grow (e.g. see above).
+
+*results will be updated soon*
 
 
 ## Methods for estimating large trees
@@ -141,9 +153,9 @@ runtime=$((end-start))
 echo $runtime
 ```
 
-### Comparing the trees
+## Methods for comparing the trees
 
-Now we have five trees to compare. There are lots of ways to compare trees, but a sensible one is to put them all in the same likelihood framework and just ask:
+We have five trees to compare. There are lots of ways to compare trees, but a sensible one is to put them all in the same likelihood framework and just ask:
 
 1. Which has the best likelihood (all assuming the same model)?
 2. Can any reject each other?
@@ -156,50 +168,58 @@ Our five trees are:
 * `rapidjn_from_aln_k2p.tree`
 * `rapidjn_from_aln_jc.tree`
 
-Let's compare them using IQ-TREE. A few initial analyses suggested here that more threads were a LOT faster, so I'll run all of these analyses on 40 threads. Note that we analyse every tree with and without optimising branch lengths. Also note that some of these anlayses require quite a bit of RAM (around 20GB).
+I compare them using IQ-TREE. A few initial analyses suggested here that more threads were a LOT faster, so I ran all of these analyses on 40 threads. Note that we analyse every tree with and without optimising branch lengths, and with various models. Also note that some of these anlayses require quite a bit of RAM (around 20GB).
 
-Most published analyses I've seen of SARS-CoV-2 sequences use a GTR or a GTR+G model. I did a lot of model comparisons on the data a couple of weeks ago, and this suggested that GTR is the best model structure, but accounting for rate variation is best done with GTR+I+R3. (Next in line, in this order, were GTR+I+G, GTR+I, GTR+G, then GTR). The importance of the +I is not too surprising, most sites in the alignment do not have any segregating variation.
+Most published analyses I've seen of SARS-CoV-2 sequences use a GTR or a GTR+G model. I did a lot of model comparisons on the data a couple of weeks ago, and this suggested that GTR is the best model structure, but accounting for rate variation is best done with GTR+I+R3. (Next in line, in this order, were GTR+I+G, GTR+I, GTR+G, then GTR). The importance of the +I is not too surprising, most sites in the alignment do not have any segregating variation. Despite the difference in the model fit, early analyses suggested that these differences didn't significantly impact the topology, and GTR+I+R3 is a tough model to optimise on large trees, so we'll avoid that model for now and just work with the simpler variants of the GTR model since they're a lot faster to work with, and might allow us to refine the topology using ML in downstream analyses.
 
-Preliminary analyses on this much larger alignment confirms that GTR+I+R3 is **by far** the best model here. So although it's slower to optimise by a fair bit, let's use it anyway because we're most interested in which of these trees is the best.
+Since the trees will have different numbers of parameters depending on the model and whether we re-estimate branch lengths (of which there are ~22K), it's useful to compare them with an approach that takes account of the differing number of parameters, so I'll use the AICc. Note though that if the AICc of re-estimating branch lenghts is *worse* than that of the fixed branch length trees, this doesn't mean we shouldn't be estimating ML branch lenghts. When the branch lengths are fixed, we're still estimating them from the data - we just do it in the NJ stage. So although the AICc isn't counting them as free parameters in the ML analysis (correctly) they're still free parameters in the global sense. Because of that, I'll only compare things within the fixed vs. variable branch length categories, not between them. I'll also record model parameters to see how much they vary across analyses, simply because if we're able to fix model parameters in some downstream analyses that would be very useful for speeding things up.
 
 
 ```
 # quicktree trees are full of line breaks(!), so we fix that first
 tr -d '\n' < quicktree_default.tree > quicktree_default_nolb.tree
 tree=quicktree_default_nolb.tree
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -fixbr -pre $tree'GTR-fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -pre $tree'GTR-varbr' -redo
 
 tr -d '\n' < quicktree_mash.tree > quicktree_mash_nolb.tree
 tree=quicktree_mash_nolb.tree
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -fixbr -pre $tree'GTR-fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -pre $tree'GTR-varbr' -redo
 
 # iqtree parsimony tree
 tree=parsimony_iqtree.treefile
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -fixbr -pre $tree'GTR-fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -pre $tree'GTR-varbr' -redo
 
 # rapidnj trees need to have quotes removed so IQ-TREE can read them
 sed "s/'//g" rapidnj_from_aln_k2p.tree > rapidnj_from_aln_k2p_noquotes.tree
 tree=rapidnj_from_aln_k2p_noquotes.tree
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -fixbr -pre $tree'GTR-fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -pre $tree'GTR-varbr' -redo
 
 sed "s/'//g" rapidnj_from_aln_jc.tree > rapidnj_from_aln_jc_noquotes.tree
 tree=rapidnj_from_aln_jc_noquotes.tree
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -fixbr -pre $tree'GTR-fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -pre $tree'GTR-varbr' -redo
 
 ```
 
 
+## Methods for comparing models
 
-iqtree -s global.fa -te rapidnj_from_aln_noquotes.tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.1 -pre egg_40thread -redo
+We'll use the MP tree, since this was the best when we compared trees. From earlier analyses and looking at the alignments themselves, there's the R3 model is the best, and it makes a lot of sense to combine it with a +I. Since these models are so expensive to optimise, we'll only look at this one.
 
+We do each model indpendently here, because modelfinder in IQ-TREE otherwise wants to optimise the tree itself.
 
+```
+tree=parsimony_iqtree.treefile
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I -nt 12 -me 0.05 -pre $tree'GTRI-varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+G -nt 12 -me 0.05 -pre $tree'GTRG-varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+G -nt 12 -me 0.05 -pre $tree'GTRIG-varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 12 -me 0.05 -pre $tree'GTRIG-varbr' -redo
 
-
+```
 
 
 
