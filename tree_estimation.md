@@ -16,16 +16,42 @@ Here are the results. Methods are below.
 
 ## Results
 
-| Tree inference method  | threads | lnL (fixed brlen) | lnL (ML brlen) | time (s) |
-|------------------------|---------|-------------------|----------------|----------|
-| quicktree default      | 1  	   | 			 	   | 				| 1644	   |
-| MASH->quicktree        | 20->1   |			       | 				| 2118 	   |
-| IQ-TREE parsimony      | 20  	   |			       |				| 1832	   |
-| IQ-TREE parsimony      | 1  	   |			       |				| 494	   |
-| rapidnj_k2p      		 | 20  	   |			       |				| 71	   |
-| rapidnj_jc      		 | 20  	   |			       |				| 72	   |
-| rapidnj_k2p      		 | 1  	   |			       |				| 186	   |
-| rapidnj_jc      		 | 1  	   |			       |				| 178	   |
+### Which method is fastest?
+
+
+| Tree inference method  | threads | time (s) |
+|------------------------|---------|----------|
+| quicktree default      | 1  	   | 1644	  |
+| MASH->quicktree        | 20->1   | 2118 	  |
+| IQ-TREE parsimony      | 20  	   | 1832	  |
+| IQ-TREE parsimony      | 1  	   | 494	  |
+| rapidnj_k2p      		 | 20  	   | 71	   	  |
+| rapidnj_jc      		 | 20  	   | 72	   	  |
+| rapidnj_k2p      		 | 1  	   | 186	  |
+| rapidnj_jc      		 | 1  	   | 178	  |
+
+So, IQ-TREE with parsimony on one thread, and `rapidnj` however you like to run it are a lot quicker than anything else. 
+
+I've never seen anything as fast as `rapidnj`!
+
+
+### Which method gives the best tree
+
+Here I just took the tree from each of the five approaches I tried, ran it in IQ-TREE with a GTR+I+R3 model and re-estimated the branch lengths. Since all the trees have the same number of parameters, the one with the best likelihood is the best tree.
+
+Out of interest (to see if any of the trees have branch lenghts that are a lot closer to the ML branch lengths) I repeated this *without* re-estimating branch lengths too. 
+
+| Tree inference method  | lnL (fixed brlen) | lnL (ML brlen)|
+|------------------------|-------------------|---------------|
+| quicktree default      | 			 	   	 | 				 |
+| MASH->quicktree        |			         | 				 |
+| IQ-TREE parsimony      |			         |				 |
+| IQ-TREE parsimony      |			         |				 |
+| rapidnj_k2p      		 |			         |				 |				
+| rapidnj_jc      		 |			         |				 |				
+| rapidnj_k2p      		 |			         |				 |				
+| rapidnj_jc      		 |			         |				 |				
+
 
 ## Methods for estimating large trees
 
