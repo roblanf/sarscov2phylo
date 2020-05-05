@@ -18,7 +18,7 @@ Here are the results. Methods are below.
 
 | Tree inference method  | threads | lnL (fixed brlen) | lnL (ML brlen) | time (s) |
 |------------------------|---------|-------------------|----------------|----------|
-| quicktree default      | 1  	   | 			 	   | 				| 	 	   |
+| quicktree default      | 1  	   | 			 	   | 				| 1644	   |
 | MASH->quicktree        | 20->1   |			       | 				| 2118 	   |
 | IQ-TREE parsimony      | 20  	   |			       |				| 1832	   |
 | IQ-TREE parsimony      | 1  	   |			       |				| 494	   |
@@ -61,7 +61,7 @@ Quicktree is single-threaded, but I use it here because it can take the output o
 start=`date +%s`
 
 mash triangle -k 21 -s 10000 -p 20 -i global.fa > global_mash_dists.phy
-quicktree -in m -out t global_mash_dists.phy > mash_quicktree.tree
+quicktree -in m -out t global_mash_dists.phy > quicktree_mash.tree
 
 end=`date +%s`
 
@@ -79,7 +79,7 @@ Here we use 1 thread because it turns out this is the fastest solution - too muc
 
 ```
 start=`date +%s`
-iqtree -s global.fa -keep-ident -n 0 -m JC -fixbr -nt 2 -pre parsimony_iqtree_from_aln
+iqtree -s global.fa -keep-ident -n 0 -m JC -fixbr -nt 1 -pre parsimony_iqtree
 end=`date +%s`
 
 runtime=$((end-start))
@@ -114,4 +114,84 @@ end=`date +%s`
 runtime=$((end-start))
 echo $runtime
 ```
+
+### Comparing the trees
+
+Now we have five trees to compare. There are lots of ways to compare trees, but a sensible one is to put them all in the same likelihood framework and just ask:
+
+1. Which has the best likelihood (all assuming the same model)?
+2. Can any reject each other?
+
+Our five trees are:
+
+* `quicktree_default.tree`
+* `quicktree_mash.tree`
+* `parsimony_iqtree.treefile`
+* `rapidjn_from_aln_k2p.tree`
+* `rapidjn_from_aln_jc.tree`
+
+Let's compare them using IQ-TREE. A few initial analyses suggested here that more threads were a LOT faster, so I'll run all of these analyses on 40 threads. Note that we analyse every tree with and without optimising branch lengths. Also note that some of these anlayses require quite a bit of RAM (around 20GB).
+
+Most published analyses I've seen of SARS-CoV-2 sequences use a GTR or a GTR+G model. I did a lot of model comparisons on the data a couple of weeks ago, and this suggested that GTR is the best model structure, but accounting for rate variation is best done with GTR+I+R3. (Next in line, in this order, were GTR+I+G, GTR+I, GTR+G, then GTR). The importance of the +I is not too surprising, most sites in the alignment do not have any segregating variation.
+
+Preliminary analyses on this much larger alignment confirms that GTR+I+R3 is **by far** the best model here. So although it's slower to optimise by a fair bit, let's use it anyway because we're most interested in which of these trees is the best.
+
+
+```
+# quicktree trees are full of line breaks(!), so we fix that first
+tr -d '\n' < quicktree_default.tree > quicktree_default_nolb.tree
+tree=quicktree_default_nolb.tree
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+
+tr -d '\n' < quicktree_mash.tree > quicktree_mash_nolb.tree
+tree=quicktree_mash_nolb.tree
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+
+# iqtree parsimony tree
+tree=parsimony_iqtree.treefile
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+
+# rapidnj trees need to have quotes removed so IQ-TREE can read them
+sed "s/'//g" rapidnj_from_aln_k2p.tree > rapidnj_from_aln_k2p_noquotes.tree
+tree=rapidnj_from_aln_k2p_noquotes.tree
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+
+sed "s/'//g" rapidnj_from_aln_jc.tree > rapidnj_from_aln_jc_noquotes.tree
+tree=rapidnj_from_aln_jc_noquotes.tree
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -fixbr -pre $tree'_fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.05 -pre $tree'_varbr' -redo
+
+```
+
+
+
+iqtree -s global.fa -te rapidnj_from_aln_noquotes.tree -keep-ident -n 0 -m GTR+I+R3 -nt 40 -me 0.1 -pre egg_40thread -redo
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
