@@ -66,4 +66,14 @@ echo ""
 aln_global="$inputdir/aln_global_unfiltered.fa"
 bash $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
 
+
+echo ""
+echo "Filtering alignment"
+echo ""
 bash $DIR/filter_aln.sh -i $aln_global -o $outputfasta
+
+echo ""
+echo "Estimating rapidnj tree with 1000 bootstraps"
+echo ""
+# finally, we estimate a tree with 100 bootstraps, using rapidnj
+rapidnj $ouputfasta -i fa -o t -b 100 -c $threads -n > $outputfasta'.tree'

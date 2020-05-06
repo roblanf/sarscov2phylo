@@ -5,7 +5,6 @@ channels:
   - defaults
 dependencies:
   - mafft
-  - goalign
   - ucsc-faSomeRecords
   - ucsc-faSplit
   - ucsc-faFilter
