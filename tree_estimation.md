@@ -37,6 +37,11 @@ tl;dr rapidnj
 
 IQ-TREE with parsimony on one thread, and `rapidnj` however you like to run it are a lot quicker than anything else. I've never seen anything as fast as `rapidnj`!
 
+N.B. Here's a list of things I tried that don't work:
+
+* IQ-TREE with the -fast option, doesn't work because the BIONJ part is too slow
+* `fasttree` too slow for this data
+
 ### Which method gives the best tree? 
 
 tl;dr parsimony
@@ -46,6 +51,8 @@ Here I just took the tree from each of the five approaches I tried, ran it in IQ
 The result is fairly clear. The best method in both cases (with or without re-estimating branch lengths) is to estimate the tree with parsimony in IQ-TREE. This makes good sense - these are highly conserved genomes, with some fairly extreme rate variation among sites but probably rarely more than one substitution in a single site on a given branch. These are just the conditions where parsimony would be expected to do well, particularly compared to methods that estimate distances without accounting for variation in rates among sites. `rapidnj` also does very well, and the results are very close to those from the parsimony tree. The conclusion is that the best way to get a quick tree for large SARS-CoV-2 is to use parsimony. If you really need speed, then `rapidnj` is what you want. It will be worth keeping track of the relative speeds of parsimony and `rapidnj` as the dataset continues to increase in size. 
 
 It's encouraging to see that the model parameters are very consistent, even though the tree topologies differ a lot. This means we can likely re-use these in later analyses to speed things up. Finally, and remarkably, it turns out it's better to use MASH distances with quicktree rather than the distances quicktree calculates. That was very unexpected.
+
+Final point - note that teh difference in likelihood between fixed and re-estimated branchlengths is very large for most methods. It is a bit smaller for rapidnj (~235 units), but it's very small for parsimony (~5 units only!). This means that the MP branch lengths are surprisingly similar to the ML branch lengths with a GTR model. This, again, is encouraging for MP. 
 
 | method             | model | brlens       | lnL           | AICc        | delta_AICc  | tree_length | internal_brlen_pct | AC     | AG     | AT     | CG     | CT     | GT    |
 |--------------------|-------|--------------|---------------|-------------|-------------|-------------|--------------------|--------|--------|--------|--------|--------|-------|
@@ -103,14 +110,14 @@ If we really want the best tree, we better check some other trees too. So, using
 
 IQ-TREE with `-fast` did not improve the topology. Perhaps not too surprising since -fast doesn't try very hard to get the best tree.
 
-IQ-TREE with `-nstop 10` (it keeps looking for trees until it doesn't find one for 10 iterations) only managed to improve the lnL by 11 units (to -127748), and took 3h to do so on 10 threads. This again suggests it is not making an appreciable difference to the topology.  
+IQ-TREE with `-nstop 10` (it keeps looking for trees until it doesn't find a better one for 10 iterations) only managed to improve the lnL by 11 units (to -127748), and took 3h to do so on 10 threads. This again suggests it is not making an appreciable difference to the topology.  
 
-These results suggest that for SARS-CoV-2 parsimony tree topologies are hard to beat. 
-
+These results suggest that for SARS-CoV-2 parsimony tree topologies (and by association the `rapidnj` ones, which are not sigificantly different, are hard to beat. 
 
 ## Methods for estimating large trees
 
 This is all run on a single server, giving the programs that can be multithreaded 20 threads. Everything was also run on a single thread (except MASH, because it won't be quicker on 1 thread) to double check if lots of threads was actually helping, and because fast single-threaded runtimes will be useful for bootstrapping. 
+
 
 ### Method: quicktree default
 
@@ -160,12 +167,13 @@ Here we use 1 thread because it turns out this is the fastest solution - too muc
 
 ```
 start=`date +%s`
-
+iqtree -s global.fa -keep-ident -n 0 -m JC -fixbr -nt 1 -pre parsimony_iqtree
 end=`date +%s`
 
 runtime=$((end-start))
 echo $runtime
 ```
+
 
 ### Method: rapidnj k2p
 
