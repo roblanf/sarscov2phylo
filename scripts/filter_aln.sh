@@ -2,7 +2,7 @@
 helpFunction()
 {
    echo "Filter strains and columns from an alignment"
-   echo "Usage: $0 -i fasta_alignment -o output_fasta -t threads"
+   echo "Usage: $0 -i fasta_alignment -o output_fasta"
    echo "\t-i Full path to aligned fasta file of SARS-CoV-2 sequences"
    echo "\t-o Output file path for filtered fasta"
    exit 1 # Exit script after printing help
