@@ -5,7 +5,7 @@ helpFunction()
    echo "Make an ML phylogeny from a large FASTA file of GISAID sequences"
    echo "Usage: $0 -i GISAID_fasta -o phylogenetic_tree -t threads -k num_dissimilar_seqs"
    echo "\t-i Full path to unaligned fasta file of SARS-CoV-2 sequences from GISAID"
-   echo "\t-o Output file path for phylogenetic tree"
+   echo "\t-o Output file path for final alignment"
    echo "\t-t number of threads to use"
    echo "\t-k Number of most dissimilar sequences to align to make the initial guide alignment (suggest ~100)"
    exit 1 # Exit script after printing help
