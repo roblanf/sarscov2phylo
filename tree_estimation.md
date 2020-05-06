@@ -6,6 +6,7 @@ It's an open question (to me, at least) what the best method to get a good very 
 
 The basic methodology is as follows: 
 
+1. Align the ~11K SARS-CoV-2 sequences from 2020-05-04-01 after trimming UTRs and removing a few bad sequences
 1. Estimate a large tree in as many was as I practically can
 2. Figure out what's best by comparing them in a likelihood framework
 3. Also record execution times on 20 threads and 1 thread
@@ -34,7 +35,6 @@ So, IQ-TREE with parsimony on one thread, and `rapidnj` however you like to run 
 
 I've never seen anything as fast as `rapidnj`!
 
-
 ### Which method gives the best tree? tl;dr parsimony
 
 
@@ -56,6 +56,32 @@ It's encouraging to see that the model parameters are very consistent, even thou
 | IQ-TREE parsimony  | GTR   | re-estimated | -129956.2197  | 414535.9915 | 0.000       | 0.288       | 20.723             | 0.217  | 0.981  | 0.139  | 0.196  | 3.002  | 1.000 |
 | rapidnj_k2p        | GTR   | re-estimated | -129996.6322  | 414616.8164 | -80.825     | 0.288       | 21.016             | 0.211  | 0.987  | 0.138  | 0.193  | 3.010  | 1.000 |
 | rapidnj_jc         | GTR   | re-estimated | -129996.0928  | 414615.7376 | -79.746     | 0.288       | 21.007             | 0.209  | 0.987  | 0.136  | 0.194  | 3.004  | 1.000 |
+
+
+### Are the trees significantly different? tl;dr yes, don't use quicktree
+
+Trees can differ, and on large alignments the likelihoods and AICc scores will look very different. But whether the differences are significant is another question. In short, we should only reject methods when the best tree is significantly better than the tree we get from those methods. To do this, we can use tree topology tests. 
+
+The results of various tree topology tests are below. But the long and short of it is that, as one might predict from the data above, we can reject the `quicktree` trees, but the `rapidnj` and IQ-TREE trees are not significantly different from one another. That's good news, because it suggests that if we need speed it's OK to use `rapidnj` even though we might expect based on the likelihood that the IQ-TREE parsimony tree is marginally better.
+
+
+|Tree | logL | deltaL  | bp-RELL | p-KH  | p-SH  | p-WKH  | p-WSH | c-ELW  | p-AU |
+|-----|------|---------|---------|-------|-------|--------|-------|--------|------|
+| quicktree default  |  -182866.3364 |   52910 |      0 - |     0 - |     0 - |     0 - |     0 -  |     0 -  | 8.59e-08 -  |
+| MASH->quicktree    |  -139298.7327 |  9342.5 |      0 - |     0 - | 0.062 + |     0 - |     0 -  |     0 -  | 9.32e-108 - | 
+| IQ-TREE parsimony  |  -129956.2194 |       0 |  0.522 + | 0.575 + |     1 + | 0.575 + | 0.859 +  | 0.522 +  |    0.571 +  |
+| rapidnj_k2p        |  -129996.8756 |  40.656 |  0.227 + | 0.423 + | 0.839 + | 0.423 + | 0.875 +  | 0.227 +  |    0.421 +  |
+| rapidnj_jc         |   -129996.426 |  40.207 |  0.251 + | 0.425 + | 0.832 + | 0.425 + | 0.865 +  | 0.251 +  |    0.443 +  |
+
+deltaL  : logL difference from the maximal logl in the set.
+bp-RELL : bootstrap proportion using RELL method (Kishino et al. 1990).
+p-KH    : p-value of one sided Kishino-Hasegawa test (1989).
+p-SH    : p-value of Shimodaira-Hasegawa test (2000).
+p-WKH   : p-value of weighted KH test.
+p-WSH   : p-value of weighted SH test.
+c-ELW   : Expected Likelihood Weight (Strimmer & Rambaut 2002).
+p-AU    : p-value of approximately unbiased (AU) test (Shimodaira, 2002).
+
 
 
 ### Which model is best
@@ -170,7 +196,7 @@ Our five trees are:
 
 I compare them using IQ-TREE. A few initial analyses suggested here that more threads were a LOT faster, so I ran all of these analyses on 40 threads. Note that we analyse every tree with and without optimising branch lengths, and with various models. Also note that some of these anlayses require quite a bit of RAM (around 20GB).
 
-Most published analyses I've seen of SARS-CoV-2 sequences use a GTR or a GTR+G model. I did a lot of model comparisons on the data a couple of weeks ago, and this suggested that GTR is the best model structure, but accounting for rate variation is best done with GTR+I+R3. (Next in line, in this order, were GTR+I+G, GTR+I, GTR+G, then GTR). The importance of the +I is not too surprising, most sites in the alignment do not have any segregating variation. Despite the difference in the model fit, early analyses suggested that these differences didn't significantly impact the topology, and GTR+I+R3 is a tough model to optimise on large trees, so we'll avoid that model for now and just work with the simpler variants of the GTR model since they're a lot faster to work with, and might allow us to refine the topology using ML in downstream analyses.
+Most published analyses I've seen of SARS-CoV-2 sequences use a GTR or a GTR+G model. I did a lot of model comparisons on the data a couple of weeks ago, and this suggested that GTR is the best model structure, but accounting for rate variation is best done with GTR+I+R3. The importance of the +I is not too surprising, most sites in the alignment do not have any segregating variation. Despite the difference in the model fit, early analyses suggested that these differences didn't significantly impact the topology, and GTR+I+R3 is a tough model to optimise on large trees, so we'll avoid that model for now and just work with the simpler variants of the GTR model since they're a lot faster to work with, and might allow us to refine the topology using ML in downstream analyses.
 
 Since the trees will have different numbers of parameters depending on the model and whether we re-estimate branch lengths (of which there are ~22K), it's useful to compare them with an approach that takes account of the differing number of parameters, so I'll use the AICc. Note though that if the AICc of re-estimating branch lenghts is *worse* than that of the fixed branch length trees, this doesn't mean we shouldn't be estimating ML branch lenghts. When the branch lengths are fixed, we're still estimating them from the data - we just do it in the NJ stage. So although the AICc isn't counting them as free parameters in the ML analysis (correctly) they're still free parameters in the global sense. Because of that, I'll only compare things within the fixed vs. variable branch length categories, not between them. I'll also record model parameters to see how much they vary across analyses, simply because if we're able to fix model parameters in some downstream analyses that would be very useful for speeding things up.
 
@@ -205,12 +231,32 @@ iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -pre $tree
 
 ```
 
+## Methods for topology tests
+```
+# first check that all trees end with a newline
+sed -i -e '$a\' quicktree_default_nolb.tree
+sed -i -e '$a\' quicktree_mash_nolb.tree
+sed -i -e '$a\' parsimony_iqtree.treefile
+sed -i -e '$a\' rapidnj_from_aln_k2p_noquotes.tree
+sed -i -e '$a\' rapidnj_from_aln_jc_noquotes.tree
+
+# now join our five trees of interest into one file
+cat quicktree_default_nolb.tree quicktree_mash_nolb.tree parsimony_iqtree.treefile rapidnj_from_aln_k2p_noquotes.tree rapidnj_from_aln_jc_noquotes.tree > five_trees.tree
+
+# check it's got five lines
+wc -l five_trees.tree
+
+# tree topology test, we'll use the starting tree as the parsimony tree (it's the best we've got) with optimised branch lengths
+iqtree -s global.fa -z five_trees.tree -m GTR -te parsimony_iqtree.treefileGTR-varbr.treefile -nt 10 -keep-ident -zb 1000 -zw -au
+```
+
+
 
 ## Methods for comparing models
 
-We'll use the MP tree, since this was the best when we compared trees. From earlier analyses and looking at the alignments themselves, there's the R3 model is the best, and it makes a lot of sense to combine it with a +I. Since these models are so expensive to optimise, we'll only look at this one.
+We do each model indpendently here, because that allows us to also measure the execution times independently.
 
-We do each model indpendently here, because modelfinder in IQ-TREE otherwise wants to optimise the tree itself.
+Of note, on earlier iterations of this analysis on a much smaller dataset (~2K seuqences) suggested that the +I+R3 model was the best. I add it here even though it will be expensive to estimate. The reason the free rate plus invariant sites models are likely to be good here is fairly simple. First, the invariant sites parameter accounts for the fact that a lot of the sites are constant, so will have effective rates of zero (the free-rate model itself doesn't allow for zero rates). The 3 rate categories of the R3 model from previous analyses included two low but similar rates, and one very very high rate. The super high rate most likely fits the data from the very very fast evolving sites (or are they common sequencing errors?) identified in this post from the Goldman lab: http://virological.org/t/issues-with-sars-cov-2-sequencing-data/473. This is very useful, since if the inferential method can allow these sites to have very fast rates, they won't unduly harm the inference of the tree itself, and could on the other hand contribute to the inference of shallower parts of the tree, assuming that the sites are genuinely of biological origin, not due to technical errors. Of course, if one masks those sites as suggested in that post, then an R1 or R2 model may be a better fit to the data than the R3 model. But this analysis was initiated before that post was written, so the alignments I use here are not masked. Indeed, the only trimming for these alignments was to remove the UTRs.
 
 ```
 tree=parsimony_iqtree.treefile
@@ -218,6 +264,14 @@ iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I -nt 12 -me 0.05 -pre $tr
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+G -nt 12 -me 0.05 -pre $tree'GTRG-varbr' -redo
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+G -nt 12 -me 0.05 -pre $tree'GTRIG-varbr' -redo
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 12 -me 0.05 -pre $tree'GTRIG-varbr' -redo
+
+
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY -nt 12 -me 0.05 -pre $tree'HKY-varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+I -nt 12 -me 0.05 -pre $tree'HKYI-varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+G -nt 12 -me 0.05 -pre $tree'HKYG-varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+I+G -nt 12 -me 0.05 -pre $tree'HKYIG-varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+I+R3 -nt 12 -me 0.05 -pre $tree'HKYIG-varbr' -redo
+
 
 ```
 
