@@ -7,9 +7,10 @@ It's an open question (to me, at least) what the best method to get a good very 
 The basic methodology is as follows: 
 
 1. Align the ~11K SARS-CoV-2 sequences from 2020-05-04-01 after trimming UTRs and removing a few bad sequences
-1. Estimate a large tree in as many was as I practically can
-2. Figure out what's best by comparing them in a likelihood framework
-3. Also record execution times on 20 threads and 1 thread
+2. Estimate a large tree in as many was as I practically can
+3. Figure out what's best by comparing them in a likelihood framework
+4. Also record execution times on 20 threads and 1 thread
+5. Take a look at what the best model is, and whether the tree can be improved via more thorough searching.
 
 I include command lines assuming you have a large (>>10K) alignment of GISAID SARS-CoV-2 sequences called global.fa
 
@@ -17,8 +18,11 @@ Here are the results. Methods are below.
 
 ## Results
 
-### Which method is fastest? tl;dr rapidnj
+Here's a summary. Estimate tree topologies either with maximum parsimony or `rapidnj`. These topologies are very hard to improve upon in a likelihood framework. `rapidnj` is quicker but gives slightly worse likelihoods for the topology, but the tree is not significantly different from the parsimony tree. 
 
+### Which method is fastest? 
+
+tl;dr rapidnj
 
 | Tree inference method  | threads | time (s) |
 |------------------------|---------|----------|
@@ -31,12 +35,11 @@ Here are the results. Methods are below.
 | rapidnj_k2p      		 | 1  	   | 186	  |
 | rapidnj_jc      		 | 1  	   | 178	  |
 
-So, IQ-TREE with parsimony on one thread, and `rapidnj` however you like to run it are a lot quicker than anything else. 
+IQ-TREE with parsimony on one thread, and `rapidnj` however you like to run it are a lot quicker than anything else. I've never seen anything as fast as `rapidnj`!
 
-I've never seen anything as fast as `rapidnj`!
+### Which method gives the best tree? 
 
-### Which method gives the best tree? tl;dr parsimony
-
+tl;dr parsimony
 
 Here I just took the tree from each of the five approaches I tried, ran it in IQ-TREE with a GTR and with/without re-estimating the branchlengths. The table shows the results parameters from each run. 
 
@@ -58,7 +61,9 @@ It's encouraging to see that the model parameters are very consistent, even thou
 | rapidnj_jc         | GTR   | re-estimated | -129996.0928  | 414615.7376 | -79.746     | 0.288       | 21.007             | 0.209  | 0.987  | 0.136  | 0.194  | 3.004  | 1.000 |
 
 
-### Are the trees significantly different? tl;dr yes, don't use quicktree
+### Are the trees significantly different? 
+
+tl;dr yes, don't use quicktree
 
 Trees can differ, and on large alignments the likelihoods and AICc scores will look very different. But whether the differences are significant is another question. In short, we should only reject methods when the best tree is significantly better than the tree we get from those methods. To do this, we can use tree topology tests. 
 
@@ -83,12 +88,24 @@ c-ELW   : Expected Likelihood Weight (Strimmer & Rambaut 2002).
 p-AU    : p-value of approximately unbiased (AU) test (Shimodaira, 2002).
 
 
-
 ### Which model is best
+tl;dr GTR+G is the best balance of execution time and model fit; GTR+I+R3 is the best.
 
-This is challenging, because estimating lots of parameters along with 22K branch lengths is going to be really hard. Nevertheless, it's worth it because if we can record the model parameters themselves, we can re-use these in later analyses since we don't expect them to change much as the trees change and the alignments grow (e.g. see above).
+This is challenging, because estimating lots of parameters along with 22K branch lengths is computationally very expensive. Nevertheless, it's worth it because if we can record the model parameters themselves, we can re-use these in later analyses since we don't expect them to change much as the trees change and the alignments grow (e.g. see above).
 
 *results will be updated soon*
+
+### Can tree search in IQ-TREE improve on the parsimony tree
+
+tl;dr not really
+
+If we really want the best tree, we better check some other trees too. So, using the parsimony tree as a starting tree, I tried two thing to improve the topology.
+
+IQ-TREE with `-fast` did not improve the topology. Perhaps not too surprising since -fast doesn't try very hard to get the best tree.
+
+IQ-TREE with `-nstop 10` (it keeps looking for trees until it doesn't find one for 10 iterations) only managed to improve the lnL by 11 units (to -127748), and took 3h to do so on 10 threads. This again suggests it is not making an appreciable difference to the topology.  
+
+These results suggest that for SARS-CoV-2 parsimony tree topologies are hard to beat. 
 
 
 ## Methods for estimating large trees
@@ -143,7 +160,7 @@ Here we use 1 thread because it turns out this is the fastest solution - too muc
 
 ```
 start=`date +%s`
-iqtree -s global.fa -keep-ident -n 0 -m JC -fixbr -nt 1 -pre parsimony_iqtree
+
 end=`date +%s`
 
 runtime=$((end-start))
@@ -263,20 +280,35 @@ tree=parsimony_iqtree.treefile
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I -nt 12 -me 0.05 -pre $tree'GTRI-varbr' -redo
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+G -nt 12 -me 0.05 -pre $tree'GTRG-varbr' -redo
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+G -nt 12 -me 0.05 -pre $tree'GTRIG-varbr' -redo
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 12 -me 0.05 -pre $tree'GTRIG-varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR+I+R3 -nt 12 -me 0.05 -pre $tree'GTRIR3-varbr' -redo
 
 
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY -nt 12 -me 0.05 -pre $tree'HKY-varbr' -redo
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+I -nt 12 -me 0.05 -pre $tree'HKYI-varbr' -redo
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+G -nt 12 -me 0.05 -pre $tree'HKYG-varbr' -redo
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+I+G -nt 12 -me 0.05 -pre $tree'HKYIG-varbr' -redo
-iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+I+R3 -nt 12 -me 0.05 -pre $tree'HKYIG-varbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+I+R3 -nt 12 -me 0.05 -pre $tree'HKYIR3-varbr' -redo
 
 
 ```
 
 
+## Methods for updating the tree
 
+Once we have a model and a tree, we can try updating the tree. But since the tree is so large, it will help to fix the model parameters first. We'll also use the best tree as our starting tree.
+
+```
+# try with fast
+tree=parsimony_iqtree.treefileGTRG-varbr.treefile
+iqtree -s global.fa -t $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 12 -me 0.05 -pre $tree'GTRG-treeopt' -redo -fast
+
+# that didn't change the tree, but it's only two iterations.
+# let's try looking for trees until we can't find a better one for 10 iterations
+iqtree -s global.fa -t $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 12 -me 0.05 -pre $tree'GTRG-treeopt' -nstop 10 -redo
+
+# even this only improved the lnL by 11 units.
+
+```
 
 
 
