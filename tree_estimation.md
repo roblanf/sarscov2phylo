@@ -63,20 +63,25 @@ Results in the table are ordered from best to worst by `delta_AICc`. `fasttree` 
 
 ### Are the trees significantly different? 
 
-* results will be updated to include those from fasttree soon
-
 Trees can differ, and on large alignments the likelihoods and AICc scores will look very different. But whether the differences are significant is another question. In short, we should only reject methods when the best tree is significantly better than the tree we get from those methods. To do this, we can use tree topology tests. 
 
-The results of various tree topology tests are below. But the long and short of it is that, as one might predict from the data above, we can reject the `quicktree` trees, but the `rapidnj` and IQ-TREE trees are not significantly different from one another. That's good news, because it suggests that if we need speed it's OK to use `rapidnj` even though we might expect based on the likelihood that the IQ-TREE parsimony tree is marginally better.
+The results of various tree topology tests are below. The table shows p values for a range of tests, where a low p value means that tree is rejected under the test. All the tests make different assumptions, but as a rule they tend to be rather conservative (i.e. quick to reject trees).
+
+Regardless, we can make some fairly clear conclusions. First, the fasttree trees and (probably) the parsimony tree are not significantly different from one another (the latter is rejected in many tests, but not by a huge amount, and this is a large tree and these are very conservative tests; on top of that the fasttree trees contain multifurcations which the parsimony tree doesn't). This is very encouraging, since parsimony was so much faster. The rapidnj trees are rejected by all but the SH test. Using a small set of trees like this is not really what the SH test is for, but a few things make me think that practically the rapidnj trees should probably not be ignored. First, these tests are conservative, so we should take their rejections with a pinch of salt. Second, the fasttree trees have a somewhat unfair advantage insofar as they contain multifurcations. All the other trees have minimum bounds on short branches, so their likelihoods will suffer considerably. 
+
+All this is to say that I'd conclude that fasttree, parsimony, and rapidnj are all producing very good and very similar trees here. You might make different conclusions.
 
 
 |Tree | logL | deltaL  | bp-RELL | p-KH  | p-SH  | p-WKH  | p-WSH | c-ELW  | p-AU |
 |-----|------|---------|---------|-------|-------|--------|-------|--------|------|
-| quicktree default  |  -182866.3364 |   52910 |      0 - |     0 - |     0 - |     0 - |     0 -  |     0 -  | 8.59e-08 -  |
-| MASH->quicktree    |  -139298.7327 |  9342.5 |      0 - |     0 - | 0.062 + |     0 - |     0 -  |     0 -  | 9.32e-108 - | 
-| IQ-TREE parsimony  |  -129956.2194 |       0 |  0.522 + | 0.575 + |     1 + | 0.575 + | 0.859 +  | 0.522 +  |    0.571 +  |
-| rapidnj_k2p        |  -129996.8756 |  40.656 |  0.227 + | 0.423 + | 0.839 + | 0.423 + | 0.875 +  | 0.227 +  |    0.421 +  |
-| rapidnj_jc         |   -129996.426 |  40.207 |  0.251 + | 0.425 + | 0.832 + | 0.425 + | 0.865 +  | 0.251 +  |    0.443 +  |
+| quicktree default  |  -182862.9989 |  53639  |     0 - |     0 - |     0 - |     0 - |     0 - |         0 - | 2.93e-68 -  | 
+| MASH->quicktree    |  -139299.8604 |  10076  |     0 - |     0 - | 0.046 - |     0 - |     0 - |         0 - | 8.57e-06 -  | 
+| IQ-TREE parsimony  |  -129956.6204 |  733.1  | 0.003 - | 0.002 - | 0.522 + | 0.002 - | 0.003 - |     0.003 - | 0.000679 -  | 
+| rapidnj_k2p        |  -129996.7879 | 773.27  |     0 - |     0 - | 0.518 + |     0 - |     0 - |  3.1e-142 - | 7.68e-85 -  | 
+| rapidnj_jc         |  -129996.2309 | 772.71  |     0 - |     0 - | 0.518 + |     0 - |     0 - | 7.14e-178 - | 1.07e-101 - |  
+| fasttree_fastest   |  -129223.5178 |      0  | 0.625 + | 0.608 + |     1 + | 0.608 + | 0.969 + |     0.626 + |    0.655 +  |
+| fasttree_default   |  -129253.7439 | 30.226  | 0.372 + | 0.392 + | 0.904 + | 0.392 + | 0.869 + |     0.371 + |    0.372 +  |
+
 
 deltaL  : logL difference from the maximal logl in the set.
 bp-RELL : bootstrap proportion using RELL method (Kishino et al. 1990).
@@ -344,7 +349,7 @@ iqtree -s global.fa -te $tree -keep-ident -n 0 -m HKY+I+R3 -nt 12 -me 0.05 -pre 
 
 ## Methods for updating the tree
 
-Once we have a model and a tree, we can try updating the tree. But since the tree is so large, it will help to fix the model parameters first. We'll also use the best tree as our starting tree.
+Once we have a model and a tree, we can try updating the tree. But since the tree is so large, it will help to fix the model parameters first. We'll also use the best tree as our starting tree. I use four threads here as raxml-ng helpfully told me how to guess roughly the right number of threads for this data.
 
 ```
 # try with fast
@@ -354,11 +359,14 @@ tree=fasttree_fastest.tree
 # we could probably just randomly resolve these, but this approach will use parsimony and a couple of rounds of optimisation with NNI
 iqtree -s global.fa -g $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 4 -me 0.05 -pre fasttree_fastest_bifurcating -redo -fast
 
+tree=fasttree_fastest_bifurcating.treefile
 iqtree -s global.fa -t $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 4 -me 0.05 -pre improve-fast -redo -fast
 
 # that didn't change the tree, but it's only two iterations.
 iqtree -s global.fa -t $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 4 -me 0.05 -pre improve-slow -redo
 
+# we'll also try raxml-ng
+raxml-ng --msa global.fa --model GTR+G --threads 4 --tree $tree --prefix improve-raxml
 
 ```
 
