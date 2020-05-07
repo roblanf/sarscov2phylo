@@ -24,18 +24,18 @@ tl;dr rapidnj
 
 | Tree inference method  | threads | time (s) |
 |------------------------|---------|----------|
-| quicktree default      | 1  	   | 1644	  |
-| MASH->quicktree        | 20->1   | 2118 	  |
-| IQ-TREE parsimony      | 20  	   | 1832	  |
-| IQ-TREE parsimony      | 1  	   | 494	  |
 | rapidnj_k2p      		 | 20  	   | 71	   	  |
-| rapidnj_k2p      		 | 1  	   | 186	  |
 | rapidnj_jc      		 | 20  	   | 72	   	  |
 | rapidnj_jc      		 | 1  	   | 178	  |
-| fasttree default 		 | 1	   | 4625	  |
+| rapidnj_k2p      		 | 1  	   | 186	  |
+| IQ-TREE parsimony      | 1  	   | 494	  |
+| quicktree default      | 1  	   | 1644	  |
+| IQ-TREE parsimony      | 20  	   | 1832	  |
+| MASH->quicktree        | 20->1   | 2118 	  |
 | fasttree fastest		 | 1 	   | 4061     |
+| fasttree default 		 | 1	   | 4625	  |
 
-IQ-TREE with parsimony on one thread, and `rapidnj` however you like to run it are a lot quicker than anything else. I've never seen anything as fast as `rapidnj`!
+These results speak for themselves. `rapidnj` is insanely quick. IQ-TREE random stepwise addition parsimony trees are also very quick. Everything else is a lot slower.
 
 N.B. Here's a list of things I tried that didn't work:
 
@@ -47,7 +47,7 @@ N.B. Here's a list of things I tried that didn't work:
 
 tl;dr fasttree, but others are close
 
-I calcualted the likelihood of each tree topology under a GTR model in IQ-TREE. I did it with and without re-estimating branch lengths, because that can help us figure out which method gives branch lengths that are closest to the branch lengths we get with ML approaches (which have some nicer properties than other methods for estimating branch lengths).
+I calcualted the likelihood of each tree topology under a GTR model in IQ-TREE. I did it with and without re-estimating branch lengths, because that can help us figure out which method gives branch lengths that are closest to the branch lengths we get with ML approaches (which have some nicer properties than other methods for estimating branch lengths; results in the delta_lnL column).
 
 Results in the table are ordered from best to worst by `delta_AICc`. `fasttree` is the best, and next best is a random stepwise addition tree in parsimony from IQ-TREE. `rapidnj` is very close beind parsimony. `quicktree` can be safely ignored as no use here. These results make sense - fasttree puts in a lot more time and effort to optimising the tree than the IQ-TREE parsimony tree or the `rapidnj` tree, both of which are one-shot trees without further optimisation.
 
