@@ -73,7 +73,10 @@ echo ""
 bash $DIR/filter_aln.sh -i $aln_global -o $outputfasta
 
 echo ""
-echo "Estimating rapidnj tree with 1000 bootstraps"
+echo "Estimating trees with bootstraps"
 echo ""
+
 # finally, we estimate a tree with 100 bootstraps, using rapidnj
-rapidnj $ouputfasta -i fa -o t -b 100 -c $threads -n > $outputfasta'.tree'
+bash $DIR/tree_nj.sh -i $outputfasta -t $threads
+bash $DIR/tree_mp.sh -i $outputfasta -t $threads
+
