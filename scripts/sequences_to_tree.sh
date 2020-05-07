@@ -70,7 +70,15 @@ bash $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $thre
 echo ""
 echo "Filtering alignment"
 echo ""
+echo "alignment stats before filtering"
+
+esl-alistat $aln_global
+
 bash $DIR/filter_aln.sh -i $aln_global -o $outputfasta
+
+echo "alignment stats after filtering"
+esl-alistat $outputfasta
+
 
 echo ""
 echo "Estimating trees with bootstraps"
