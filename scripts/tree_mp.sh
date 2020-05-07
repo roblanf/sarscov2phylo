@@ -4,6 +4,10 @@ helpFunction()
 {
    echo "build a stepwise addition parsimony tree with 100 bootstraps, support in TBE and FBP"
    echo "Usage: $0 -i fasta_alignment -t threads"
+   echo "Output will be three files:"
+   echo "\t mp_replicates.tree: 100 bootstrap replicate mp trees"
+   echo "\t *mp_boot_TBE.tree, stepwise mp tree with transfer bootstrap supports"
+   echo "\t *mp_boot_FBP.tree, stepwise mp tree with felsenstein bootstrap supports"
    echo "\t-i Full path to aligned fasta file of SARS-CoV-2 sequences"
    echo "\t-t number of threads to use"
    exit 1 # Exit script after printing help
@@ -25,13 +29,14 @@ then
    helpFunction
 fi
 
+inputdir=$(dirname $inputfasta)
 export INPUT_FASTA=$inputfasta
 
 # make the reference tree
 echo ""
 echo "Making the reference tree with IQ-TREE stepwise addition parsimony"
 echo ""
-iqtree -s $inputfasta -keep-ident -n 0 -m JC -fixbr -nt 1 -pre $inputfasta'_mp'
+iqtree -s $inputfasta -keep-ident -n 0 -m JC -fixbr -nt 1 
 
 
 
@@ -51,16 +56,17 @@ boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*.treefile > parsimony_replicates.tree
+cat boot*.treefile > mp_replicates.tree
 inputdir=$(dirname $inputfasta)
 find $inputdir -maxdepth 1 -name "boot*" -delete
 
 # make felsenstein bs in iqtre like: iqtree -t TREES_SET_FILE -sup FOCAL_TREE
 echo ""
 echo "Running raxml to map bootstrap support to focal tree"
-raxml-ng --support --tree $inputfasta'_mp.treefile' --bs-trees parsimony_replicates.tree --prefix $focaltree'mp_boot' --threads $threads --bs-metric fbp,tbe --redo
+raxml-ng --support --tree $inputfasta'.parstree' --bs-trees mp_replicates.tree --prefix $focaltree'mp_boot' --threads $threads --bs-metric fbp,tbe --redo
 
-mv $focaltree'mp_boot.raxml.supportFBP' $focaltree'mp_boot_FBP_tree'
-mv $focaltree'mp_boot.raxml.supportTBE' $focaltree'mp_boot_TBE_tree'
+mv $focaltree'mp_boot.raxml.supportFBP' $inputfasta'mp_boot_FBP.tree'
+mv $focaltree'mp_boot.raxml.supportTBE' $inputfasta'mp_boot_TBE.tree'
 
 rm $inputfasta'_mp.treefile'
+rm $inputfasta.*

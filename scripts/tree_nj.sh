@@ -3,9 +3,13 @@
 helpFunction()
 {
    echo "build a rapidnj tree with 100 bootstraps, support in TBE and FBP"
+   echo "Output will be three files:"
+   echo "\t nj_replicates.tree: 100 bootstrap replicate nj trees"
+   echo "\t *nj_boot_TBE.tree, rapidnj tree with transfer bootstrap supports"
+   echo "\t *nj_boot_FBP.tree, rapidnj tree with felsenstein bootstrap supports"
    echo "Usage: $0 -i fasta_alignment -t threads"
-   echo "\t-i Full path to aligned fasta file of SARS-CoV-2 sequences"
-   echo "\t-t number of threads to use"
+   echo "\t -i Full path to aligned fasta file of SARS-CoV-2 sequences"
+   echo "\t -t number of threads to use"
    exit 1 # Exit script after printing help
 }
 
@@ -64,7 +68,8 @@ echo ""
 echo "Running raxml to map bootstrap support to focal tree"
 raxml-ng --support --tree $inputfasta'_rapidnj.tree' --bs-trees nj_replicates.tree --prefix $focaltree'nj_boot' --threads $threads --bs-metric fbp,tbe --redo
 
-mv $focaltree'nj_boot.raxml.supportFBP' $focaltree'nj_boot_FBP_tree'
-mv $focaltree'nj_boot.raxml.supportTBE' $focaltree'nj_boot_TBE_tree'
+mv $focaltree'nj_boot.raxml.supportFBP' $inputfasta'nj_boot_FBP.tree'
+mv $focaltree'nj_boot.raxml.supportTBE' $inputfasta'nj_boot_TBE.tree'
 
 rm $inputfasta'_rapidnj.tree'
+rm 'nj_boot.raxml.log'
