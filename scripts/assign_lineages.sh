@@ -1,3 +1,6 @@
+#!/bin/bash
+
+
 helpFunction()
 {
    echo "Assign pangolin lineages to a set of sequences"
