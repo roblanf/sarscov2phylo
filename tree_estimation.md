@@ -108,8 +108,6 @@ Models estimated in IQ-TREE using the parsimony tree.
 
 Both raxml-ng and IQ-TREE struggled to estimated a tree because their starting trees took too long to estimate. We can potentially circumvent that by using the fasttree topology as a starting tree and asking if we can improve the topology.
 
-raxml wasn't able to use the fasttree start tree, and I couldn't figure out why (some Assertion failed, but the error was not very informative.)
-
 * results coming soon
 
 
