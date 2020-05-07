@@ -2,7 +2,7 @@
 
 helpFunction()
 {
-   echo "Trim UTRs from SARS-CoV-2 sequences relative to the NC_045512.2 reference"
+   echo "Trim ends from SARS-CoV-2 sequences relative to the NC_045512.2 reference"
    echo "Usage: $0 -i fasta_file_of_SARS-CoV-2_seqs -o output_file -t threads"
    echo "\t-i Full path to unaligned fasta file of SARS-CoV-2 sequences"
    echo "\t-o Output file path"
@@ -76,8 +76,8 @@ faSplit sequence $input_seqs $N individual_seq
 # mafft and parallel
 # build this into augur as trim_seqs.py
 echo "Trimming UTRs from sequences relative to NC_045512.2 reference"
-echo "UTRs are assumed to be start:265 and 29675:end"
-
+#echo "UTRs are assumed to be start:265 and 29675:end"
+echo "Trimming start:55 and 29804:end, as suggested in http://virological.org/t/issues-with-sars-cov-2-sequencing-data/473"
 trim_a_seq()
 {
 	# input fasta file 
@@ -108,7 +108,7 @@ trim_a_seq()
 	# also trims out gaps from focal seq during fasta conversion
 	# the numbers 265 and 29675 correspond to the UTRs from 
 	# the genbank accession NC_045512.2 (SARS-CoV-2)
-	esl-alimask -t --t-rf $stofile "265..29675" > $alfile"_trimmed.sto"
+	esl-alimask -t --t-rf $stofile "55..29804" > $alfile"_trimmed.sto"
 	esl-reformat --mingap fasta $alfile"_trimmed.sto" > $seqfile"_trimmed.fa"
 }
 

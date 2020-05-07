@@ -1,12 +1,10 @@
 # Phylogenetics for SARS-CoV-2
 
-This repository contains scripts for reproducible phylogenetic analyses of SARS-CoV-2 data from GISAID.
+This repository allows you to estimate very large trees with bootstrap support (Felsenstein Bootstrap and Transfer Bootstrap) for SARS-CoV-2 alignments of 10's of 1000's of sequences.
 
-For many analyses, running your own phylogenies won't be necessary - one can simply use the excellent NextStrain pipeline (particularly augur, for the phylogenetics).
+Note that for many applications it won't be necessary to run your own trees. One can simply use the excellent NextStrain site or pipeline (particularly `augur` for the phylogenetics). Despite that, sometimes a global tree with bootstrap support is a useful thing. I will provide regularly-updated global trees on this repository, starting shortly. 
 
-I wanted to build something that did a little more than augur though, which means first solving a few problems in different ways, hence this repository. We hope that if the methods prove useful, we'll have time to build them into augur at a later date.
-
-The point of this repository is to allow for reproducible phylogenetic analyses that more-or-less follow best practice. I had been somewhat frustrated by reading so many SARS-CoV-2 analyses that present sensible analyses but no code. This repo tries to follow best practice, and I appreciate all feedback which indicates how it could be improved. 
+The point of this repository is to allow for reproducible phylogenetic analyses that follow best practice as closely as possible. I appreciate all feedback which indicates how it could be improved. 
 
 # Installation
 You will need some version of conda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/
@@ -33,7 +31,6 @@ conda activate sarscov2phylo
 
 3. Run this: `bash sequences_to_tree.sh -i gisaid.fasta -o global.fa -t 20 -k 100`
 
-
 # What does it do, exactly?
 
 To see exactly what's happening, you can take a look at each of the scripts in the `/scripts` folder. They are all shell scripts and what they do is described at the top of each. 
@@ -42,18 +39,22 @@ Here's an overview of what the wrapper script `seqeucnes_to_tree.sh` is actually
 
 1. Fixes known issues with GISAID sequences (there are quite a few...)
 2. Removes sequences that I or others have determined to be questionable 
-3. Trims the UTRs from every sequence in the input file (saved as `trimmed.fa`)
+3. Trims the low-quality ends from every sequence in the input file (saved as `trimmed.fa`)
 4. Makes an alignment of the 100 most dissimilar (but high-quality) sequences in the input, then filters gappy sites from this (saved as `aln_k_filtered.fa`)
 5. Creates a global alignment by aligning every sequence to `aln_k_filtered.fa` with MAFFT
 6. Filters sequence from the alignment that are shorter than 29100 bp (that's ~1% shorter than the typical alignment), or contain >200 ambiguities (that's also ~1%)
 7. Filters sites from the alignment with >1 % gaps.
 8. Estimates a global tree with 100 bootstraps using `rapidnj`
+9. Estimates a global tree with 100 bootstraps using stepwise addition parsimony
+10. Creates bootstrap support trees with standard bootstraps and the transfer bootstrap. The latter is likely more appropriate for large SARS-CoV-2 trees.
 
-On my server (which is not too flash) with 40 threads, the whole process takes a couple of hours. Most of that time is estimating the tree with bootstraps.
+On my server (which is not too flash) with 40 threads, the whole process takes a few of hours. Most of that time is estimating the trees with bootstraps.
 
 # Next steps under development
 
-* build high-quality local trees for a set of focal input genomes
+* build higher-quality local trees for a set of focal input genomes
+* molecular dating with LSD in IQ-TREE
+* publish regularly-updated global trees for others to use
 
 # How you can help
 
@@ -65,6 +66,7 @@ On my server (which is not too flash) with 40 threads, the whole process takes a
 The scripts rely on a suite of absolutely excellent tools. Here are many of them:
 
 * `mafft`
+* `raxml-ng`
 * `rapidnj`
 * Easel tools like `esl-alimanip`
 * `iqtree`
