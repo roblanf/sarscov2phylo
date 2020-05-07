@@ -11,3 +11,9 @@ hCoV-19/pangolin/Guangxi/P3B/2017|EPI_ISL_410543|2017	excluded because non-human
 hCoV-19/bat/Yunnan/RaTG13/2013|EPI_ISL_402131|2013-07-24	excluded because non-human
 hCoV-19/Senegal/610/2020|EPI_ISL_420075|2020-03-20	excluded because it has a few stretches (one at the end, one near the start) with incorrect basecalls in a string e.g. NNNGCAGAGCAGTGCTCT
 hCoV-19/England/20140063904/2020|EPI_ISL_423392|2020-03-29	excluded because it has an odd artefact where there is frequently an incorrect? singleton basecall at the end of a row of N's, e.g. the final G here CAAACAGGTTCATCTAAGTGTGTGTGTGNNN
+hCoV-19/bat/Yunnan/RmYN02/2019|EPI_ISL_412977|2019-06-25	non-human
+hCoV-19/pangolin/Guangxi/P4L/2017|EPI_ISL_410538|2017	non-human
+hCoV-19/pangolin/Guangxi/P1E/2017|EPI_ISL_410539|2017	non-human
+hCoV-19/pangolin/Guangxi/P5E/2017|EPI_ISL_410541|2017	non-human
+hCoV-19/pangolin/Guangxi/P2V/2017|EPI_ISL_410542|2017	non-human
+hCoV-19/pangolin/Guangxi/P5L/2017|EPI_ISL_410540|2017	non-human
