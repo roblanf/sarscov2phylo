@@ -56,7 +56,7 @@ boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*.treefile > $inputfasta"mp_replicates.tree"
+cat boot*.treefile > $inputfasta"_mp_replicates.tree"
 inputdir=$(dirname $inputfasta)
 find $inputdir -maxdepth 1 -name "boot*" -delete
 

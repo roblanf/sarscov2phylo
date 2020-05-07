@@ -59,14 +59,14 @@ boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*.tree > $inputfasta"/_nj_replicates.tree"
+cat boot*.tree > $inputfasta"_nj_replicates.tree"
 inputdir=$(dirname $inputfasta)
 find $inputdir -maxdepth 1 -name "boot*" -delete
 
 # make felsenstein bs in iqtre like: iqtree -t TREES_SET_FILE -sup FOCAL_TREE
 echo ""
 echo "Running raxml to map bootstrap support to focal tree"
-raxml-ng --support --tree $inputfasta'_rapidnj.tree' --bs-trees $inputfasta"/_nj_replicates.tree" --prefix $focaltree'nj_boot' --threads $threads --bs-metric fbp,tbe --redo
+raxml-ng --support --tree $inputfasta'_rapidnj.tree' --bs-trees $inputfasta"_nj_replicates.tree" --prefix $focaltree'nj_boot' --threads $threads --bs-metric fbp,tbe --redo
 
 mv $focaltree'nj_boot.raxml.supportFBP' $inputfasta'_nj_boot_FBP.tree'
 mv $focaltree'nj_boot.raxml.supportTBE' $inputfasta'_nj_boot_TBE.tree'
