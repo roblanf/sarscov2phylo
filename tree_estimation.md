@@ -111,9 +111,11 @@ Models estimated in IQ-TREE using the parsimony tree.
 
 ### Can tree search improve the fasttree tree
 
-Both raxml-ng and IQ-TREE struggled to estimated a tree because their starting trees took too long to estimate. We can potentially circumvent that by using the fasttree topology as a starting tree and asking if we can improve the topology.
+Both raxml-ng and IQ-TREE struggled because their starting trees took too long to estimate. We can potentially circumvent that by using the fasttree topology as a starting tree and asking if we can improve it with the more thorough search algorithms in IQ-TREE and raxml-ng.
 
-* results coming soon
+Using IQ-TREE with the `-fast` option did not improve the tree. That's not surprising because this is an algorithm designed to do something similar to fasttree, and it only tries improving the tree for a couple of iterations.
+
+* more results coming soon
 
 
 ## Methods for estimating large trees
