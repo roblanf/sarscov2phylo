@@ -2,7 +2,7 @@
 
 helpFunction()
 {
-   echo "Bootstrap 100 parsimony analyses using IQ-TREE"
+   echo "Bootstrap 100 rapidnj analyses using IQ-TREE"
    echo "Usage: $0 -i fasta_alignment -o output_file -t threads"
    echo "\t-i Full path to aligned fasta file of SARS-CoV-2 sequences"
    echo "\t-f Full path focal phylogeny on which to map bootstrap support"
@@ -33,7 +33,11 @@ export INPUT_FASTA=$inputfasta
 one_bootstrap(){
 
    bootpre='boot'$1
-   iqtree -s "$INPUT_FASTA" -keep-ident -n 0 -m JC -fixbr -nt 1 -bo 1 -wbtl -pre $bootpre
+   goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
+   rapidnj $bootpre'0.fa' -i fa -c 1 -n -t d -x $bootpre'.tree'
+   sed -i.bak "s/'//g" $bootpre'.tree'
+   rm $bootpre'.tree.bak'
+   rm $bootpre'0.fa'
 
 }
 
@@ -43,11 +47,11 @@ boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*.treefile > parsimony_replicates.tree
+cat boot*.tree > nj_replicates.tree
 inputdir=$(dirname $inputfasta)
 find $inputdir -maxdepth 1 -name "boot*" -delete
 
 # make felsenstein bs in iqtre like: iqtree -t TREES_SET_FILE -sup FOCAL_TREE
 echo ""
 echo "Running raxml to map bootstrap support to focal tree"
-raxml-ng --support --tree $focaltree --bs-trees replicates.tree --prefix $focaltree'mp_boot' --threads $threads --bs-metric fbp,tbe --redo
+raxml-ng --support --tree $focaltree --bs-trees nj_replicates.tree --prefix $focaltree'nj_boot' --threads $threads --bs-metric fbp,tbe --redo
