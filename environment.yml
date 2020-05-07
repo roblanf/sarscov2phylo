@@ -5,6 +5,7 @@ channels:
   - defaults
 dependencies:
   - mafft
+  - raxml-ng
   - ucsc-faSomeRecords
   - ucsc-faSplit
   - ucsc-faFilter
