@@ -18,8 +18,6 @@ Here are the results. Methods are below.
 
 ## Results
 
-Here's a summary. Estimate tree topologies either with maximum parsimony or `rapidnj`. These topologies are very hard to improve upon in a likelihood framework. `rapidnj` is quicker but gives slightly worse likelihoods for the topology, but the tree is not significantly different from the parsimony tree. 
-
 ### Which method is fastest? 
 
 tl;dr rapidnj
@@ -31,46 +29,41 @@ tl;dr rapidnj
 | IQ-TREE parsimony      | 20  	   | 1832	  |
 | IQ-TREE parsimony      | 1  	   | 494	  |
 | rapidnj_k2p      		 | 20  	   | 71	   	  |
-| rapidnj_jc      		 | 20  	   | 72	   	  |
 | rapidnj_k2p      		 | 1  	   | 186	  |
+| rapidnj_jc      		 | 20  	   | 72	   	  |
 | rapidnj_jc      		 | 1  	   | 178	  |
+| fasttree default 		 | 1	   | 4625	  |
+| fasttree fastest		 | 1 	   | 4061     |
 
 IQ-TREE with parsimony on one thread, and `rapidnj` however you like to run it are a lot quicker than anything else. I've never seen anything as fast as `rapidnj`!
 
-N.B. Here's a list of things I tried that don't work:
+N.B. Here's a list of things I tried that didn't work:
 
-* IQ-TREE with the -fast option, doesn't work because the BIONJ part is too slow
-* `fasttree` too slow for this data
+* IQ-TREE with the -fast option, the BIONJ part of the inference is too slow (>1hr, and that's before we've started optimising it with ML)
+* MPBoot: too slow for this data (i.e. doesn't add anything that IQ-TREE can't do, which is to estimate 1 tree in 8 minutes)
+* raxml-ng: all attempts at using raxml-ng were too slow because even calcualting a single parsimony tree took >1hr
 
 ### Which method gives the best tree? 
 
-tl;dr parsimony
+tl;dr fasttree, but others are close
 
-Here I just took the tree from each of the five approaches I tried, ran it in IQ-TREE with a GTR and with/without re-estimating the branchlengths. The table shows the results parameters from each run. 
+I calcualted the likelihood of each tree topology under a GTR model in IQ-TREE. I did it with and without re-estimating branch lengths, because that can help us figure out which method gives branch lengths that are closest to the branch lengths we get with ML approaches (which have some nicer properties than other methods for estimating branch lengths).
 
-The result is fairly clear. The best method in both cases (with or without re-estimating branch lengths) is to estimate the tree with parsimony in IQ-TREE. This makes good sense - these are highly conserved genomes, with some fairly extreme rate variation among sites but probably rarely more than one substitution in a single site on a given branch. These are just the conditions where parsimony would be expected to do well, particularly compared to methods that estimate distances without accounting for variation in rates among sites. `rapidnj` also does very well, and the results are very close to those from the parsimony tree. The conclusion is that the best way to get a quick tree for large SARS-CoV-2 is to use parsimony. If you really need speed, then `rapidnj` is what you want. It will be worth keeping track of the relative speeds of parsimony and `rapidnj` as the dataset continues to increase in size. 
+Results in the table are ordered from best to worst by `delta_AICc`. `fasttree` is the best, and next best is a random stepwise addition tree in parsimony from IQ-TREE. `rapidnj` is very close beind parsimony. `quicktree` can be safely ignored as no use here. These results make sense - fasttree puts in a lot more time and effort to optimising the tree than the IQ-TREE parsimony tree or the `rapidnj` tree, both of which are one-shot trees without further optimisation.
 
-It's encouraging to see that the model parameters are very consistent, even though the tree topologies differ a lot. This means we can likely re-use these in later analyses to speed things up. Finally, and remarkably, it turns out it's better to use MASH distances with quicktree rather than the distances quicktree calculates. That was very unexpected.
-
-Final point - note that teh difference in likelihood between fixed and re-estimated branchlengths is very large for most methods. It is a bit smaller for rapidnj (~235 units), but it's very small for parsimony (~5 units only!). This means that the MP branch lengths are surprisingly similar to the ML branch lengths with a GTR model. This, again, is encouraging for MP. 
-
-| method             | model | brlens       | lnL           | AICc        | delta_AICc  | tree_length | internal_brlen_pct | AC     | AG     | AT     | CG     | CT     | GT    |
-|--------------------|-------|--------------|---------------|-------------|-------------|-------------|--------------------|--------|--------|--------|--------|--------|-------|
-| quicktree default  | GTR   | fixed        | -217884.160   | 435784.331  | -175845.047 | 1.874       | 22.800             | 0.171  | 1.222  | 0.107  | 0.295  | 3.171  | 1.000 |
-| MASH->quicktree    | GTR   | fixed        | -142614.8586  | 285245.7221 | -25306.438  | 0.4288      | 18.3429            | 0.2207 | 1.0489 | 0.1342 | 0.2471 | 3.0507 | 1.000 |
-| IQ-TREE parsimony  | GTR   | fixed        | -129961.6397  | 259939.2843 | 0.000       | 0.288       | 20.769             | 0.217  | 0.981  | 0.139  | 0.196  | 3.002  | 1.000 |
-| rapidnj_k2p        | GTR   | fixed        | -130224.1103  | 260464.2256 | -524.941    | 0.272       | 19.449             | 0.209  | 0.976  | 0.136  | 0.193  | 2.978  | 1.000 |
-| rapidnj_jc         | GTR   | fixed        | -130231.2089  | 260478.4228 | -539.139    | 0.272       | 19.414             | 0.208  | 0.981  | 0.136  | 0.193  | 2.989  | 1.000 |
-| quicktree default  | GTR   | re-estimated | -182757.4812  | 520138.5145 | -105602.523 | 0.451       | 17.688             | 0.171  | 1.220  | 0.107  | 0.296  | 3.148  | 1.000 |
-| MASH->quicktree    | GTR   | re-estimated | -139291.3666  | 433206.2853 | -18670.294  | 0.318       | 19.842             | 0.220  | 1.050  | 0.134  | 0.247  | 3.053  | 1.000 |
-| IQ-TREE parsimony  | GTR   | re-estimated | -129956.2197  | 414535.9915 | 0.000       | 0.288       | 20.723             | 0.217  | 0.981  | 0.139  | 0.196  | 3.002  | 1.000 |
-| rapidnj_k2p        | GTR   | re-estimated | -129996.6322  | 414616.8164 | -80.825     | 0.288       | 21.016             | 0.211  | 0.987  | 0.138  | 0.193  | 3.010  | 1.000 |
-| rapidnj_jc         | GTR   | re-estimated | -129996.0928  | 414615.7376 | -79.746     | 0.288       | 21.007             | 0.209  | 0.987  | 0.136  | 0.194  | 3.004  | 1.000 |
-
+| method             | lnL        | lnl_fixedbrlen | delta_lnL | AICc      | delta_AICc | tree_length |
+|--------------------|------------|----------------|-----------|-----------|------------|-------------|
+| fasttree_fastest   | -129223.52 | -129223.52     | 0.00      | 354507.62 | 0.00       | 0.27        |
+| fasttree_default   | -129253.66 | -129253.67     | 0.00      | 354567.91 | -60.29     | 0.27        |
+| IQ-TREE parsimony  | -129956.22 | -129961.64     | -5.42     | 414535.99 | -60028.37  | 0.29        |
+| rapidnj_jc         | -129996.09 | -130231.21     | -235.12   | 414615.74 | -60108.11  | 0.29        |
+| rapidnj_k2p        | -129996.63 | -130224.11     | -227.48   | 414616.82 | -60109.19  | 0.29        |
+| MASH->quicktree    | -139291.37 | -142614.86     | -3323.49  | 433206.29 | -78698.66  | 0.32        |
+| quicktree default  | -182757.48 | -217884.16     | -35126.68 | 520138.51 | -165630.89 | 0.45        |
 
 ### Are the trees significantly different? 
 
-tl;dr yes, don't use quicktree
+* results will be updated to include those from fasttree soon
 
 Trees can differ, and on large alignments the likelihoods and AICc scores will look very different. But whether the differences are significant is another question. In short, we should only reject methods when the best tree is significantly better than the tree we get from those methods. To do this, we can use tree topology tests. 
 
@@ -100,19 +93,25 @@ tl;dr GTR+G is the best balance of execution time and model fit; GTR+I+R3 is the
 
 This is challenging, because estimating lots of parameters along with 22K branch lengths is computationally very expensive. Nevertheless, it's worth it because if we can record the model parameters themselves, we can re-use these in later analyses since we don't expect them to change much as the trees change and the alignments grow (e.g. see above).
 
-*results will be updated soon*
+Models estimated in IQ-TREE using the parsimony tree.
 
-### Can tree search in IQ-TREE improve on the parsimony tree
+| model    | AICc        | execution_time |
+|----------|-------------|----------------|
+| GTR+I+R3 | 408343.0549 | 25949.333      |
+| GTR+I+G  | 409437.2883 | 47040.2        |
+| GTR+G    | 410169.0518 | 1022.47        |
+| GTR+I    | 410465.71   | 834.28         |
+| GTR      | 414535.99   | 567.5          |
 
-tl;dr not really
 
-If we really want the best tree, we better check some other trees too. So, using the parsimony tree as a starting tree, I tried two thing to improve the topology.
+### Can tree search improve the fasttree tree
 
-IQ-TREE with `-fast` did not improve the topology. Perhaps not too surprising since -fast doesn't try very hard to get the best tree.
+Both raxml-ng and IQ-TREE struggled to estimated a tree because their starting trees took too long to estimate. We can potentially circumvent that by using the fasttree topology as a starting tree and asking if we can improve the topology.
 
-IQ-TREE with `-nstop 10` (it keeps looking for trees until it doesn't find a better one for 10 iterations) only managed to improve the lnL by 11 units (to -127748), and took 3h to do so on 10 threads. This again suggests it is not making an appreciable difference to the topology.  
+raxml wasn't able to use the fasttree start tree, and I couldn't figure out why (some Assertion failed, but the error was not very informative.)
 
-These results suggest that for SARS-CoV-2 parsimony tree topologies (and by association the `rapidnj` ones, which are not sigificantly different, are hard to beat. 
+* results coming soon
+
 
 ## Methods for estimating large trees
 
@@ -204,20 +203,52 @@ runtime=$((end-start))
 echo $runtime
 ```
 
+
+### Method: fasttree default
+
+Fasttree might work here, let's see.
+
+```
+start=`date +%s`
+fasttree -nosupport -nt global.fa > fasttree_default.tree
+end=`date +%s`
+
+runtime=$((end-start))
+echo $runtime
+```
+
+
+### Method: fasttree fastest
+
+Fasttree also has a `fastest` option.
+
+```
+start=`date +%s`
+fasttree -nosupport -nt -fastest global.fa > fasttree_fastest.tree
+end=`date +%s`
+
+runtime=$((end-start))
+echo $runtime
+```
+
+
+
 ## Methods for comparing the trees
 
-We have five trees to compare. There are lots of ways to compare trees, but a sensible one is to put them all in the same likelihood framework and just ask:
+We have seven trees to compare. There are lots of ways to compare trees, but a sensible one is to put them all in the same likelihood framework and just ask:
 
 1. Which has the best likelihood (all assuming the same model)?
 2. Can any reject each other?
 
-Our five trees are:
+Our seven trees are:
 
 * `quicktree_default.tree`
 * `quicktree_mash.tree`
 * `parsimony_iqtree.treefile`
 * `rapidjn_from_aln_k2p.tree`
 * `rapidjn_from_aln_jc.tree`
+* `fasttree_default.tree`
+* `fasttree_fastest.tree`
 
 I compare them using IQ-TREE. A few initial analyses suggested here that more threads were a LOT faster, so I ran all of these analyses on 40 threads. Note that we analyse every tree with and without optimising branch lengths, and with various models. Also note that some of these anlayses require quite a bit of RAM (around 20GB).
 
@@ -254,6 +285,16 @@ tree=rapidnj_from_aln_jc_noquotes.tree
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -fixbr -pre $tree'GTR-fixbr' -redo
 iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -pre $tree'GTR-varbr' -redo
 
+# fasttree trees
+tree=fasttree_default.tree
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -fixbr -pre $tree'GTR-fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -pre $tree'GTR-varbr' -redo
+
+tree=fasttree_fastest.tree
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -fixbr -pre $tree'GTR-fixbr' -redo
+iqtree -s global.fa -te $tree -keep-ident -n 0 -m GTR -nt 40 -me 0.05 -pre $tree'GTR-varbr' -redo
+
+
 ```
 
 ## Methods for topology tests
@@ -264,15 +305,17 @@ sed -i -e '$a\' quicktree_mash_nolb.tree
 sed -i -e '$a\' parsimony_iqtree.treefile
 sed -i -e '$a\' rapidnj_from_aln_k2p_noquotes.tree
 sed -i -e '$a\' rapidnj_from_aln_jc_noquotes.tree
+sed -i -e '$a\' fasttree_fastest.tree
+sed -i -e '$a\' fasttree_default.tree
 
 # now join our five trees of interest into one file
-cat quicktree_default_nolb.tree quicktree_mash_nolb.tree parsimony_iqtree.treefile rapidnj_from_aln_k2p_noquotes.tree rapidnj_from_aln_jc_noquotes.tree > five_trees.tree
+cat quicktree_default_nolb.tree quicktree_mash_nolb.tree parsimony_iqtree.treefile rapidnj_from_aln_k2p_noquotes.tree rapidnj_from_aln_jc_noquotes.tree fasttree_fastest.tree fasttree_default.tree > all_trees.tree
 
-# check it's got five lines
-wc -l five_trees.tree
+# check it's got the right number of lines
+wc -l all_trees.tree
 
-# tree topology test, we'll use the starting tree as the parsimony tree (it's the best we've got) with optimised branch lengths
-iqtree -s global.fa -z five_trees.tree -m GTR -te parsimony_iqtree.treefileGTR-varbr.treefile -nt 10 -keep-ident -zb 1000 -zw -au
+# tree topology test, we'll use the starting tree as the best tree with optimised branch lengths
+iqtree -s global.fa -z all_trees.tree -m GTR -te fasttree_fastest.treeGTR-varbr.treefile -nt 10 -keep-ident -zb 1000 -zw -au -pre topotests
 ```
 
 
@@ -307,14 +350,17 @@ Once we have a model and a tree, we can try updating the tree. But since the tre
 
 ```
 # try with fast
-tree=parsimony_iqtree.treefileGTRG-varbr.treefile
-iqtree -s global.fa -t $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 12 -me 0.05 -pre $tree'GTRG-treeopt' -redo -fast
+tree=fasttree_fastest.tree
+
+# first we need to fix multifurcations in the fasttree tree
+# we could probably just randomly resolve these, but this approach will use parsimony and a couple of rounds of optimisation with NNI
+iqtree -s global.fa -g $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 4 -me 0.05 -pre fasttree_fastest_bifurcating -redo -fast
+
+iqtree -s global.fa -t $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 4 -me 0.05 -pre improve-fast -redo -fast
 
 # that didn't change the tree, but it's only two iterations.
-# let's try looking for trees until we can't find a better one for 10 iterations
-iqtree -s global.fa -t $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 12 -me 0.05 -pre $tree'GTRG-treeopt' -nstop 10 -redo
+iqtree -s global.fa -t $tree -keep-ident -m 'GTR{0.1644,0.8062,0.1464,0.1433,2.7414}+G{0.2210}' -nt 4 -me 0.05 -pre improve-slow -redo
 
-# even this only improved the lnL by 11 units.
 
 ```
 

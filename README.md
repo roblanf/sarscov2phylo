@@ -55,6 +55,7 @@ On my server (which is not too flash) with 40 threads, the whole process takes a
 * build higher-quality local trees for a set of focal input genomes
 * molecular dating with LSD in IQ-TREE
 * publish regularly-updated global trees for others to use
+* update the mp and nj trees with constrained ml searches
 
 # How you can help
 
