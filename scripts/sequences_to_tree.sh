@@ -44,6 +44,14 @@ allseqs=$inputdir"allseqs_unaligned.fasta"
 cat $inputfasta $addseqs > $allseqs
 
 echo ""
+echo "Checking for and fixing spaces in additional seuqence file "
+echo ""
+
+echo "Replacing spaces in sequence names with '_'"
+sed -i.bak '/^>/s/ /_/g' $addseqs
+rm $addseqs'.bak'
+
+echo ""
 echo "Processing raw data and trimming UTRs "
 echo ""
 
