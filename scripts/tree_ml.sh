@@ -34,7 +34,7 @@ export INPUT_FASTA=$inputfasta
 
 # make the reference tree
 echo ""
-echo "Making the reference tree with fasttree -fastest option"
+echo "Making the reference tree with IQTREE+MFP"
 echo ""
 iqtree -s $inputfasta -m MFP -nt 3 -merit AICc -blmin 0.000000001 -o 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'
 

@@ -31,6 +31,11 @@ then
    helpFunction
 fi
 
+
+echo ""
+echo "Calculating number of nodes to go back from focal sequence to cut tree"
+echo ""
+
 # calculate the minimum depth we need to get to 
 length=$(esl-alistat $aln | grep 'Alignment length' | cut -d ':' -f2 | tr -d '[:space:]')
 depth_bl=$( bc -l <<< "$depth/$length")
@@ -50,10 +55,20 @@ for c in $(seq 1 100); do
     fi
 done
 
+echo ""
+echo "Cutting tree "$c" nodes deeper than the focal sequence"
+echo ""
+
+
+echo ""
+echo "Making a sub-alignment"
+echo ""
 # make a sub-alignment
 # the nw_ commands just get the sub-tree, get the names
 # then we cut and pass to faSomeRecords
 nw_clade -c $c $tree $seq | nw_distance -n -s f - | cut -f1 | faSomeRecords $aln /dev/stdin $seq'_aln.fa'
+
+
 
 # add the outgroup sequencde to the alignment
 echo "hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05" | faSomeRecords $aln /dev/stdin $aln'WH4.fa'
@@ -61,6 +76,14 @@ echo "hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05" | faSomeRecords $aln /d
 cat $seq'_aln.fa' $aln'WH4.fa' > tmp.fa
 mv tmp.fa $seq'_aln.fa'
 rm tmp.fa
+rm $aln'WH4.fa'
+
+
+echo ""
+echo "Sub-alignment statistics"
+echo ""
+esl-alistat $seq'_aln.fa'
+
 
 # run sub-alignment in IQ-TREE with rigorous settings.
 DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -71,7 +94,15 @@ bash $DIR/tree_ml.sh -i $seq'_aln.fa' -t $threads
 finalTBE=$seq'_aln.fa_ml_boot_TBE.tree'
 finalFBP=$seq'_aln.fa_ml_boot_FBP.tree'
 
+rm *.tax
+
+
 # make rudimentary pdfs
+echo ""
+echo "Attempting to build PDFs of your trees (if inkscape works)"
+echo ""
+
+
 echo "fill:blue L "$seq > css.map
 echo '"stroke-width:2; stroke:blue"  Clade '$seq >> css.map
 
@@ -81,7 +112,6 @@ inkscape -f $finalTBE'.svg' -D -A $finalTBE.pdf
 nw_display -s -w 1000 -c css.map $finalFBP > $finalFBP'.svg'
 inkscape -f $finalTBE'.svg' -D -A $finalFBP.pdf
 
-rm *.tax
 
 # dating the tree
 #../iqtree-2.0.4-Linux/bin/iqtree2 -s global.fa -te global.fa_mp_boot_TBE.tree -keep-ident -m JC -fixbr --date TAXNAME -o "hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05" -nt 4 -pre date
