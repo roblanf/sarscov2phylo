@@ -42,7 +42,8 @@ fasttree -nosupport -nt -fastest $inputfasta > $inputfasta'.fasttree'
 one_bootstrap(){
 
    bootpre='boot'$1
-   fasttree -nosupport -nt -fastest "$INPUT_FASTA" > $bootpre'.tree'
+   goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
+   fasttree -nosupport -nt -fastest $bootpre'0.fa' > $bootpre'.tree'
 
 }
 
@@ -74,4 +75,4 @@ rm $inputfasta'_ft_boot.raxml.supportFBP'
 nw_reroot $inputfasta'_ft_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_boot_TBE.tree'
 rm $inputfasta'_ft_boot.raxml.supportTBE'
 
-rm $inputfasta.*
+rm $inputfasta'_ft_boot.raxml.log'

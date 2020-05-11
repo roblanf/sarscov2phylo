@@ -44,6 +44,8 @@ one_bootstrap(){
    bootpre='boot'$1
    goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
    rapidnj $bootpre'0.fa' -i fa -c 1 -n -t d -x $bootpre'.tree'
+   
+   # remove quotes
    sed -i.bak "s/'//g" $bootpre'.tree'
    rm $bootpre'.tree.bak'
    rm $bootpre'0.fa'
@@ -80,4 +82,4 @@ nw_reroot $inputfasta'_nj_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_IS
 rm $inputfasta'_nj_boot.raxml.supportTBE'
 
 rm $inputfasta'_rapidnj.tree'
-rm 'nj_boot.raxml.log'
+rm $inputfasta'_nj_boot.raxml.log'

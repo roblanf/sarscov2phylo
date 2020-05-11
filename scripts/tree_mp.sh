@@ -76,4 +76,4 @@ nw_reroot $inputfasta'_mp_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_IS
 rm $inputfasta'_mp_boot.raxml.supportTBE'
 
 rm $inputfasta.*
-rm $inputdir'/mp_boot.raxml.log'
+rm $inputfasta'_mp_boot.raxml.log'

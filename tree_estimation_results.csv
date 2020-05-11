@@ -1,8 +1,8 @@
-﻿method,brlens,lnL,lnl_fixedbrlen,delta_lnL,AICc,delta_AICc,tree_length
-fasttree_fastest,re-estimated,-129223.52,-129223.52,0.00,354507.62,0.00,0.27
-fasttree_default,re-estimated,-129253.66,-129253.67,0.00,354567.91,-60.29,0.27
-IQ-TREE parsimony ,re-estimated,-129956.22,-129961.64,-5.42,414535.99,-60028.37,0.29
-rapidnj_jc      ,re-estimated,-129996.09,-130231.21,-235.12,414615.74,-60108.11,0.29
-rapidnj_k2p      ,re-estimated,-129996.63,-130224.11,-227.48,414616.82,-60109.19,0.29
-MASH->quicktree   ,re-estimated,-139291.37,-142614.86,-3323.49,433206.29,-78698.66,0.32
-quicktree default ,re-estimated,-182757.48,-217884.16,-35126.68,520138.51,-165630.89,0.45
+﻿method,lnL,lnl_fixedbrlen,delta_lnL,AICc,delta_AICc,tree_length
+fasttree_fastest,-129223.52,-129223.52,0.00,354507.62,0.00,0.27
+fasttree_default,-129253.66,-129253.67,0.00,354567.91,-60.29,0.27
+IQ-TREE parsimony ,-129956.22,-129961.64,-5.42,414535.99,-60028.37,0.29
+rapidnj_jc      ,-129996.09,-130231.21,-235.12,414615.74,-60108.11,0.29
+rapidnj_k2p      ,-129996.63,-130224.11,-227.48,414616.82,-60109.19,0.29
+MASH->quicktree   ,-139291.37,-142614.86,-3323.49,433206.29,-78698.66,0.32
+quicktree default ,-182757.48,-217884.16,-35126.68,520138.51,-165630.89,0.45
