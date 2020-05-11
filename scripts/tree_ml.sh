@@ -65,6 +65,7 @@ cat boot*.treefile > $inputfasta"_ml_replicates.tree"
 inputdir=$(dirname $inputfasta)
 find $inputdir -maxdepth 1 -name "boot*" -delete
 
+
 echo ""
 echo "Running raxml to map bootstrap support to focal tree"
 raxml-ng --support --tree $inputfasta'.treefile' --bs-trees $inputfasta"_ml_replicates.tree" --prefix $inputfasta'_ml_boot' --threads $threads --bs-metric fbp,tbe --redo
@@ -81,3 +82,11 @@ nw_reroot $inputfasta'_ml_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_IS
 rm $inputfasta'_ml_boot.raxml.supportTBE'
 
 rm $inputfasta'_ml_boot.raxml.log'
+
+rm $inputfasta'.iqtree'
+rm $inputfasta'.log'
+rm $inputfasta'.bionj'
+rm $inputfasta'.mldist'
+rm $inputfasta'.parstree'
+rm $inputfasta'.treefile'
+

@@ -112,6 +112,7 @@ inkscape -f $finalTBE'.svg' -D -A $finalTBE.pdf
 nw_display -s -w 1000 -c css.map $finalFBP > $finalFBP'.svg'
 inkscape -f $finalTBE'.svg' -D -A $finalFBP.pdf
 
+rm css.map
 
 # dating the tree
 #../iqtree-2.0.4-Linux/bin/iqtree2 -s global.fa -te global.fa_mp_boot_TBE.tree -keep-ident -m JC -fixbr --date TAXNAME -o "hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05" -nt 4 -pre date
