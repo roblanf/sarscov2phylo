@@ -113,10 +113,23 @@ Models estimated in IQ-TREE using the parsimony tree.
 
 Both raxml-ng and IQ-TREE struggled because their starting trees took too long to estimate. We can potentially circumvent that by using the fasttree topology as a starting tree and asking if we can improve it with the more thorough search algorithms in IQ-TREE and raxml-ng.
 
-Using IQ-TREE with the `-fast` option did not improve the tree. That's not surprising because this is an algorithm designed to do something similar to fasttree, and it only tries improving the tree for a couple of iterations.
+Using IQ-TREE with either `-fast` or the default settings (GTR+G model, fixed parameters) did not improve the tree from the fasttree_fastest tree. The full IQ-TREE search took 30 hours on 4 threads. 
+
+Using `raxml-ng` with default settings and a GTR+G model did improve the tree. 
 
 * more results coming soon
 
+### Viewing the tree
+
+I asked on twitter how people like to view large trees, so I thought I may as well record what worked there too: https://twitter.com/RobLanfear/status/1258615595060178945
+
+* Figtree - my go to. Works, but is not built for such huge datatsets so finding the taxa I'm interested in involves a lot of scrolling.
+
+* Iroki (https://www.iroki.net/viewer): great promise, but just doesn't work. Lots of 'unresponsive' warnings from chrome. Took about half an hour just to *load* the tree. Didn't render it. Gave up.
+
+* OneZoom (https://github.com/onezoom/OZtree): sounds like it would work well, but requires a lot of installation. Didn't try it. 
+
+* 
 
 ## Methods for estimating large trees
 
@@ -372,7 +385,50 @@ raxml-ng --msa global.fa --model GTR+G --threads 4 --tree $tree --prefix improve
 
 ```
 
+## Methods for making a constraint tree
 
+```
+
+# first set all branches with length zero to have a bootstrap support of 0.999999
+# note we also change their branchlength to be non-zero, simply to stop this sed
+# command getting stuck in an infinite loop. In princple we could change it back later
+# but why bother. 
+
+# first make a tree with bootstraps
+bash tree_mp.sh -i global.fa -t 50
+
+# then set all minimum-length branches to have high TBE support
+# minimum branch lenght in an IQ-TREE tree is 0.000001
+
+tree=global.fa_mp_boot_TBE.tree
+sed -e ':a' -e ' s/)[0-9]\+.[0-9]\+:0.000001/)0.999999:0.000000/g; ta' $tree > tree_a.tree
+
+# now use nw_ed to collapse all branches with TBE<x
+# we can choose x like this, noting that we are interested in the proportion of 
+# nodes that we have fixed
+nw_stats $tree # there are 21296 nodes in the tree
+nw_ed $tree 'i & b<0.5' o | nw_stats - # if we fix all nodes >0.5 TBE we fix 16128 nodes! 
+
+# so, fixing all minimum length branches and all those with TBE<0.5
+# means we only have 21296-16128=5168 nodes to care about! That's nice.
+
+nw_ed $tree 'i & b<0.5' o > constraint.tree
+
+# now we optimise the tree by using this as a constraint tree and the other tree as a starting tree
+# to see if this is any better at optimisation
+# we'll use the MP tree as a starting tree, and the constraint tree to constrain the search
+raxml-ng --msa global.fa --model GTR+G --threads 4 --tree-constraint constraint.tree --prefix raxml_constraint
+
+
+# we'll compare directly by doing the same thing but without using the constraint tree
+raxml-ng --msa global.fa --model GTR+G --threads 4 --tree $tree --prefix raxml_free
+
+
+iqtree -s global.fa -t $tree -g constraint.tree -keep-ident -m GTR+G -nt 4 -pre iqtree_constraint
+
+iqtree -s global.fa -t $tree -keep-ident -m GTR+G -nt 4 -pre iqtree_constraint
+
+```
 
 
 
