@@ -34,28 +34,23 @@ export INPUT_FASTA=$inputfasta
 
 # make the reference tree
 echo ""
-echo "Making the reference tree with IQTREE+MFP"
+echo "Making the reference tree with IQTREE with GTR+I+G model"
 echo ""
-iqtree -s $inputfasta -m MFP -nt 3 -merit AICc -blmin 0.000000001 -o 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'
+iqtree -s $inputfasta -m GTR+I+G -nt 3 -o 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'
 
-iqfile=$inputfasta'.iqtree'
-bestmod=$(grep "Best-fit model according to" $iqfile | cut -d':' -f2 | cut -d' ' -f2)
-
-export BESTMOD=$bestmod
 
 one_bootstrap(){
 
    bootpre='boot'$1
    goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
-   iqtree -s $bootpre'0.fa' -m "$BESTMOD" -nt 1 -merit AICc -blmin 0.000000001 -o 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'
+   iqtree -s $bootpre'0.fa' -m GTR+I+G -nt 1 -o 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'
 
 }
 
 export -f one_bootstrap
 
 echo ""
-echo "Making 100 bootstrap trees with IQ-TREE"
-echo "using the ML model "$bestmod
+echo "Making 100 bootstrap trees with IQ-TREE with GTR+I+G model"
 echo ""
 boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
