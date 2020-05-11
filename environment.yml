@@ -4,12 +4,14 @@ channels:
   - bioconda
   - defaults
 dependencies:
+  - bc
   - mafft
   - raxml-ng
   - ucsc-faSomeRecords
   - ucsc-faSplit
   - ucsc-faFilter
   - easel
+  - goalign
   - parallel
   - biopython=1.74
   - iqtree>2
