@@ -38,6 +38,7 @@ inputdir=$(dirname $inputfasta)
 
 cd $inputdir
 
+allseqs=$inputdir"allseqs_unaligned.fasta"
 cat $inputfasta $addseqs > $allseqs
 
 echo ""
