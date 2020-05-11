@@ -3,13 +3,13 @@
 helpFunction()
 {
    echo "build a rapidnj tree with 100 bootstraps, support in TBE and FBP"
-   echo "Output will be three files:"
-   echo "\t *_nj_replicates.tree: 100 bootstrap replicate nj trees"
-   echo "\t *_nj_boot_TBE.tree, rapidnj tree with transfer bootstrap supports"
-   echo "\t *_nj_boot_FBP.tree, rapidnj tree with felsenstein bootstrap supports"
    echo "Usage: $0 -i fasta_alignment -t threads"
-   echo "\t -i Full path to aligned fasta file of SARS-CoV-2 sequences"
-   echo "\t -t number of threads to use"
+   echo "    -i Full path to aligned fasta file of SARS-CoV-2 sequences"
+   echo "    -t number of threads to use"
+   echo "Output will be three files:"
+   echo "    *_nj_replicates.tree: 100 bootstrap replicate nj trees"
+   echo "    *_nj_boot_TBE.tree, rapidnj tree with transfer bootstrap supports"
+   echo "    *_nj_boot_FBP.tree, rapidnj tree with felsenstein bootstrap supports"
    exit 1 # Exit script after printing help
 }
 
@@ -66,10 +66,18 @@ find $inputdir -maxdepth 1 -name "boot*" -delete
 # make felsenstein bs in iqtre like: iqtree -t TREES_SET_FILE -sup FOCAL_TREE
 echo ""
 echo "Running raxml to map bootstrap support to focal tree"
-raxml-ng --support --tree $inputfasta'_rapidnj.tree' --bs-trees $inputfasta"_nj_replicates.tree" --prefix $focaltree'nj_boot' --threads $threads --bs-metric fbp,tbe --redo
+raxml-ng --support --tree $inputfasta'_rapidnj.tree' --bs-trees $inputfasta"_nj_replicates.tree" --prefix $inputfasta'_nj_boot' --threads $threads --bs-metric fbp,tbe --redo
 
-mv $focaltree'nj_boot.raxml.supportFBP' $inputfasta'_nj_boot_FBP.tree'
-mv $focaltree'nj_boot.raxml.supportTBE' $inputfasta'_nj_boot_TBE.tree'
+# re-root as per https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1
+echo ""
+echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
+echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
+echo ""
+nw_reroot $inputfasta'_nj_boot.raxml.supportFBP' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_nj_boot_FBP.tree'
+rm $inputfasta'_nj_boot.raxml.supportFBP'
+
+nw_reroot $inputfasta'_nj_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_nj_boot_TBE.tree'
+rm $inputfasta'_nj_boot.raxml.supportTBE'
 
 rm $inputfasta'_rapidnj.tree'
 rm 'nj_boot.raxml.log'
