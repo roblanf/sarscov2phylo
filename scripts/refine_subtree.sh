@@ -43,16 +43,28 @@ depth_bl=$( bc -l <<< "$depth/$length")
 
 # get the depth we need to go to in order to get the right number of substitutions
 # we just keep going one parent deeper until the distance from the focal leaf
-# to the parent node is at least depth/alignment_lenght
+# to the parent node is at least depth/alignment_length
+# we have two additional conditions
+# number of taxa must be >100
+# break if number of taxa >999 (because we can't pracically estimate trees that large...)
 for c in $(seq 1 100); do
     depth=$(nw_clade -c $c $tree $seq | nw_distance - $seq)
+
+    ntax=$(nw_clade -c 10 $tree $seq | nw_labels -I - | wc -l)
 
     # convert depth to a float
     printf -v depth "%f" "$depth"
 
     if (( $(bc -l <<< "$depth > $depth_bl") )); then
+        if (( $(bc -l <<< "$ntax > 100") )); then
+            break
+        fi
+    fi
+
+    if (( $(bc -l <<< "$ntax > 999") )); then
         break
     fi
+
 done
 
 echo ""
@@ -70,7 +82,7 @@ nw_clade -c $c $tree $seq | nw_distance -n -s f - | cut -f1 | faSomeRecords $aln
 
 
 
-# add the outgroup sequencde to the alignment
+# add the outgroup sequence to the alignment
 echo "hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05" | faSomeRecords $aln /dev/stdin $aln'WH4.fa'
 
 cat $seq'_aln.fa' $aln'WH4.fa' > tmp.fa
