@@ -110,7 +110,7 @@ nw_display -s -w 1000 -c css.map $finalTBE > $finalTBE'.svg'
 inkscape -f $finalTBE'.svg' -D -A $finalTBE.pdf
 
 nw_display -s -w 1000 -c css.map $finalFBP > $finalFBP'.svg'
-inkscape -f $finalTBE'.svg' -D -A $finalFBP.pdf
+inkscape -f $finalFBP'.svg' -D -A $finalFBP.pdf
 
 rm css.map
 

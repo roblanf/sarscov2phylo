@@ -9,10 +9,11 @@ helpFunction()
    echo "    -t number of threads to use"
    echo "    -k Number of most dissimilar sequences to align to make the initial guide alignment (suggest ~100)"
    echo "    -a full path to unaligned fasta file of additional sequences not on GISAID"
+   echo "    -d number of substitutions from focal sequences in seqs passed through -a at which to cut trees to refine sub-trees"
    exit 1 # Exit script after printing help
 }
 
-while getopts "i:o:t:k:a:" opt
+while getopts "i:o:t:k:a:d:" opt
 do
    case "$opt" in
       i ) inputfasta="$OPTARG" ;;
@@ -20,12 +21,13 @@ do
       t ) threads="$OPTARG" ;;
       k ) k="$OPTARG" ;;
       a ) addseqs="$OPTARG" ;;
+      d ) depthcut="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$inputfasta" ] || [ -z "$outputfasta" ] || [ -z "$threads" ] || [ -z "$k" ] || [ -z "$addseqs" ]
+if [ -z "$inputfasta" ] || [ -z "$outputfasta" ] || [ -z "$threads" ] || [ -z "$k" ] || [ -z "$addseqs" ] || [ -z "$depthcut" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
@@ -108,6 +110,8 @@ bash $DIR/tree_nj.sh -i $outputfasta -t $threads
 #bash $DIR/tree_ft.sh -i $outputfasta -t $threads
 
 # now we refine trees for all of the sequences we're really interested in.
+declare -a to_refine=$(grep '>' $addseqs | tr -d \>)
 
-
-
+for name in $to_refine; do
+   bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_nj_boot_TBE.tree' -f $name -d $depthcut
+done
