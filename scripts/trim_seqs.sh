@@ -120,7 +120,9 @@ ls $inputdir | grep individual_seq | parallel -j $threads --bar "trim_a_seq {}" 
 
 # make the new sequence set, and clean up
 # use find to avoid "Argument list too long" issue
+echo "putting all the trimmed sequences into one file"
 find $inputdir -name \*.fa_trimmed.fa -exec cat {} \; > $output_seqs
 
 #clean up
+echo "cleaning up"
 find $inputdir -maxdepth 1 -name "individual_seq*" -delete

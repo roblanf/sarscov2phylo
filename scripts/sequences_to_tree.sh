@@ -75,29 +75,22 @@ bash $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $thre
 echo ""
 echo "Filtering alignment"
 echo ""
-echo "alignment stats before filtering"
 
+echo "alignment stats before filtering"
 esl-alistat $aln_global
 
-
+echo "Filtering sites with >1% gaps"
 esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o $aln_global"_alimask.fa" -g  $aln_global
+echo "Filtering sequences that are shorter than 29100 bp and/or have >200 ambiguities"
 esl-alimanip --lmin 29100 --xambig 200 --informat afa --outformat afa --dna -o $aln_global"alimanip.fa" $aln_global"_alimask.fa"
 
-
 echo "Ensuring additional seuqences are in the alignment"
-# get the seqs from $aln_global"_alimask.fa"
 grep '>' $addseqs | tr -d \> | faSomeRecords $aln_global"_alimask.fa" /dev/stdin $addseqs"_aln.fa"
-
-# add to $aln_global"alimanip.fa"
 cat $aln_global"alimanip.fa" $addseqs"_aln.fa" > $outputfasta"_dupe.fa"
-
-# dedupe
 faFilter -uniq $outputfasta"_dupe.fa" $outputfasta
 
 echo "alignment stats after filtering"
 esl-alistat $outputfasta
-
-
 
 
 echo ""
