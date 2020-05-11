@@ -5,23 +5,24 @@ channels:
   - defaults
 dependencies:
   - bc
+  - biopython=1.74
+  - easel
+  - iqtree>2
   - inkscape
+  - fasttree
+  - goalign
   - mafft
   - raxml-ng
-  - ucsc-faSomeRecords
-  - ucsc-faSplit
-  - ucsc-faFilter
-  - easel
-  - goalign
+  - newick_utils
   - parallel
-  - biopython=1.74
-  - iqtree>2
   - pip=19.3.1
   - python=3.6
+  - rapidnj
   - snakemake-minimal=5.13
   - seqmagick
-  - rapidnj
-  - newick_utils
+  - ucsc-faFilter
+  - ucsc-faSomeRecords
+  - ucsc-faSplit
   - pip:
     - pandas==1.0.1
     - pytools==2020.1
