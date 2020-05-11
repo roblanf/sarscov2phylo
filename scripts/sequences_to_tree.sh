@@ -79,26 +79,35 @@ echo ""
 echo "alignment stats before filtering"
 esl-alistat $aln_global
 
+echo ""
 echo "Filtering sites with >1% gaps"
 esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o $aln_global"_alimask.fa" -g  $aln_global
 echo "Filtering sequences that are shorter than 29100 bp and/or have >200 ambiguities"
 esl-alimanip --lmin 29100 --xambig 200 --informat afa --outformat afa --dna -o $aln_global"alimanip.fa" $aln_global"_alimask.fa"
 
+echo ""
 echo "Ensuring additional seuqences are in the alignment"
 grep '>' $addseqs | tr -d \> | faSomeRecords $aln_global"_alimask.fa" /dev/stdin $addseqs"_aln.fa"
 cat $aln_global"alimanip.fa" $addseqs"_aln.fa" > $outputfasta"_dupe.fa"
 faFilter -uniq $outputfasta"_dupe.fa" $outputfasta
 
+echo ""
 echo "alignment stats after filtering"
 esl-alistat $outputfasta
 
+
+#### ESTIMATE THE GLOBAL TREE ######
 
 echo ""
 echo "Estimating trees with bootstraps"
 echo ""
 
-# finally, we estimate a tree with 100 bootstraps, using rapidnj and MP
+# finally, we estimate a tree with 100 bootstraps, using rapidnj, MP, and fasttree
 bash $DIR/tree_nj.sh -i $outputfasta -t $threads
-bash $DIR/tree_mp.sh -i $outputfasta -t $threads
-bash $DIR/tree_ft.sh -i $outputfasta -t $threads
+#bash $DIR/tree_mp.sh -i $outputfasta -t $threads
+#bash $DIR/tree_ft.sh -i $outputfasta -t $threads
+
+# now we refine trees for all of the sequences we're really interested in.
+
+
 
