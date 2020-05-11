@@ -18,6 +18,7 @@ dependencies:
   - snakemake-minimal=5.13
   - seqmagick
   - rapidnj
+  - newick_utils
   - pip:
     - pandas==1.0.1
     - pytools==2020.1
