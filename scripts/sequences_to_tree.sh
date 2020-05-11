@@ -3,27 +3,29 @@
 helpFunction()
 {
    echo "Make an ML phylogeny from a large FASTA file of GISAID sequences"
-   echo "Usage: $0 -i GISAID_fasta -o phylogenetic_tree -t threads -k num_dissimilar_seqs"
-   echo "\t-i Full path to unaligned fasta file of SARS-CoV-2 sequences from GISAID"
-   echo "\t-o Output file path for final alignment"
-   echo "\t-t number of threads to use"
-   echo "\t-k Number of most dissimilar sequences to align to make the initial guide alignment (suggest ~100)"
+   echo "Usage: $0 -i GISAID_fasta -o phylogenetic_tree -t threads -k num_dissimilar_seqs -a additional_sequences"
+   echo "    -i Full path to unaligned fasta file of SARS-CoV-2 sequences from GISAID"
+   echo "    -o Output file path for final alignment"
+   echo "    -t number of threads to use"
+   echo "    -k Number of most dissimilar sequences to align to make the initial guide alignment (suggest ~100)"
+   echo "    -a full path to unaligned fasta file of additional sequences not on GISAID"
    exit 1 # Exit script after printing help
 }
 
-while getopts "i:o:t:k:" opt
+while getopts "i:o:t:k:a:" opt
 do
    case "$opt" in
       i ) inputfasta="$OPTARG" ;;
       o ) outputfasta="$OPTARG" ;;
       t ) threads="$OPTARG" ;;
       k ) k="$OPTARG" ;;
+      a ) addseqs="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$inputfasta" ] || [ -z "$outputfasta" ] || [ -z "$threads" ] || [ -z "$k" ]
+if [ -z "$inputfasta" ] || [ -z "$outputfasta" ] || [ -z "$threads" ] || [ -z "$k" ] || [ -z "$addseqs" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
@@ -36,12 +38,14 @@ inputdir=$(dirname $inputfasta)
 
 cd $inputdir
 
+cat $inputfasta $addseqs > $allseqs
+
 echo ""
-echo "Processing raw GISAID data and trimming UTRs "
+echo "Processing raw data and trimming UTRs "
 echo ""
 
 trimmed_gisaid="$inputdir/trimmed.fa"
-bash $DIR/trim_seqs.sh -i $inputfasta -o $trimmed_gisaid -t $threads
+bash $DIR/trim_seqs.sh -i $allseqs -o $trimmed_gisaid -t $threads
 
 #### BUILD THE GLOBAL ALIGNMENT ######
 
@@ -54,7 +58,7 @@ aln_k="$inputdir/aln_k.fa"
 bash $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k -t $threads
 
 echo ""
-echo "Filtering sites with >10% gaps k most dissimilar sequence alignment"
+echo "Filtering sites with >10% gaps from k most dissimilar sequence alignment"
 echo ""
 aln_k_filtered="$inputdir/aln_k_filtered.fa"
 esl-alimask --gapthresh 0.1 --informat afa --outformat afa --dna -o $aln_k_filtered -g  $aln_k
@@ -74,17 +78,33 @@ echo "alignment stats before filtering"
 
 esl-alistat $aln_global
 
-bash $DIR/filter_aln.sh -i $aln_global -o $outputfasta
+
+esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o $aln_global"_alimask.fa" -g  $aln_global
+esl-alimanip --lmin 29100 --xambig 200 --informat afa --outformat afa --dna -o $aln_global"alimanip.fa" $aln_global"_alimask.fa"
+
+
+echo "Ensuring additional seuqences are in the alignment"
+# get the seqs from $aln_global"_alimask.fa"
+grep '>' $addseqs | tr -d \> | faSomeRecords $aln_global"_alimask.fa" /dev/stdin $addseqs"_aln.fa"
+
+# add to $aln_global"alimanip.fa"
+cat $aln_global"alimanip.fa" $addseqs"_aln.fa" > $outputfasta"_dupe.fa"
+
+# dedupe
+faFilter -uniq $outputfasta"_dupe.fa" $outputfasta
 
 echo "alignment stats after filtering"
 esl-alistat $outputfasta
+
+
 
 
 echo ""
 echo "Estimating trees with bootstraps"
 echo ""
 
-# finally, we estimate a tree with 100 bootstraps, using rapidnj
+# finally, we estimate a tree with 100 bootstraps, using rapidnj and MP
 bash $DIR/tree_nj.sh -i $outputfasta -t $threads
 bash $DIR/tree_mp.sh -i $outputfasta -t $threads
+bash $DIR/tree_ft.sh -i $outputfasta -t $threads
 
