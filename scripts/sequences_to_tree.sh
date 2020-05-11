@@ -121,5 +121,5 @@ bash $DIR/tree_ft.sh -i $outputfasta -t $threads
 declare -a to_refine=$(grep '>' $addseqs | tr -d \>)
 
 for name in $to_refine; do
-   bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_nj_boot_TBE.tree' -f $name -d $depthcut
+   bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_ft_boot_TBE.tree' -f $name -d $depthcut
 done
