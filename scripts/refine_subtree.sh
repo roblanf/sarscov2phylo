@@ -3,8 +3,8 @@
 helpFunction()
 {
    echo "Use ML to refine the sub-tree of a focal taxon"
-   echo "Usage: $0 -i fasta_alignment -t threads -g global_phylogeny -f focal_taxon_name -d depth"
-   echo "    -i Full path to aligned fasta file of SARS-CoV-2 sequences"
+   echo "Usage: $0 -i global_alignment -t threads -g global_phylogeny -f focal_taxon_name -d depth"
+   echo "    -i Full path to global aligned fasta file of SARS-CoV-2 sequences"
    echo "    -t number of threads to use"
    echo "    -g global phylogeny that contains the focal taxon"
    echo "    -f focal taxon name (must be present in alignment and global phylogeny)"
@@ -25,7 +25,7 @@ do
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$inputfasta" ] || [ -z "$threads" ] || [ -z "$tree" ] || [ -z "$seq" ] || [ -z "$depth" ]
+if [ -z "$aln" ] || [ -z "$threads" ] || [ -z "$tree" ] || [ -z "$seq" ] || [ -z "$depth" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
