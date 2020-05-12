@@ -123,3 +123,19 @@ declare -a to_refine=$(grep '>' $addseqs | tr -d \>)
 for name in $to_refine; do
    bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_nj_TBE.tree' -f $name -d $depthcut
 done
+
+
+# also output PDFs of the global tree with all the sequences of intereste highlighted
+for name in $to_refine; do
+   echo "fill:blue L "$name > css_global.map
+   echo '"stroke-width:2; stroke:blue"  Clade '$name >> css_global.map
+done
+
+nw_display -s -w 1000 -c css_global.map $outputfasta'_nj_TBE.tree' > $outputfasta'_nj_TBE.tree.svg'
+inkscape -f $outputfasta'_nj_TBE.tree.svg' -D -A $outputfasta'_nj_TBE.tree.pdf'
+
+nw_display -s -w 1000 -c css_global.map $outputfasta'_nj_FBP.tree' > $outputfasta'_nj_FBP.tree.svg'
+inkscape -f $outputfasta'_nj_FBP.tree.svg' -D -A $outputfasta'_nj_FBP.tree.pdf'
+
+
+
