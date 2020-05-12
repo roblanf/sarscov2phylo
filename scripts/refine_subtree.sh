@@ -50,7 +50,7 @@ depth_bl=$( bc -l <<< "$depth/$length")
 for c in $(seq 1 100); do
     depth=$(nw_clade -c $c $tree $seq | nw_distance - $seq)
 
-    ntax=$(nw_clade -c 10 $tree $seq | nw_labels -I - | wc -l)
+    ntax=$(nw_clade -c $c $tree $seq | nw_labels -I - | wc -l)
 
     # convert depth to a float
     printf -v depth "%f" "$depth"
@@ -79,8 +79,6 @@ echo ""
 # the nw_ commands just get the sub-tree, get the names
 # then we cut and pass to faSomeRecords
 nw_clade -c $c $tree $seq | nw_distance -n -s f - | cut -f1 | faSomeRecords $aln /dev/stdin $seq'_aln.fa'
-
-
 
 # add the outgroup sequence to the alignment
 echo "hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05" | faSomeRecords $aln /dev/stdin $aln'WH4.fa'
