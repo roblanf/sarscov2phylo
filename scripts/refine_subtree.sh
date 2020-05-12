@@ -114,8 +114,8 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 # get the ML tree with bootstraps
 bash $DIR/tree_ml.sh -i $seq'_aln.fa' -t $threads
 
-finalTBE=$seq'_aln.fa_ml_boot_TBE.tree'
-finalFBP=$seq'_aln.fa_ml_boot_FBP.tree'
+finalTBE=$seq'_aln.fa_ml_TBE.tree'
+finalFBP=$seq'_aln.fa_ml_FBP.tree'
 
 # make rudimentary pdfs
 echo ""
