@@ -47,8 +47,9 @@ depth_bl=$( bc -l <<< "$depth/$length")
 # we have two additional conditions
 # number of taxa must be >100
 # break if number of taxa >999 (because we can't pracically estimate trees that large...)
+f=0
 for c in $(seq 1 100); do
-    
+
     depth=$(nw_clade -c $c $tree $seq | nw_distance - $seq)
 
     ntax=$(nw_clade -c $c $tree $seq | nw_labels -I - | wc -l)
@@ -62,8 +63,13 @@ for c in $(seq 1 100); do
         fi
     fi
 
-    if (( $(bc -l <<< "$ntax > 999") )); then
+    if (( $(bc -l <<< "$ntax > 1000") )); then
+        
+        # keep datasets to a maximum of 1000 taxa
+        c=$(( $c - 1 ))
+        f=1 # just flag that we did this for later...
         break
+
     fi
 
 done
@@ -110,9 +116,6 @@ bash $DIR/tree_ml.sh -i $seq'_aln.fa' -t $threads
 
 finalTBE=$seq'_aln.fa_ml_boot_TBE.tree'
 finalFBP=$seq'_aln.fa_ml_boot_FBP.tree'
-
-rm *.tax
-
 
 # make rudimentary pdfs
 echo ""
