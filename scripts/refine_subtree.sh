@@ -48,6 +48,7 @@ depth_bl=$( bc -l <<< "$depth/$length")
 # number of taxa must be >100
 # break if number of taxa >999 (because we can't pracically estimate trees that large...)
 for c in $(seq 1 100); do
+    
     depth=$(nw_clade -c $c $tree $seq | nw_distance - $seq)
 
     ntax=$(nw_clade -c $c $tree $seq | nw_labels -I - | wc -l)
@@ -80,13 +81,19 @@ echo ""
 # then we cut and pass to faSomeRecords
 nw_clade -c $c $tree $seq | nw_distance -n -s f - | cut -f1 | faSomeRecords $aln /dev/stdin $seq'_aln.fa'
 
-# add the outgroup sequence to the alignment
-echo "hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05" | faSomeRecords $aln /dev/stdin $aln'WH4.fa'
+# add the outgroup sequence to the alignment if it's not already there
 
-cat $seq'_aln.fa' $aln'WH4.fa' > tmp.fa
-mv tmp.fa $seq'_aln.fa'
-rm tmp.fa
-rm $aln'WH4.fa'
+og="hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
+ogn=$(grep $og $aln | wc -l)
+if (( $ogn = 0 )); then
+
+    echo $og | faSomeRecords $aln /dev/stdin $aln'WH4.fa'
+    cat $seq'_aln.fa' $aln'WH4.fa' > tmp.fa
+    mv tmp.fa $seq'_aln.fa'
+    rm tmp.fa
+    rm $aln'WH4.fa'
+
+fi
 
 
 echo ""

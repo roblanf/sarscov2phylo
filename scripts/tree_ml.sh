@@ -2,7 +2,7 @@
 
 helpFunction()
 {
-   echo "build a ML tree in IQ-TREE with 100 bootstraps, support in TBE and FBP, uses WH04 as an ougroup in all cases"
+   echo "build a ML tree in raxml-ng with 100 bootstraps, support in TBE and FBP, uses WH04 as an ougroup in all cases"
    echo "Usage: $0 -i fasta_alignment -t threads"
    echo "    -i Full path to aligned fasta file of SARS-CoV-2 sequences"
    echo "    -t number of threads to use"
@@ -36,52 +36,46 @@ export INPUT_FASTA=$inputfasta
 echo ""
 echo "Making the reference tree with IQTREE with GTR+I+G model"
 echo ""
-iqtree -s $inputfasta -m GTR+I+G -nt 3 -o 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'
-
+raxml-ng --msa $inputfasta --model GTR+I+G --threads 4 --tree 'pars{5}'
 
 one_bootstrap(){
 
    bootpre='boot'$1
    goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
-   iqtree -s $bootpre'0.fa' -m GTR+I+G -nt 1 -o 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'
+   # these are bootstraps, and MP is very good, so we'll just do 1 starting tree
+   raxml-ng --msa $bootpre'0.fa' --model GTR+I+G --threads 1 --tree 'pars{1}'
 
 }
 
 export -f one_bootstrap
 
 echo ""
-echo "Making 100 bootstrap trees with IQ-TREE with GTR+I+G model"
+echo "Making 100 bootstrap trees with raxml-ng with GTR+I+G model"
 echo ""
 boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*.treefile > $inputfasta"_ml_replicates.tree"
+cat boot*.bestTree > $inputfasta"_ml_replicates.tree"
 inputdir=$(dirname $inputfasta)
 find $inputdir -maxdepth 1 -name "boot*" -delete
 
 
 echo ""
 echo "Running raxml to map bootstrap support to focal tree"
-raxml-ng --support --tree $inputfasta'.treefile' --bs-trees $inputfasta"_ml_replicates.tree" --prefix $inputfasta'_ml_boot' --threads $threads --bs-metric fbp,tbe --redo
+raxml-ng --support --tree $inputfasta'.raxml.bestTree' --bs-trees $inputfasta"_ml_replicates.tree" --prefix $inputfasta'_ml_boot' --threads $threads --bs-metric fbp,tbe --redo
 
 # re-root as per https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1
 echo ""
 echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
 echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
 echo ""
-nw_reroot $inputfasta'_ml_boot.raxml.supportFBP' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ml_boot_FBP.tree'
+nw_reroot $inputfasta'_ml_boot.raxml.supportFBP' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ml_FBP.tree'
 rm $inputfasta'_ml_boot.raxml.supportFBP'
 
-nw_reroot $inputfasta'_ml_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ml_boot_TBE.tree'
+nw_reroot $inputfasta'_ml_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ml_TBE.tree'
 rm $inputfasta'_ml_boot.raxml.supportTBE'
 
 rm $inputfasta'_ml_boot.raxml.log'
 
-rm $inputfasta'.iqtree'
-rm $inputfasta'.log'
-rm $inputfasta'.bionj'
-rm $inputfasta'.mldist'
-rm $inputfasta'.parstree'
-rm $inputfasta'.treefile'
-
+rm $inputfasta'.raxml'*

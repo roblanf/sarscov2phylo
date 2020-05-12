@@ -69,10 +69,10 @@ echo ""
 echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
 echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
 echo ""
-nw_reroot $inputfasta'_ft_boot.raxml.supportFBP' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_boot_FBP.tree'
+nw_reroot $inputfasta'_ft_boot.raxml.supportFBP' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_FBP.tree'
 rm $inputfasta'_ft_boot.raxml.supportFBP'
 
-nw_reroot $inputfasta'_ft_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_boot_TBE.tree'
+nw_reroot $inputfasta'_ft_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_TBE.tree'
 rm $inputfasta'_ft_boot.raxml.supportTBE'
 
 rm $inputfasta'_ft_boot.raxml.log'
