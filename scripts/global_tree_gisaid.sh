@@ -23,7 +23,7 @@ do
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$inputfasta" ] || [ -z "$outputfasta" ] || [ -z "$threads" ] || [ -z "$k" ] ||
+if [ -z "$inputfasta" ] || [ -z "$outputfasta" ] || [ -z "$threads" ] || [ -z "$k" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
