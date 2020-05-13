@@ -84,6 +84,8 @@ esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o $aln_global
 echo "Filtering sequences that are shorter than 29100 bp and/or have >200 ambiguities"
 esl-alimanip --lmin 29100 --xambig 200 --informat afa --outformat afa --dna -o $aln_global"alimanip.fa" $aln_global"_alimask.fa"
 
+mv $aln_global $outputfasta
+
 echo ""
 echo "alignment stats after filtering"
 esl-alistat $outputfasta

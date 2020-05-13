@@ -113,14 +113,10 @@ echo "Estimating trees with bootstraps"
 echo ""
 
 # finally, we estimate a tree with 100 bootstraps, using rapidnj, MP, and fasttree
-#bash $DIR/tree_nj.sh -i $outputfasta -t $threads
+bash $DIR/tree_nj.sh -i $outputfasta -t $threads
 #bash $DIR/tree_mp.sh -i $outputfasta -t $threads
 #bash $DIR/tree_ft.sh -i $outputfasta -t $threads
 
-echo ""
-echo "Estimating an ML tree using fasttree"
-echo ""
-rapidnj $outputfasta -i fa -c $threads -n -t d -x $outputfasta'_rapidnj.tree'
 
 echo ""
 echo "Refining subtrees for additional sequences and calculating support using raxml-ng, with the fasttree tree as input"
@@ -130,6 +126,6 @@ echo ""
 declare -a to_refine=$(grep '>' $addseqs | tr -d \>)
 
 for name in $to_refine; do
-   bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_rapidnj.tree' -f $name -d $depthcut
+   bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_nj_FBP.tree' -f $name -d $depthcut
 done
 
