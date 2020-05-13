@@ -36,14 +36,14 @@ export INPUT_FASTA=$inputfasta
 echo ""
 echo "Making the reference tree with IQTREE with GTR+I+G model"
 echo ""
-raxml-ng --msa $inputfasta --model GTR+I+G --threads 4 --tree 'pars{5}'
+raxml-ng --msa $inputfasta --model GTR+I+G --threads 4  --blmin 0.00000001 --tree 'pars{5}'
 
 one_bootstrap(){
 
    bootpre='boot'$1
    goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
    # these are bootstraps, and MP is very good, so we'll just do 1 starting tree
-   raxml-ng --msa $bootpre'0.fa' --model GTR+I+G --threads 1 --tree 'pars{1}'
+   raxml-ng --msa $bootpre'0.fa' --model GTR+I+G --threads 1 --blmin 0.00000001 --tree 'pars{1}'
 
 }
 
