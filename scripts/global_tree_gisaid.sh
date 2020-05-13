@@ -8,8 +8,6 @@ helpFunction()
    echo "    -o Output file path for final alignment"
    echo "    -t number of threads to use"
    echo "    -k Number of most dissimilar sequences to align to make the initial guide alignment (suggest ~100)"
-   echo "    -a full path to unaligned fasta file of additional sequences not on GISAID"
-   echo "    -d number of substitutions from focal sequences in seqs passed through -a at which to cut trees to refine sub-trees"
    exit 1 # Exit script after printing help
 }
 
@@ -20,14 +18,12 @@ do
       o ) outputfasta="$OPTARG" ;;
       t ) threads="$OPTARG" ;;
       k ) k="$OPTARG" ;;
-      a ) addseqs="$OPTARG" ;;
-      d ) depthcut="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$inputfasta" ] || [ -z "$outputfasta" ] || [ -z "$threads" ] || [ -z "$k" ] || [ -z "$addseqs" ] || [ -z "$depthcut" ]
+if [ -z "$inputfasta" ] || [ -z "$outputfasta" ] || [ -z "$threads" ] || [ -z "$k" ] ||
 then
    echo "Some or all of the parameters are empty";
    helpFunction
@@ -41,15 +37,8 @@ inputdir=$(dirname $inputfasta)
 cd $inputdir
 
 allseqs=$inputdir"allseqs_unaligned.fasta"
-cat $inputfasta $addseqs > $allseqs
+cat $inputfasta > $allseqs
 
-echo ""
-echo "Checking for and fixing spaces in additional seuqence file "
-echo ""
-
-echo "Replacing spaces in sequence names with '_'"
-sed -i.bak '/^>/s/ /_/g' $addseqs
-rm $addseqs'.bak'
 
 echo ""
 echo "Processing raw data and trimming UTRs "
@@ -96,12 +85,6 @@ echo "Filtering sequences that are shorter than 29100 bp and/or have >200 ambigu
 esl-alimanip --lmin 29100 --xambig 200 --informat afa --outformat afa --dna -o $aln_global"alimanip.fa" $aln_global"_alimask.fa"
 
 echo ""
-echo "Ensuring additional seuqences are in the alignment"
-grep '>' $addseqs | tr -d \> | faSomeRecords $aln_global"_alimask.fa" /dev/stdin $addseqs"_aln.fa"
-cat $aln_global"alimanip.fa" $addseqs"_aln.fa" > $outputfasta"_dupe.fa"
-faFilter -uniq $outputfasta"_dupe.fa" $outputfasta
-
-echo ""
 echo "alignment stats after filtering"
 esl-alistat $outputfasta
 
@@ -109,33 +92,20 @@ esl-alistat $outputfasta
 #### ESTIMATE THE GLOBAL TREE ######
 
 echo ""
-echo "Estimating trees with bootstraps"
+echo "Estimating trees with bootstraps using fasttree -fastest"
 echo ""
 
 # finally, we estimate a tree with 100 bootstraps, using rapidnj, MP, and fasttree
-bash $DIR/tree_nj.sh -i $outputfasta -t $threads
+#bash $DIR/tree_nj.sh -i $outputfasta -t $threads
 #bash $DIR/tree_mp.sh -i $outputfasta -t $threads
-#bash $DIR/tree_ft.sh -i $outputfasta -t $threads
+bash $DIR/tree_ft.sh -i $outputfasta -t $threads
 
-# now we refine trees for all of the sequences we're really interested in.
-declare -a to_refine=$(grep '>' $addseqs | tr -d \>)
+echo ""
+echo "Attempting to make PDFs of the global tree (if inkscape works)"
+echo ""
 
-for name in $to_refine; do
-   bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_nj_TBE.tree' -f $name -d $depthcut
-done
+nw_display -s -w 1000 -c css_global.map $outputfasta'_ft_TBE.tree' > $outputfasta'_ft_TBE.tree.svg'
+inkscape -f $outputfasta'_ft_TBE.tree.svg' -D -A $outputfasta'_ft_TBE.tree.pdf'
 
-
-# also output PDFs of the global tree with all the sequences of intereste highlighted
-for name in $to_refine; do
-   echo "fill:blue L "$name > css_global.map
-   echo '"stroke-width:2; stroke:blue"  Clade '$name >> css_global.map
-done
-
-nw_display -s -w 1000 -c css_global.map $outputfasta'_nj_TBE.tree' > $outputfasta'_nj_TBE.tree.svg'
-inkscape -f $outputfasta'_nj_TBE.tree.svg' -D -A $outputfasta'_nj_TBE.tree.pdf'
-
-nw_display -s -w 1000 -c css_global.map $outputfasta'_nj_FBP.tree' > $outputfasta'_nj_FBP.tree.svg'
-inkscape -f $outputfasta'_nj_FBP.tree.svg' -D -A $outputfasta'_nj_FBP.tree.pdf'
-
-
-
+nw_display -s -w 1000 -c css_global.map $outputfasta'_ft_FBP.tree' > $outputfasta'_ft_FBP.tree.svg'
+inkscape -f $outputfasta'_ft_FBP.tree.svg' -D -A $outputfasta'_ft_FBP.tree.pdf'
