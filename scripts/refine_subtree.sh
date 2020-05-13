@@ -90,7 +90,7 @@ nw_clade -c $c $tree $seq | nw_distance -n -s f - | cut -f1 | faSomeRecords $aln
 # add the outgroup sequence to the alignment if it's not already there
 
 og="hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
-ogn=$(grep $og $aln | wc -l)
+ogn=$(grep $og $seq'_aln.fa' | wc -l)
 if (( $ogn = 0 )); then
 
     echo $og | faSomeRecords $aln /dev/stdin $aln'WH4.fa'
