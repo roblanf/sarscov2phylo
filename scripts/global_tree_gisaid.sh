@@ -99,13 +99,3 @@ echo ""
 #bash $DIR/tree_nj.sh -i $outputfasta -t $threads
 #bash $DIR/tree_mp.sh -i $outputfasta -t $threads
 bash $DIR/tree_ft.sh -i $outputfasta -t $threads
-
-echo ""
-echo "Attempting to make PDFs of the global tree (if inkscape works)"
-echo ""
-
-nw_display -s -w 1000 -c css_global.map $outputfasta'_ft_TBE.tree' > $outputfasta'_ft_TBE.tree.svg'
-inkscape -f $outputfasta'_ft_TBE.tree.svg' -D -A $outputfasta'_ft_TBE.tree.pdf'
-
-nw_display -s -w 1000 -c css_global.map $outputfasta'_ft_FBP.tree' > $outputfasta'_ft_FBP.tree.svg'
-inkscape -f $outputfasta'_ft_FBP.tree.svg' -D -A $outputfasta'_ft_FBP.tree.pdf'
