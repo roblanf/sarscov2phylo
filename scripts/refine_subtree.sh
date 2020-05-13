@@ -91,7 +91,7 @@ nw_clade -c $c $tree $seq | nw_distance -n -s f - | cut -f1 | faSomeRecords $aln
 
 og="hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
 ogn=$(grep $og $seq'_aln.fa' | wc -l)
-if (( $ogn = 0 )); then
+if (( $ogn == 0 )); then
 
     echo $og | faSomeRecords $aln /dev/stdin $aln'WH4.fa'
     cat $seq'_aln.fa' $aln'WH4.fa' > tmp.fa
