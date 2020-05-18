@@ -31,20 +31,23 @@ fi
 
 inputdir=$(dirname $inputfasta)
 export INPUT_FASTA=$inputfasta
+DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # make the reference tree
 echo ""
 echo "Making the reference tree with fasttree -fastest option"
 echo ""
-fasttree -nosupport -nt -fastest $inputfasta > $inputfasta'.fasttree'
+fasttree -nosupport -nt -fastest $inputfasta > $inputfasta'multi.fasttree'
 
+Rscript $DIR/bifurcate.R -i $inputfasta'multi.fasttree' -o $inputfasta'.fasttree'
 
 one_bootstrap(){
 
    bootpre='boot'$1
    goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
-   fasttree -nosupport -nt -fastest $bootpre'0.fa' > $bootpre'.tree'
-
+   fasttree -nosupport -nt -fastest $bootpre'0.fa' > $bootpre'unrooted.tree'
+   nw_reroot $bootpre'unrooted.tree' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $bootpre'multi.tree'
+   
 }
 
 export -f one_bootstrap
@@ -56,9 +59,15 @@ boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*.tree > $inputfasta"_ft_replicates.tree"
+cat boot*multi.tree > $inputfasta"_ft_replicates_multi.tree"
+
+# make it bifurcating
+Rscript $DIR/bifurcate.R -i $inputfasta"_ft_replicates_multi.tree" -o $inputfasta"_ft_replicates.tree" 
+
 inputdir=$(dirname $inputfasta)
+
 find $inputdir -maxdepth 1 -name "boot*" -delete
+rm $inputfasta"_ft_replicates_multi.tree"
 
 echo ""
 echo "Running raxml to map bootstrap support to focal tree"
