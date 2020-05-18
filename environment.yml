@@ -8,7 +8,6 @@ dependencies:
   - biopython=1.74
   - easel
   - iqtree>2
-  - inkscape
   - fasttree
   - goalign
   - mafft
