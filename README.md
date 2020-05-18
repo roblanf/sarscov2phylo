@@ -16,9 +16,9 @@ For most people this repository won't contain much of use. Instead, one should s
 This repository exists for two reasons:
 
 1. To provide a global phylogeny of SARS-CoV-2 sequences that others might find useful
-2. To provide reproducible best-practice analyses for estimating.  
+2. To develop and provide reproducible best-practice analyses for estimating that tree  
 
-Figuring out the best approach for estimating a global phylogeny is an open question. I have kept notes of methods I have tried and compared [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md). My research group develops phylogenetic methods like [IQ-TREE](http://www.iqtree.org/), [PartitionFinder](http://www.robertlanfear.com/partitionfinder/), and [RWTY](https://cran.r-project.org/web/packages/rwty/vignettes/rwty.html). We are always working on improving these methods, and this is part of that research. Indeed, some of these methods are used internally by the amazing (and likely more useful to most working with SARS-CoV-2 sequences) Nextstrain and PANGOLIN services, so it's really important that my group really understands these data.
+Figuring out the best approach for estimating a very large phylogeny like this is an open question. I have kept notes of methods I have tried and compared [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md). A big part of the reason for working on this is that my research group develops phylogenetic methods like [IQ-TREE](http://www.iqtree.org/), [PartitionFinder](http://www.robertlanfear.com/partitionfinder/), and [RWTY](https://cran.r-project.org/web/packages/rwty/vignettes/rwty.html). We are always working on improving these methods (indeed, some of these methods are used internally by the amazing Nextstrain and PANGOLIN services), so it's really important that my group really understands these data.
 
 If you want to dig deeper into how we estimate the trees, and/or contribute by trying other methods or making suggestions, please read on. Feel free to use these trees for your work, but please cite this repository and more importantly all the relevant tools that are used to make the trees. 
 
