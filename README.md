@@ -40,7 +40,7 @@ cd sarscov2phylo/
 # 3. download and install all the packages you need 
 conda env create -f environment.yml
 
-#4. acviate the conda environment with all the packages
+# 4. acviate the conda environment with all the packages
 conda activate sarscov2phylo
 ```
 
