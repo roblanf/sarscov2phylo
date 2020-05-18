@@ -43,8 +43,11 @@ one_bootstrap(){
 
    bootpre='boot'$1
    goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
-   rapidnj $bootpre'0.fa' -i fa -c 1 -n -t d -x $bootpre'.tree'
+   rapidnj $bootpre'0.fa' -i fa -c 1 -n -t d -x $bootpre'unrooted.tree'
    
+   nw_reroot $bootpre'unrooted.tree' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $bootpre'multi.tree'
+
+
    # remove quotes
    sed -i.bak "s/'//g" $bootpre'.tree'
    rm $bootpre'.tree.bak'
@@ -61,7 +64,7 @@ boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*.tree > $inputfasta"_nj_replicates.tree"
+cat boot*multi.tree > $inputfasta"_nj_replicates.tree"
 inputdir=$(dirname $inputfasta)
 find $inputdir -maxdepth 1 -name "boot*" -delete
 
