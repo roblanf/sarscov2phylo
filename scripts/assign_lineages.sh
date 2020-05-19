@@ -24,6 +24,7 @@ do
 done
 
 
+set -xeuo pipefail
 # First we get the pre-computed lineages from hcov lineages
 
 wget $lineageurl > lineages.csv

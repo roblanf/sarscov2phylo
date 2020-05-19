@@ -28,49 +28,45 @@ then
 fi
 
 
-input_seqs=$inputfasta
-output_seqs=$outputfasta
+set -xeuo pipefail
+export TMP="${TMP:-$(mktemp -d)}"
+
+input_seqs="$inputfasta"
+output_seqs="$outputfasta"
 
 echo ""
 echo "Preprocessing GISAID data to fix known issues"
 
 # first let's fix cases where gisaid doesn't put a newline before the '>''
 echo "Making sure all records start with a new line before the '>'"
-sed 's/>/\'$'\n>/g' $input_seqs > $input_seqs"_namesfixed.fa"
-input_seqs=$input_seqs"_namesfixed.fa"
-
-sed -i.bak '/^$/d' $input_seqs
-
+sed -e 's/>/\'$'\n>/g' -e '/^$/d' "$input_seqs" > "$TMP/namesfixed.fa"
 
 # next we remove sequences in the excluded_sequences.tsv file
 echo "Removing sequences in exluded_sequence.tsv"
-BASEDIR=$(dirname "$0")
-exseq=$BASEDIR/../excluded_sequences.tsv
-cut -f1 $exseq | faSomeRecords $input_seqs /dev/stdin $input_seqs"tmp.fa" -exclude
-rm $input_seqs
-mv $input_seqs"tmp.fa" $input_seqs
+DIR="$(dirname "$(readlink -f "$0")")"
+exseq="$DIR/../excluded_sequences.tsv"
+cut -f1 $exseq | faSomeRecords "$TMP/namesfixed.fa" /dev/stdin "$TMP/somerecords.fa" -exclude
 
 # now we fix spaces in the fasta headers from GISAID
 # we do this ONLY on header lines
 echo "Replacing spaces in sequence names with '_'"
-sed -i.bak '/^>/s/ /_/g' $input_seqs
+sed '/^>/s/ /_/g' "$TMP/somerecords.fa" > "$TMP/nospaces.fa"
 
 # now we replaces spaces in the sequences with N's
 # these occur in a number of PHE UK sequences
 echo "Replacing spaces in sequences with 'N'"
-sed -i.bak '/^[^>]/s/ /N/g' $input_seqs
-rm $input_seqs'.bak'
+sed -i '/^[^>]/s/ /N/g' "$TMP/nospaces.fa"
 
 echo ""
-
 
 
 # Split GISAID data into individual sequences
 # fasplit
 echo "Splitting sequences from input file into individual files"
-N=$(grep ">" $input_seqs | wc -l)
+N=$(grep ">" "$TMP/nospaces.fa" | wc -l)
 N=$(( N*2 )) # doubling it is to ensure each record goes to one file
-faSplit sequence $input_seqs $N individual_seq
+faSplit sequence "$TMP/nospaces.fa" $N "$TMP/individual_seq"
+
 
 # Pairwise align each to the ref. with MAFFT and trim the UTRs
 # mafft and parallel
@@ -115,14 +111,14 @@ trim_a_seq()
 export -f trim_a_seq
 
 # we use parallel like this to avoid "Argument list too long" issues
-inputdir=$(dirname $inputfasta)
-ls $inputdir | grep individual_seq | parallel -j $threads --bar "trim_a_seq {}" > /dev/null
+find $TMP -type f -name '*individual_seq*' | parallel -j $threads --bar "trim_a_seq {}" > /dev/null
 
 # make the new sequence set, and clean up
 # use find to avoid "Argument list too long" issue
 echo "putting all the trimmed sequences into one file"
-find $inputdir -name \*.fa_trimmed.fa -exec cat {} \; > $output_seqs
+find $TMP -name \*.fa_trimmed.fa -exec cat {} \; > $output_seqs
+wc -l "$output_seqs"
 
 #clean up
 echo "cleaning up"
-find $inputdir -maxdepth 1 -name "individual_seq*" -delete
+find $TMP -maxdepth 1 -name "individual_seq*" -delete

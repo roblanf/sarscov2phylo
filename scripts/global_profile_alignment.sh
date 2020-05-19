@@ -29,6 +29,7 @@ then
    helpFunction
 fi
 
+set -uxeo pipefail
 # so we can get at it as a global variable
 export REFERENCE_ALN=$refaln
 
@@ -37,7 +38,7 @@ echo ""
 echo "Splitting unaligned input sequences into individual files"
 N=$(grep ">" $inputfasta | wc -l)
 N=$(( N*2 )) # doubling it is to ensure each record goes to one file
-faSplit sequence $inputfasta $N individual_seq
+faSplit sequence $inputfasta $N $TMP/profile_align_individual_seq
 
 
 echo ""
@@ -50,8 +51,7 @@ profile_align()
 
 	seqfile=$1
 	alfile=$seqfile"_profile_aligned.fa"
-	stofile=$alfile".sto"
-   final=$seqfile"_ind_aligned.fa"
+	final=$seqfile"_ind_aligned.fa"
 
 	mafft --thread 1 --quiet --keeplength --add $seqfile "$REFERENCE_ALN" > $alfile
 
@@ -61,22 +61,16 @@ profile_align()
 
 	rm $seqfile
 	rm $alfile
-
 }
 
 export -f profile_align
 
-inputdir=$(dirname $inputfasta)
-ls $inputdir | grep individual_seq | parallel -j $threads --bar "profile_align {}" > /dev/null
+find $TMP -type f -name '*profile_align_individual_seq*' | parallel -j $threads --bar "profile_align {}" > /dev/null
 
 # join it all together and clean up
 # note that here we *APPEND* to the global alignment, which allows us to add small batches of new stuff whenever we like
-find $inputdir -name \*.fa_ind_aligned.fa -exec cat {} \; >> $outputfasta
-find $inputdir -maxdepth 1 -name "individual_seq*" -delete
+find $TMP -name \*.fa_ind_aligned.fa -exec cat {} \; >> "$TMP/aligned_withdups.fa"
+find $TMP -maxdepth 1 -name "*profile_align_individual_seq*" -delete
 
 #finally, remove duplicates by name - can occur if a seq. exists in the reference alignment
-faFilter -uniq $outputfasta $outputfasta"_deduped.fa"
-
-# overwite the output with the deduplicated file
-rm $outputfasta
-mv $outputfasta"_deduped.fa" $outputfasta
+faFilter -uniq "$TMP/aligned_withdups.fa" $outputfasta

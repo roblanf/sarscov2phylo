@@ -29,23 +29,28 @@ then
    helpFunction
 fi
 
+set -uxeo pipefail
+
 DIR="$(cd "$(dirname "$0")" && pwd)"
+export TMP="${TMP:-$(mktemp -d)}"
+#trap "rm -rf '$TMP'" EXIT
 
 # first we trim the sequences
 inputdir=$(dirname $inputfasta)
 
-cd $inputdir
-
-allseqs=$inputdir"allseqs_unaligned.fasta"
-cat $inputfasta > $allseqs
+allseqs="$TMP/allseqs_unaligned.fasta"
+cp $inputfasta $allseqs
 
 
 echo ""
 echo "Processing raw data and trimming UTRs "
 echo ""
 
-trimmed_gisaid="$inputdir/trimmed.fa"
+wc -l $allseqs
+trimmed_gisaid="$TMP/trimmed.fa"
 bash $DIR/trim_seqs.sh -i $allseqs -o $trimmed_gisaid -t $threads
+wc -l $trimmed_gisaid
+
 
 #### BUILD THE GLOBAL ALIGNMENT ######
 
@@ -54,20 +59,21 @@ bash $DIR/trim_seqs.sh -i $allseqs -o $trimmed_gisaid -t $threads
 echo ""
 echo "Making alignment of $k most dissimilar sequences"
 echo ""
-aln_k="$inputdir/aln_k.fa"
+aln_k="$TMP/aln_k.fa"
 bash $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k -t $threads
 
 echo ""
 echo "Filtering sites with >10% gaps from k most dissimilar sequence alignment"
 echo ""
-aln_k_filtered="$inputdir/aln_k_filtered.fa"
+aln_k_filtered="$TMP/aln_k_filtered.fa"
 esl-alimask --gapthresh 0.1 --informat afa --outformat afa --dna -o $aln_k_filtered -g  $aln_k
+
 
 
 echo ""
 echo "Making global profile alignment"
 echo ""
-aln_global="$inputdir/aln_global_unfiltered.fa"
+aln_global="$TMP/aln_global_unfiltered.fa"
 bash $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
 
 
@@ -80,11 +86,11 @@ esl-alistat $aln_global
 
 echo ""
 echo "Filtering sites with >1% gaps"
-esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o $aln_global"_alimask.fa" -g  $aln_global
+esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o "$TMP/aln_global_alimask.fa" -g  $aln_global
 echo "Filtering sequences that are shorter than 29100 bp and/or have >200 ambiguities"
-esl-alimanip --lmin 29100 --xambig 200 --informat afa --outformat afa --dna -o $aln_global"alimanip.fa" $aln_global"_alimask.fa"
+esl-alimanip --lmin 29100 --xambig 200 --informat afa --outformat afa --dna -o "$TMP/aln_global_alimanip.fa" "$TMP/aln_global_alimask.fa"
 
-mv $aln_global $outputfasta
+mv "$TMP/aln_global_alimanip.fa" "$outputfasta"
 
 echo ""
 echo "alignment stats after filtering"

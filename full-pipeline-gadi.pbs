@@ -1,0 +1,26 @@
+#!/bin/bash
+#PBS -q hugemem
+#PBS -l ncpus=48
+#PBS -l walltime=12:00:00
+#PBS -l mem=1500G
+#PBS -l jobfs=1400G
+#PBS -l wd
+#PBS -l storage=scratch/xe2+gdata/xe2
+#PBS -j oe
+#PBS -o gadi/log/
+#PBS -M pbs@kdmurray.id.au
+#PBS -m abe
+#PBS -P xe2
+#PBS -W umask=002
+#PBS -N sarscov2
+
+source /g/data/xe2/gadi/profile.sh
+module purge
+useconda
+conda activate sarscov2phylo
+
+set -xeuo pipefail
+
+#bash scripts/global_tree_gisaid.sh -i ../data/act/act.fasta -o ../data/act/global_act.fa -t ${PBS_NCPUS:-2} -k 100
+#bash scripts/global_tree_gisaid.sh -i ../data/gisaid/gisaid_hcov-19_2020_05_08_06.fasta -o ../data/gisaid/global.fa -t ${PBS_NCPUS:-2} -k 100
+bash scripts/global_tree_gisaid.sh -i ../data/tiny-gisaid/tiny-gisaid.fa -o ../data/tiny-gisaid/global.fa -t ${PBS_NCPUS:-2} -k 100

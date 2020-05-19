@@ -29,6 +29,7 @@ then
    helpFunction
 fi
 
+set -uxeo pipefail
 inputdir=$(dirname $inputfasta)
 export INPUT_FASTA=$inputfasta
 

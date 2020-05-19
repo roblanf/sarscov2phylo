@@ -24,6 +24,8 @@ then
    helpFunction
 fi
 
+set -xeuo pipefail
+
 echo ""
 echo "Filtering strains shorter than 29100 and/or with more than 200 ambiguities (that's ~1%)"
 echo "Filtering sites with more than 1% gaps"
