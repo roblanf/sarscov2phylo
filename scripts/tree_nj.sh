@@ -49,8 +49,8 @@ one_bootstrap(){
 
 
    # remove quotes
-   sed -i.bak "s/'//g" $bootpre'.tree'
-   rm $bootpre'.tree.bak'
+   sed -i.bak "s/'//g" $bootpre'multi.tree'
+   rm $bootpre'multi.tree.bak'
    rm $bootpre'0.fa'
 
 }
