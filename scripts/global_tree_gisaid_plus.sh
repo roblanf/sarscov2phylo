@@ -33,6 +33,8 @@ then
    helpFunction
 fi
 
+set -uxeo pipefail
+
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # first we trim the sequences

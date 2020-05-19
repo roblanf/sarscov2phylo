@@ -29,6 +29,7 @@ then
    helpFunction
 fi
 
+set -uxeo pipefail
 export INPUT_FASTA=$inputfasta
 
 

@@ -31,6 +31,7 @@ then
    helpFunction
 fi
 
+set -uxeo pipefail
 
 echo ""
 echo "Calculating number of nodes to go back from focal sequence to cut tree"

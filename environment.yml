@@ -22,6 +22,10 @@ dependencies:
   - ucsc-faFilter
   - ucsc-faSomeRecords
   - ucsc-faSplit
+  - openssl=="1.0.*"  # Beacuse ucsc tools are broken with openssl 1.1.1*
+  - r-base
+  - r-ape
+  - r-optparse
   - pip:
     - pandas==1.0.1
     - pytools==2020.1
