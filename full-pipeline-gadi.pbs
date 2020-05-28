@@ -23,4 +23,6 @@ set -xeuo pipefail
 
 #bash scripts/global_tree_gisaid.sh -i ../data/act/act.fasta -o ../data/act/global_act.fa -t ${PBS_NCPUS:-2} -k 100
 #bash scripts/global_tree_gisaid.sh -i ../data/gisaid/gisaid_hcov-19_2020_05_08_06.fasta -o ../data/gisaid/global.fa -t ${PBS_NCPUS:-2} -k 100
-bash scripts/global_tree_gisaid.sh -i ../data/tiny-gisaid/tiny-gisaid.fa -o ../data/tiny-gisaid/global.fa -t ${PBS_NCPUS:-2} -k 100
+#bash scripts/global_tree_gisaid.sh -i ../data/act_2020-05-20/gisaid_hcov-19_2020_05_20_01.fasta -o ../data/tiny-gisaid/global.fa -t ${PBS_NCPUS:-2} -k 100
+#bash scripts/global_tree_gisaid_plus.sh -i ../data/tiny-gisaid/tiny-gisaid.fa  -a  ../data/act/act.fasta -d 5 -o ../data/tiny-gisaid/global_plus_act.fa -t ${PBS_NCPUS:-2} -k 100
+bash scripts/global_tree_gisaid_plus.sh -i ../data/act_2020-05-20/gisaid_hcov-19_2020_05_20_01.fasta  -a  ../data/act/act.fasta -d 5 -o ../data/act/global_plus_act.fa -t ${PBS_NCPUS:-2} -k 100

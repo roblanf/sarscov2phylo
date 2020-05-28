@@ -46,11 +46,8 @@ echo ""
 echo "Processing raw data and trimming UTRs "
 echo ""
 
-wc -l $allseqs
 trimmed_gisaid="$TMP/trimmed.fa"
 bash $DIR/trim_seqs.sh -i $allseqs -o $trimmed_gisaid -t $threads
-wc -l $trimmed_gisaid
-
 
 #### BUILD THE GLOBAL ALIGNMENT ######
 

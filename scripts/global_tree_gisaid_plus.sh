@@ -10,13 +10,17 @@ helpFunction()
    echo "    -k Number of most dissimilar sequences to align to make the initial guide alignment (suggest ~100)"
    echo "    -a full path to unaligned fasta file of additional sequences not on GISAID"
    echo "    -d number of substitutions from focal sequences in seqs passed through -a at which to cut trees to refine sub-trees"
+   echo "    -c (Additional argument: Don't clean up the temp directory. Use a custom temp dir by 'export TMP=/some/persistent/path')"
+
    exit 1 # Exit script after printing help
 }
 
-while getopts "i:o:t:k:a:d:" opt
+clean=yes
+while getopts "i:o:t:k:a:d:c" opt
 do
    case "$opt" in
       i ) inputfasta="$OPTARG" ;;
+      c ) clean="no" ;;
       o ) outputfasta="$OPTARG" ;;
       t ) threads="$OPTARG" ;;
       k ) k="$OPTARG" ;;
@@ -36,13 +40,15 @@ fi
 set -uxeo pipefail
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
+export TMP="${TMP:-$(mktemp -d)}"
+echo "Tempdir is: $TMP"
+if [ "$clean" == "yes" ]
+then
+	trap "rm -rf '$TMP'" EXIT
+fi
 
 # first we trim the sequences
-inputdir=$(dirname $inputfasta)
-
-cd $inputdir
-
-allseqs=$inputdir"allseqs_unaligned.fasta"
+allseqs="$TMP/allseqs_unaligned.fasta"
 cat $inputfasta $addseqs > $allseqs
 
 echo ""
@@ -50,14 +56,13 @@ echo "Checking for and fixing spaces in additional seuqence file "
 echo ""
 
 echo "Replacing spaces in sequence names with '_'"
-sed -i.bak '/^>/s/ /_/g' $addseqs
-rm $addseqs'.bak'
+sed -i '/^>/s/ /_/g' $addseqs
 
 echo ""
 echo "Processing raw data and trimming UTRs "
 echo ""
 
-trimmed_gisaid="$inputdir/trimmed.fa"
+trimmed_gisaid="$TMP/trimmed.fa"
 bash $DIR/trim_seqs.sh -i $allseqs -o $trimmed_gisaid -t $threads
 
 #### BUILD THE GLOBAL ALIGNMENT ######
@@ -67,20 +72,20 @@ bash $DIR/trim_seqs.sh -i $allseqs -o $trimmed_gisaid -t $threads
 echo ""
 echo "Making alignment of $k most dissimilar sequences"
 echo ""
-aln_k="$inputdir/aln_k.fa"
+aln_k="$TMP/aln_k.fa"
 bash $DIR/align_k_dissimilar.sh -i $trimmed_gisaid -k $k -o $aln_k -t $threads
 
 echo ""
 echo "Filtering sites with >10% gaps from k most dissimilar sequence alignment"
 echo ""
-aln_k_filtered="$inputdir/aln_k_filtered.fa"
+aln_k_filtered="$TMP/aln_k_filtered.fa"
 esl-alimask --gapthresh 0.1 --informat afa --outformat afa --dna -o $aln_k_filtered -g  $aln_k
 
 
 echo ""
 echo "Making global profile alignment"
 echo ""
-aln_global="$inputdir/aln_global_unfiltered.fa"
+aln_global="$TMP/aln_global_unfiltered.fa"
 bash $DIR/global_profile_alignment.sh -i $trimmed_gisaid -o $aln_global -t $threads -r $aln_k_filtered
 
 
@@ -93,15 +98,15 @@ esl-alistat $aln_global
 
 echo ""
 echo "Filtering sites with >1% gaps"
-esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o $aln_global"_alimask.fa" -g  $aln_global
+esl-alimask --gapthresh 0.01 --informat afa --outformat afa --dna -o "${TMP}/aln_global_alimask.fa" -g  $aln_global
 echo "Filtering sequences that are shorter than 29100 bp and/or have >200 ambiguities"
-esl-alimanip --lmin 29100 --xambig 200 --informat afa --outformat afa --dna -o $aln_global"alimanip.fa" $aln_global"_alimask.fa"
+esl-alimanip --lmin 29100 --xambig 200 --informat afa --outformat afa --dna -o "${TMP}/aln_global_alimanip.fa" "${TMP}/aln_global_alimask.fa"
 
 echo ""
 echo "Ensuring additional seuqences are in the alignment"
-grep '>' $addseqs | tr -d \> | faSomeRecords $aln_global"_alimask.fa" /dev/stdin $addseqs"_aln.fa"
-cat $aln_global"alimanip.fa" $addseqs"_aln.fa" > $outputfasta"_dupe.fa"
-faFilter -uniq $outputfasta"_dupe.fa" $outputfasta
+grep '>' $addseqs | tr -d \> | faSomeRecords "${TMP}/aln_global_alimask.fa" /dev/stdin "${TMP}/addseqs_aln.fa"
+cat "${TMP}/aln_global_alimanip.fa" "${TMP}/addseqs_aln.fa" > "${TMP}/global_output_dupe.fa"
+faFilter -uniq "${TMP}/global_output_dupe.fa" $outputfasta
 
 echo ""
 echo "alignment stats after filtering"

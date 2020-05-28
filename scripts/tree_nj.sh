@@ -31,6 +31,7 @@ fi
 
 set -uxeo pipefail
 export INPUT_FASTA=$inputfasta
+export TMPBASE="${TMP}/$(basename "$INPUT_FASTA" .fa)"
 
 
 # make the reference tree
@@ -39,10 +40,12 @@ echo "Making the reference tree with rapidnj"
 echo ""
 rapidnj $inputfasta -i fa -c $threads -n -t d -x $inputfasta'_rapidnj.tree'
 
+export BOOTBASE="${TMPBASE}_boot"
 
 one_bootstrap(){
 
-   bootpre='boot'$1
+   set -ueo pipefail
+   bootpre="${BOOTBASE}_$1"
    goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
    rapidnj $bootpre'0.fa' -i fa -c 1 -n -t d -x $bootpre'unrooted.tree'
    
@@ -50,8 +53,7 @@ one_bootstrap(){
 
 
    # remove quotes
-   sed -i.bak "s/'//g" $bootpre'.tree'
-   rm $bootpre'.tree.bak'
+   sed -i "s/'//g" $bootpre'.tree'
    rm $bootpre'0.fa'
 
 }
@@ -65,9 +67,9 @@ boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*multi.tree > $inputfasta"_nj_replicates.tree"
+cat "${BOOTBASE}"*multi.tree > $inputfasta"_nj_replicates.tree"
 inputdir=$(dirname $inputfasta)
-find $inputdir -maxdepth 1 -name "boot*" -delete
+rm "${BOOTBASE}"*
 
 # make felsenstein bs in iqtre like: iqtree -t TREES_SET_FILE -sup FOCAL_TREE
 echo ""

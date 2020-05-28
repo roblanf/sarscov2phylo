@@ -41,12 +41,15 @@ raxml-ng --msa $inputfasta --model GTR+I+G --threads 4  --blmin 0.0000001 --tree
 
 one_bootstrap(){
 
-   bootpre='boot'$1
+   bootpre="${BOOTBASE}_$1"
    goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
    # these are bootstraps, and MP is very good, so we'll just do 1 starting tree
    raxml-ng --msa $bootpre'0.fa' --model GTR+I+G --threads 1 --blmin 0.0000001 --tree 'pars{1}'
 
 }
+
+base="$(basename "$INPUT_FASTA" .fa)"
+export BOOTBASE="$TMP/boot_${base}"
 
 export -f one_bootstrap
 
@@ -57,7 +60,7 @@ boot_nums=($(seq 1 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*.bestTree > $inputfasta"_ml_replicates.tree"
+cat "${BOOTBASE}"*.bestTree > $inputfasta"_ml_replicates.tree"
 inputdir=$(dirname $inputfasta)
 find $inputdir -maxdepth 1 -name "boot*" -delete
 

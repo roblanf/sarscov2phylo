@@ -32,6 +32,8 @@ then
 fi
 
 set -uxeo pipefail
+export TMP="${TMP:-$(mktemp -d)}"
+export TMPBASE="${TMP}/${seq}"
 
 echo ""
 echo "Calculating number of nodes to go back from focal sequence to cut tree"
@@ -86,37 +88,35 @@ echo ""
 # make a sub-alignment
 # the nw_ commands just get the sub-tree, get the names
 # then we cut and pass to faSomeRecords
-nw_clade -c $c $tree $seq | nw_distance -n -s f - | cut -f1 | faSomeRecords $aln /dev/stdin $seq'_aln.fa'
+nw_clade -c $c $tree $seq | nw_distance -n -s f - | cut -f1 | faSomeRecords $aln /dev/stdin "${TMPBASE}_subset_aln.fa"
 
 # add the outgroup sequence to the alignment if it's not already there
 
 og="hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
-ogn=$(grep $og $seq'_aln.fa' | wc -l)
-if (( $ogn == 0 )); then
+ogn=$( (grep $og "${TMPBASE}_subset_aln.fa" || [[ $? == 1 ]] ) | wc -l)
+if [ "$ogn" -eq 0 ]; then
 
-    echo $og | faSomeRecords $aln /dev/stdin $aln'WH4.fa'
-    cat $seq'_aln.fa' $aln'WH4.fa' > tmp.fa
-    mv tmp.fa $seq'_aln.fa'
-    rm tmp.fa
-    rm $aln'WH4.fa'
-
+    echo $og | faSomeRecords $aln /dev/stdin "${TMPBASE}_WH4.fa"
+    cat "${TMPBASE}_subset_aln.fa" "${TMPBASE}_WH4.fa" > "${TMPBASE}_tmp.fa"
+    mv "${TMPBASE}_tmp.fa" "${TMPBASE}_subset_aln.fa"
+    rm "${TMPBASE}_WH4.fa"
 fi
 
 
 echo ""
 echo "Sub-alignment statistics"
 echo ""
-esl-alistat $seq'_aln.fa'
+esl-alistat "${TMPBASE}_subset_aln.fa"
 
 
 # run sub-alignment in IQ-TREE with rigorous settings.
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # get the ML tree with bootstraps
-bash $DIR/tree_ml.sh -i $seq'_aln.fa' -t $threads
+bash $DIR/tree_ml.sh -i "${TMPBASE}_subset_aln.fa" -t $threads
 
-finalTBE=$seq'_aln.fa_ml_TBE.tree'
-finalFBP=$seq'_aln.fa_ml_FBP.tree'
+finalTBE="${TMPBASE}_subset_aln.fa_ml_TBE.tree"
+finalFBP="${TMPBASE}_subset_aln.fa_ml_FBP.tree"
 
 # make rudimentary pdfs
 echo ""
@@ -124,16 +124,24 @@ echo "Attempting to build PDFs of your trees (if inkscape works)"
 echo ""
 
 
-echo "fill:blue L "$seq > css.map
-echo '"stroke-width:2; stroke:blue"  Clade '$seq >> css.map
+echo "fill:blue L "$seq > ${TMPBASE}_css.map
+echo '"stroke-width:2; stroke:blue"  Clade '$seq >> ${TMPBASE}_css.map
 
-nw_display -s -w 1000 -c css.map -i 'font-size:8; fill:red' -b 'font-size:8; fill:green' $finalTBE > $finalTBE'.svg'
-inkscape -f $finalTBE'.svg' -D -A $finalTBE.pdf
+nw_display -s -w 1000 -c ${TMPBASE}_css.map -i 'font-size:8; fill:red' -b 'font-size:8; fill:green' $finalTBE > $finalTBE'.svg'
 
-nw_display -s -w 1000 -c css.map -i 'font-size:8; fill:red' -b 'font-size:8; fill:green' $finalFBP > $finalFBP'.svg'
-inkscape -f $finalFBP'.svg' -D -A $finalFBP.pdf
+nw_display -s -w 1000 -c ${TMPBASE}_css.map -i 'font-size:8; fill:red' -b 'font-size:8; fill:green' $finalFBP > $finalFBP'.svg'
 
-rm css.map
+if which inkscape &>/dev/null
+then
+	inkscape -f $finalTBE'.svg' -D -A $finalTBE.pdf
+	inkscape -f $finalFBP'.svg' -D -A $finalFBP.pdf
+else
+	cairosvg $finalTBE'.svg' -o $finalTBE.pdf
+	cairosvg $finalFBP'.svg' -o $finalFBP.pdf
+fi
+
+rm ${TMPBASE}_css.map
+cp -v "$finalFBP"* "$finalTBE"* "$(dirname "$aln")"
 
 # dating the tree
 #../iqtree-2.0.4-Linux/bin/iqtree2 -s global.fa -te global.fa_mp_boot_TBE.tree -keep-ident -m JC -fixbr --date TAXNAME -o "hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05" -nt 4 -pre date
