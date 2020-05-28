@@ -133,4 +133,3 @@ declare -a to_refine=$(grep '>' $addseqs | tr -d \>)
 for name in $to_refine; do
    bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_rapidnj_rooted.tree' -f $name -d $depthcut
 done
-

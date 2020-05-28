@@ -34,9 +34,9 @@ export INPUT_FASTA=$inputfasta
 
 # make the reference tree
 echo ""
-echo "Making the reference tree with IQTREE with GTR+I+G model"
+echo "Making the reference tree with raxml-ng with GTR+I+G model"
 echo ""
-raxml-ng --msa $inputfasta --model GTR+I+G --threads 4  --blmin 0.0000001 --tree 'pars{5}'
+raxml-ng --msa $inputfasta --model GTR+I+G --threads 4  --blmin 0.0000001 --tree 'pars{1}'
 
 one_bootstrap(){
 
