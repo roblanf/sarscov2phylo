@@ -109,13 +109,18 @@ esl-alistat $outputfasta
 #### ESTIMATE THE GLOBAL TREE ######
 
 echo ""
-echo "Estimating trees with bootstraps"
+echo "Estimating tree of all sequences"
 echo ""
 
 # finally, we estimate a tree with 100 bootstraps, using rapidnj, MP, and fasttree
-bash $DIR/tree_nj.sh -i $outputfasta -t $threads
+#bash $DIR/tree_nj.sh -i $outputfasta -t $threads
 #bash $DIR/tree_mp.sh -i $outputfasta -t $threads
 #bash $DIR/tree_ft.sh -i $outputfasta -t $threads
+
+rapidnj $outputfasta -i fa -c $threads -n -t d -x $outputfasta'_rapidnj.tree'
+nw_reroot $outputfasta'_rapidnj.tree' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $outputfasta'_rapidnj_rooted.tree'
+sed -i.bak "s/'//g" $outputfasta'_rapidnj_rooted.tree'
+rm $outputfasta'_rapidnj_rooted.tree.bak'
 
 
 echo ""
@@ -126,6 +131,6 @@ echo ""
 declare -a to_refine=$(grep '>' $addseqs | tr -d \>)
 
 for name in $to_refine; do
-   bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_nj_FBP.tree' -f $name -d $depthcut
+   bash $DIR/refine_subtree.sh -i $outputfasta -t $threads -g $outputfasta'_rapidnj_rooted.tree' -f $name -d $depthcut
 done
 
