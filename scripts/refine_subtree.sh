@@ -108,14 +108,14 @@ echo ""
 esl-alistat $seq'_aln.fa'
 
 
-# run sub-alignment in IQ-TREE with rigorous settings.
+# run sub-alignment to get tree.
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # get the ML tree with bootstraps
-bash $DIR/tree_ml.sh -i $seq'_aln.fa' -t $threads
+bash $DIR/tree_ft.sh -i $seq'_aln.fa' -t $threads
 
-finalTBE=$seq'_aln.fa_ml_TBE.tree'
-finalFBP=$seq'_aln.fa_ml_FBP.tree'
+finalTBE=$seq'_aln.fa_ft_TBE.tree'
+finalFBP=$seq'_aln.fa_ft_FBP.tree'
 
 # make rudimentary pdfs
 echo ""
