@@ -123,14 +123,24 @@ echo "Attempting to build PDFs of your trees (if inkscape works)"
 echo ""
 
 
-echo "fill:blue L "$seq > css.map
+#label all the ACT seqs too
+declare -a act_seqs=$(grep '>ACT' $seq'_aln.fa' | tr -d \>)
+
+for name in $act_seqs; do
+  echo "fill:blue L "$name >> css.map
+  echo '"stroke-width:2; stroke:blue"  Clade '$name >> css.map
+done
+
+
+# colour in the focal sequence as well
+echo "fill:blue L "$seq >> css.map
 echo '"stroke-width:2; stroke:blue"  Clade '$seq >> css.map
 
-nw_display -s -w 1000 -c css.map -i 'font-size:8; fill:red' -b 'font-size:8; fill:green' $finalTBE > $finalTBE'.svg'
-inkscape -f $finalTBE'.svg' -D -A $finalTBE.pdf
+nw_display -s -w 1000 -c css.map -I 'r' -i 'font-size:6; fill:red' -b 'font-size:2; fill:green' $finalTBE > $finalTBE'.svg'
+#inkscape -f $finalTBE'.svg' -D -A $finalTBE.pdf
 
-nw_display -s -w 1000 -c css.map -i 'font-size:8; fill:red' -b 'font-size:8; fill:green' $finalFBP > $finalFBP'.svg'
-inkscape -f $finalFBP'.svg' -D -A $finalFBP.pdf
+nw_display -s -w 1000 -c css.map -I 'r' -i 'font-size:6; fill:red' -b 'font-size:2; fill:green' $finalFBP > $finalFBP'.svg'
+#inkscape -f $finalFBP'.svg' -D -A $finalFBP.pdf
 
 rm css.map
 
