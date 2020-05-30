@@ -98,6 +98,6 @@ echo "Estimating trees with bootstraps using rapidnj"
 echo ""
 
 # finally, we estimate a tree with 100 bootstraps, using rapidnj, MP, and fasttree
-bash $DIR/tree_nj.sh -i $outputfasta -t $threads
+#bash $DIR/tree_nj.sh -i $outputfasta -t $threads
 #bash $DIR/tree_mp.sh -i $outputfasta -t $threads
-#bash $DIR/tree_ft.sh -i $outputfasta -t $threads
+bash $DIR/tree_ft.sh -i $outputfasta -t $threads
