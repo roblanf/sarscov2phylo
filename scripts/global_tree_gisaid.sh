@@ -94,10 +94,34 @@ esl-alistat $outputfasta
 #### ESTIMATE THE GLOBAL TREE ######
 
 echo ""
-echo "Estimating trees with bootstraps using rapidnj"
+echo "Estimating trees with bootstraps using fasttree"
 echo ""
 
 # finally, we estimate a tree with 100 bootstraps, using rapidnj, MP, and fasttree
 #bash $DIR/tree_nj.sh -i $outputfasta -t $threads
 #bash $DIR/tree_mp.sh -i $outputfasta -t $threads
 bash $DIR/tree_ft.sh -i $outputfasta -t $threads
+
+
+echo ""
+echo "Cleaning trees with treeshrink"
+echo ""
+
+run_treeshrink.py -t global.fa_ft_TBE.tree -q 0.05 -c -o treeshrink_TBE
+run_treeshrink.py -t global.fa_ft_FBP.tree -q 0.05 -c -o treeshrink_FBP
+
+
+echo ""
+echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
+echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
+echo ""
+nw_reroot treeshrink_TBE/global.fa_ft_TBE_0.05.tree 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > ft_TBE.tree
+nw_reroot treeshrink_FBP/global.fa_ft_FBP_0.05.tree 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > ft_FBP.tree
+
+# remove quotes that treeshrink adds
+sed -i.bak "s/'//g" ft_TBE.tree
+rm ft_TBE.tree.bak
+
+sed -i.bak "s/'//g" ft_FBP.tree
+rm ft_FBP.tree.bak
+
