@@ -17,7 +17,7 @@ For convenience, you can also get the latest results via the following links:
 
 Privacy rules around the alignments themselves mean that they cannot be released here. The alignments can be recreated by following the steps described below. 
 
-![Part of global SARS-CoV-2 phylogeny](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpeg)
+![Part of global SARS-CoV-2 phylogeny](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpg)
 
 # Why are there two trees, and what are all the numbers
 
