@@ -91,7 +91,7 @@ To estimate a global phylogeny for the GISAID sequences, the code run by [this s
 
 1. Fixes known issues with GISAID sequences (there are quite a few...)
 2. Removes sequences that I or others have determined to be questionable (these are documented in [excluded_sequences.tsv](https://github.com/roblanf/sarscov2phylo/blob/master/excluded_sequences.tsv))
-3. Trims the low-quality ends from every sequence in the input file (saved as `trimmed.fa`), currently this is the UTRs only.
+3. Trims the low-quality ends from every sequence in the input file (saved as `trimmed.fa`), following advice here: http://virological.org/t/issues-with-sars-cov-2-sequencing-data/473.
 4. Makes an alignment of the 100 most dissimilar (but high-quality) sequences in the input, then filters gappy sites from this (saved as `aln_k_filtered.fa`)
 5. Creates a global alignment by aligning every sequence to `aln_k_filtered.fa` with MAFFT, parallelised with GNU parallel
 6. Filters sites from the alignment with >5 % gaps.
