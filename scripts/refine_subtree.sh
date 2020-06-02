@@ -9,10 +9,11 @@ helpFunction()
    echo "    -g global phylogeny that contains the focal taxon"
    echo "    -f focal taxon name (must be present in alignment and global phylogeny)"
    echo "    -d number of substitutions below the focal taxon to prune the sub-tree"
+   echo "    -h highlight sequences in the svg files whose names start with this string, e.g. '>ACT'"
    exit 1 # Exit script after printing help
 }
 
-while getopts "i:t:g:f:d:" opt
+while getopts "i:t:g:f:d:h:" opt
 do
    case "$opt" in
       i ) aln="$OPTARG" ;;
@@ -20,12 +21,13 @@ do
       g ) tree="$OPTARG" ;;
       f ) seq="$OPTARG" ;;
       d ) depth="$OPTARG" ;;
+      h ) highlight="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
 
 # Print helpFunction in case parameters are empty
-if [ -z "$aln" ] || [ -z "$threads" ] || [ -z "$tree" ] || [ -z "$seq" ] || [ -z "$depth" ]
+if [ -z "$aln" ] || [ -z "$threads" ] || [ -z "$tree" ] || [ -z "$seq" ] || [ -z "$depth" ] || [ -z "$highlight" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
@@ -124,13 +126,12 @@ echo ""
 
 
 #label all the ACT seqs too
-declare -a act_seqs=$(grep '>ACT' $seq'_aln.fa' | tr -d \>)
+declare -a act_seqs=$(grep $highlight $seq'_aln.fa' | tr -d \>)
 
 for name in $act_seqs; do
   echo "fill:blue L "$name >> $seq'css.map'
   echo '"stroke-width:2; stroke:blue"  Clade '$name >> $seq'css.map'
 done
-
 
 # colour in the focal sequence as well
 echo "fill:blue L "$seq >> $seq'css.map'
