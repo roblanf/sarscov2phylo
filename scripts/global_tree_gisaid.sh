@@ -82,9 +82,9 @@ echo ""
 echo "Filtering sites with >5% gaps"
 esl-alimask --gapthresh 0.05 --informat afa --outformat afa --dna -o $aln_global"_alimask.fa" -g  $aln_global
 echo "Filtering sequences that are shorter than 28000 bp and/or have >1000 ambiguities"
-esl-alimanip --lmin 28000 --xambig 1000 --informat afa --outformat afa --dna -o $aln_global"alimanip.fa" $aln_global"_alimask.fa"
+esl-alimanip --lmin 28000 --xambig 1000 --informat afa --outformat afa --dna -o $aln_global"_alimanip.fa" $aln_global"_alimask.fa"
 
-mv $aln_global $outputfasta
+mv $aln_global"_alimanip.fa" $outputfasta
 
 echo ""
 echo "alignment stats after filtering"
