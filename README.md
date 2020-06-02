@@ -19,9 +19,11 @@ Privacy rules around the alignments themselves mean that they cannot be released
 
 ![Part of global SARS-CoV-2 phylogeny](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpeg)
 
-# Why are there two trees
+# Why are there two trees, and what are all the numbers
 
-The topology of the two trees is identical. The only difference is the support values. One tree (ft_FBP.tree) contains standard bootstrap values (also known as Felsenstein Bootstrap Proportions, or FBP). The other is built using the Transfer Bootstrap Expectation (or TBE). You can read more about these two values and how they differe [here](https://natureecoevocommunity.nature.com/users/87831-olivier-gascuel/posts/32426-renewing-felsenstein-s-phylogenetic-bootstrap-in-the-era-of-big-data) and [here](https://www.nature.com/articles/s41586-018-0043-0). 
+The topology and branch lengths of the two trees is identical. In both cases, the topology is the best topology estimated by `fasttree` using the `-fastest` option, which [I found to perform the best out of a wide range of potential approaches](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md). The branch lengths represent substitutions per site. 
+
+The only difference between the two trees are the support values represented for each branch. One tree (ft_FBP.tree) contains standard bootstrap values (also known as Felsenstein Bootstrap Proportions, or FBP). The other is built using the Transfer Bootstrap Expectation (or TBE). You can read more about these two values and how they differe [here](https://natureecoevocommunity.nature.com/users/87831-olivier-gascuel/posts/32426-renewing-felsenstein-s-phylogenetic-bootstrap-in-the-era-of-big-data) and [here](https://www.nature.com/articles/s41586-018-0043-0). 
 
 The difference is fairly simple to describe. The FBP value represents the percentage of bootstrap trees in which a split appeared. The TBE value represents the proportion of taxa in a clade that are, on average, stable across bootstrap replicates. The TBE is always at least as high as the FBP. In trees of thousands of taxa (this tree has 10s of 1000s), FBP values can often be very close to zero simply because branches are very short and some taxa can move around a lot. The TBE is more informative in this case, because it measures how many taxa have to be moved to recover a branch in a tree, rather than just the presence/absence of that branch. 
 
