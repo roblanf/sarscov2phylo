@@ -13,9 +13,11 @@ For convenience, you can also get the latest results via the following links:
 * [Latest global phylogeny with Transfer Bootstrap Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_TBE.tree)
 * [Latest global phylogeny with Felsenstein Bootstrap Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_FBP.tree)
 * [Acknowledgements file for those that upload to GISAID](https://github.com/roblanf/sarscov2phylo/blob/master/gisaid_hcov-19_acknowledgement.tsv)
-* [Script to reproduce the analyses](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh)
+* [Latest version of the script to produce a global tree](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh)
 
 Privacy rules around the alignments themselves mean that they cannot be released here. The alignments can be recreated by following the steps described below. 
+
+Also, please note that the script to produce the global tree is continually modified as new data are released. If you would like to reproduce the latest tree, please head over to the [latest release](https://github.com/roblanf/sarscov2phylo/releases/latest), which contains the latest tree and the version of the code used to produce it.
 
 ![Part of global SARS-CoV-2 phylogeny](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpg)
 
