@@ -36,7 +36,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 
 one_bootstrap(){
 
-   if (( $(bc -l <<< "$e == 0") )); then
+   if (( $(bc -l <<< "$1 == 0") )); then
       # make the reference tree if bootstrap ref = 0
       echo ""
       echo "Making the reference tree with fasttree -fastest option"
