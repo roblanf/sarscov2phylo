@@ -55,6 +55,10 @@ mv $input_seqs"tmp.fa" $input_seqs
 echo "Replacing spaces in sequence names with '_'"
 sed -i.bak '/^>/s/ /_/g' $input_seqs
 
+echo "Replacing brackets in sequence names with '-'"
+sed -i.bak '/^>/s/(/-/g' $input_seqs
+sed -i.bak '/^>/s/)/-/g' $input_seqs
+
 # now we replaces spaces in the sequences with N's
 # these occur in a number of PHE UK sequences
 echo "Replacing spaces in sequences with 'N'"
