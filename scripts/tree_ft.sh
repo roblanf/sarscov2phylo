@@ -33,21 +33,26 @@ inputdir=$(dirname $inputfasta)
 export INPUT_FASTA=$inputfasta
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# make the reference tree
-echo ""
-echo "Making the reference tree with fasttree -fastest option"
-echo ""
-fasttree -nosupport -nt -fastest $inputfasta > $inputfasta'multi.fasttree'
-
-Rscript $DIR/bifurcate.R -i $inputfasta'multi.fasttree' -o $inputfasta'.fasttree'
 
 one_bootstrap(){
 
-   bootpre='boot'$1
-   goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
-   fasttree -nosupport -nt -fastest $bootpre'0.fa' > $bootpre'unrooted.tree'
-   nw_reroot $bootpre'unrooted.tree' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $bootpre'multi.tree'
-   
+   if (( $(bc -l <<< "$e == 0") )); then
+      # make the reference tree if bootstrap ref = 0
+      echo ""
+      echo "Making the reference tree with fasttree -fastest option"
+      echo ""
+      fasttree -nosupport -nt -fastest "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
+
+      Rscript $DIR/bifurcate.R -i "$INPUT_FASTA"'multi.fasttree' -o "$INPUT_FASTA"'.fasttree'
+
+   else
+
+      bootpre='boot'$1
+      goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
+      fasttree -nosupport -nt -fastest $bootpre'0.fa' > $bootpre'unrooted.tree'
+      nw_reroot $bootpre'unrooted.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > $bootpre'multi.tree'
+
+   fi   
 }
 
 export -f one_bootstrap
@@ -55,7 +60,7 @@ export -f one_bootstrap
 echo ""
 echo "Making 100 bootstrap trees with fasttree -fastest"
 echo ""
-boot_nums=($(seq 1 100))
+boot_nums=($(seq 0 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
