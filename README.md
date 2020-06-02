@@ -97,9 +97,9 @@ To estimate a global phylogeny for the GISAID sequences, the code run by [this s
 6. Filters sites from the alignment with >5 % gaps.
 7. Filters sequence from the alignment that are shorter than 28000 bp, or contain >1000 ambiguities
 8. Estimates a global tree using `fasttree` with the `-fastest` setting ([why's this good?](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md))
-9. Uses `goalign` and GNU `parallel` to estimate 100 bootstrap trees as in step 7.
-10. Creates bootstrap support trees with standard bootstraps and the transfer bootstrap using `raxml-ng`. The latter measure is likely more appropriate for large SARS-CoV-2 trees.
-11. Removes sequences on very long branches from the tree using TreeShrink (these sequences are likely to be either of poor quality and/or poorly aligned)
+9. Uses `goalign` and GNU `parallel` to make 100 bootstrap alignments, then make trees from these as in step 8.
+10. Creates bootstrap support trees with standard bootstraps and the transfer bootstrap using `raxml-ng`. The latter measure is likely more appropriate for large SARS-CoV-2 trees (see above).
+11. Removes sequences on very long branches from the tree using [TreeShrink](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4620-2) (these sequences are likely to be either of poor quality and/or poorly aligned)
 12. Roots the trees with [nw_utils](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2887050/) using sequence hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05, following advice [here](https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1)
 
 
