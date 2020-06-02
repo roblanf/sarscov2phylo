@@ -6,7 +6,7 @@ We gratefully acknowledge the authors, originating and submitting laboratories o
 
 # Key files
 
-The latest tree with the associated code to reproduce that tree can always be obtained from the latest release of this repository [here](https://github.com/roblanf/sarscov2phylo/releases)
+The latest tree with the associated code to reproduce that tree can always be obtained from the latest release of this repository [here](https://github.com/roblanf/sarscov2phylo/releases/latest)
 
 For convenience, you can also get the latest results via the following links:
 
