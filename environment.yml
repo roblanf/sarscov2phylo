@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - bioconda
   - defaults
+  - smirarab
 dependencies:
   - bc
   - biopython=1.74
@@ -19,6 +20,7 @@ dependencies:
   - rapidnj
   - snakemake-minimal=5.13
   - seqmagick
+  - treeshrink
   - ucsc-faFilter
   - ucsc-faSomeRecords
   - ucsc-faSplit
