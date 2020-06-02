@@ -75,7 +75,7 @@ faSplit sequence $input_seqs $N individual_seq
 # Pairwise align each to the ref. with MAFFT and trim the UTRs
 # mafft and parallel
 # build this into augur as trim_seqs.py
-echo "Trimming UTRs from sequences relative to NC_045512.2 reference"
+echo "Trimming ends of sequences relative to NC_045512.2 reference"
 echo "UTRs are assumed to be start:265 and 29675:end"
 #echo "Trimming start:55 and 29804:end, as suggested in http://virological.org/t/issues-with-sars-cov-2-sequencing-data/473"
 trim_a_seq()
