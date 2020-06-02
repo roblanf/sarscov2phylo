@@ -85,11 +85,9 @@ You can get more information on what is happening from the scripts themselves, a
 
 # What does it do, exactly?
 
-Note that all trees are rooted with the WH4 sequence, as suggested here: 
+## Estimating a tree for just GISAID data (i.e. reproducing the trees in this repository)
 
-## Estimating a tree for just GISAID data
-
-To estimate a global phylogeny for the GISAID sequences, the code:
+To estimate a global phylogeny for the GISAID sequences, the code run by [this script](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh):
 
 1. Fixes known issues with GISAID sequences (there are quite a few...)
 2. Removes sequences that I or others have determined to be questionable (these are documented in [excluded_sequences.tsv](https://github.com/roblanf/sarscov2phylo/blob/master/excluded_sequences.tsv))
