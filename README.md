@@ -21,10 +21,20 @@ Also, please note that the script to produce the global tree is continually modi
 
 ![Part of global SARS-CoV-2 phylogeny](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpg)
 
-# How do I look at these trees
+# How do I look at these trees?
 
 The trees contain more than 30,000 sequences. If you would like to visualise them, I recommend using [Dendroscope](http://dendroscope.org/). This is very fast, has a very quick search that allows you to find sequences of interest, and allows you to switch easily between cladograms, phylogenies, etc. The image above is a screenshot from Dendroscope.
 
+# Why isn't the sequence I'm intersted in in the tree?
+
+Sequences are filtered out for a few reasons:
+
+1. Shorter than 28,000 bp after alignment
+2. Contains more than 1000 ambiguities after alignment
+3. Identified as being on a long branch by TreeShrink
+4. Identified as questionable in the [excluded_sequences.tsv](https://github.com/roblanf/sarscov2phylo/blob/master/excluded_sequences.tsv) file
+
+If your sequence is in GISAID, and was submitted before the date noted in the [latest release of the repository](https://github.com/roblanf/sarscov2phylo/releases/latest), but it is not in the tree, then it was filtered for one of the above reasons.
 
 # Why are there two trees, and what are all the numbers?
 
