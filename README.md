@@ -21,6 +21,11 @@ Also, please note that the script to produce the global tree is continually modi
 
 ![Part of global SARS-CoV-2 phylogeny](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpg)
 
+# How do I look at these trees
+
+The trees contain more than 30,000 sequences. If you would like to visualise them, I recommend using [Dendroscope](http://dendroscope.org/). This is very fast, has a very quick search that allows you to find sequences of interest, and allows you to switch easily between cladograms, phylogenies, etc. The image above is a screenshot from Dendroscope.
+
+
 # Why are there two trees, and what are all the numbers?
 
 The topology and branch lengths of the two trees are identical. In both cases, the topology is the best topology estimated by `fasttree` using the `-fastest` option, which [I found to perform the best out of a wide range of potential approaches](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md). The branch lengths represent substitutions per site. 
