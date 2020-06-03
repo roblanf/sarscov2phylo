@@ -6,7 +6,7 @@ We gratefully acknowledge the authors, originating and submitting laboratories o
 
 # Key files
 
-The latest tree with the associated code to reproduce that tree can always be obtained from the latest release of this repository [here](https://github.com/roblanf/sarscov2phylo/releases/latest)
+The latest tree with the associated code to reproduce that tree can always be obtained from the latest release of this repository [here](https://github.com/roblanf/sarscov2phylo/releases/latest). Releases are named by the date (in Australian time) on which the sequences were downloaded from GISAID.
 
 For convenience, you can also get the latest results via the following links:
 
@@ -15,15 +15,15 @@ For convenience, you can also get the latest results via the following links:
 * [Acknowledgements file for those that upload to GISAID](https://github.com/roblanf/sarscov2phylo/blob/master/gisaid_hcov-19_acknowledgement.tsv)
 * [Latest version of the script to produce a global tree](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh)
 
-Privacy rules around the alignments themselves mean that they cannot be released here. The alignments can be recreated by following the steps described below. 
+Privacy rules around the alignments themselves mean that they cannot be released here. The alignments can be recreated by following the steps described below. If you are a GISAID member and would like a copy of the alignment, please email me and I'll share it with you.
 
-Also, please note that the script to produce the global tree is continually modified as new data are released. If you would like to reproduce the latest tree, please head over to the [latest release](https://github.com/roblanf/sarscov2phylo/releases/latest), which contains the latest tree and the version of the code used to produce it.
+Also, please note that the script to produce the global tree is continually modified as new data are released, so if you are looking at the master branch it may be the case that the latest code will not exactly reproduce the latest tree. If you would like to reproduce the latest tree, please head over to the [latest release](https://github.com/roblanf/sarscov2phylo/releases/latest), which contains the latest tree and the version of the code used to produce it.
 
 ![Part of global SARS-CoV-2 phylogeny](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpg)
 
 # Why are there two trees, and what are all the numbers?
 
-The topology and branch lengths of the two trees is identical. In both cases, the topology is the best topology estimated by `fasttree` using the `-fastest` option, which [I found to perform the best out of a wide range of potential approaches](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md). The branch lengths represent substitutions per site. 
+The topology and branch lengths of the two trees are identical. In both cases, the topology is the best topology estimated by `fasttree` using the `-fastest` option, which [I found to perform the best out of a wide range of potential approaches](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md). The branch lengths represent substitutions per site. 
 
 The only difference between the two trees are the support values represented for each branch. One tree (ft_FBP.tree) contains standard bootstrap values (also known as Felsenstein Bootstrap Proportions, or FBP). The other is built using the Transfer Bootstrap Expectation (or TBE). You can read more about these two values and how they differe [here](https://natureecoevocommunity.nature.com/users/87831-olivier-gascuel/posts/32426-renewing-felsenstein-s-phylogenetic-bootstrap-in-the-era-of-big-data) and [here](https://www.nature.com/articles/s41586-018-0043-0). 
 
@@ -89,19 +89,25 @@ You can get more information on what is happening from the scripts themselves, a
 
 ## Estimating a tree for just GISAID data (i.e. reproducing the trees in this repository)
 
-To estimate a global phylogeny for the GISAID sequences, the code run by [this script](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh):
+To estimate a global phylogeny for the GISAID sequences, run [this script](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh) with the following commandline:
 
-1. Fixes known issues with GISAID sequences (there are quite a few...)
+```
+bash global_tree_gisaid.sh -i gisaid.fasta -o global.fa -t 20 -k 100
+```
+
+Here's what the code does:
+
+1. Fixes known issues with GISAID sequences, include replacing spaces in sequences with N's, and illegal characters in names. (The EPI-ID is never changed, so if you are interested in a particular sequence, it's best to search for it with the EPI-ID)
 2. Removes sequences that I or others have determined to be questionable (these are documented in [excluded_sequences.tsv](https://github.com/roblanf/sarscov2phylo/blob/master/excluded_sequences.tsv))
 3. Trims the low-quality ends from every sequence in the input file (saved as `trimmed.fa`), following advice here: http://virological.org/t/issues-with-sars-cov-2-sequencing-data/473.
-4. Makes an alignment of the 100 most dissimilar (but high-quality) sequences in the input, then filters gappy sites from this (saved as `aln_k_filtered.fa`)
-5. Creates a global alignment by aligning every sequence to `aln_k_filtered.fa` with MAFFT, parallelised with GNU parallel
-6. Filters sites from the alignment with >5 % gaps.
-7. Filters sequence from the alignment that are shorter than 28000 bp, or contain >1000 ambiguities
+4. Makes an alignment of the 100 most dissimilar (but high-quality, namely no more than 10 ambiguous bases, filtered with `seqmagick`) sequences in the input, then filters sites with >10% gaps from this alignment using `esl-alimask` (saved as `aln_k_filtered.fa`)
+5. Creates a global alignment by aligning every sequence to `aln_k_filtered.fa` with MAFFT, parallelised with GNU parallel, and doing various format interconversions with the EASEL tools.
+6. Filters sites from the alignment with >5 % gaps using `esl-alimask`.
+7. Filters sequence from the alignment that are shorter than 28000 bp, or contain >1000 ambiguities using `esl-alimanip`
 8. Estimates a global tree using `fasttree` with the `-fastest` setting ([why's this good?](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md))
 9. Uses `goalign` and GNU `parallel` to make 100 bootstrap alignments, then make trees from these as in step 8.
 10. Creates bootstrap support trees with standard bootstraps and the transfer bootstrap using `raxml-ng`. The latter measure is likely more appropriate for large SARS-CoV-2 trees (see above).
-11. Removes sequences on very long branches from the tree using [TreeShrink](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4620-2) (these sequences are likely to be either of poor quality and/or poorly aligned)
+11. Removes sequences on very long branches from the tree using [TreeShrink](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4620-2) (these sequences are likely to be either of poor quality and/or poorly aligned, and are subsequently added to the list of excluded seuqences so they are not included in future iterations of the pipeline)
 12. Roots the trees with [nw_utils](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2887050/) using sequence hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05, following advice [here](https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1)
 
 
