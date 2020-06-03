@@ -43,8 +43,6 @@ one_bootstrap(){
       echo ""
       fasttree -nosupport -nt -fastest "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
 
-      Rscript $DIR/bifurcate.R -i "$INPUT_FASTA"'multi.fasttree' -o "$INPUT_FASTA"'.fasttree'
-
    else
 
       bootpre='boot'$1
@@ -66,7 +64,8 @@ parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 # make the file we need and clean up
 cat boot*multi.tree > $inputfasta"_ft_replicates_multi.tree"
 
-# make it bifurcating
+# make all the trees bifurcating
+Rscript $DIR/bifurcate.R -i $inputfasta'multi.fasttree' -o $inputfasta'.fasttree'
 Rscript $DIR/bifurcate.R -i $inputfasta"_ft_replicates_multi.tree" -o $inputfasta"_ft_replicates.tree" 
 
 inputdir=$(dirname $inputfasta)
