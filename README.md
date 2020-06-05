@@ -15,7 +15,7 @@ For convenience, you can also get the latest results via the following links:
 * [Acknowledgements file for those that upload to GISAID](https://github.com/roblanf/sarscov2phylo/blob/master/gisaid_hcov-19_acknowledgement.tsv)
 * [Latest version of the script to produce a global tree](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh)
 
-Privacy rules around the alignments themselves mean that they cannot be released here. The alignments can be recreated by following the steps described below. If you are a GISAID member and would like a copy of the alignment, please email me and I'll share it with you.
+Privacy rules around the alignments themselves mean that they cannot be released here. The alignments can be recreated by following the steps described below. If you are a GISAID member and would like a copy of the alignment, please email me and I'll share it with you. 
 
 Also, please note that the script to produce the global tree is continually modified as new data are released, so if you are looking at the master branch it may be the case that the latest code will not exactly reproduce the latest tree. If you would like to reproduce the latest tree, please head over to the [latest release](https://github.com/roblanf/sarscov2phylo/releases/latest), which contains the latest tree and the version of the code used to produce it.
 
@@ -62,7 +62,7 @@ If you want to dig deeper into how we estimate the trees, and/or contribute by t
 
 # Installation
 
-You should be able to re-run the scripts I provide here, provided you have access to a reasonably large server (e.g. ~500GB RAM and ~50 cores). 
+You should be able to re-run the scripts I provide here, provided you have access to a reasonably large server (e.g. ~500GB RAM and ~50 cores). With those resources I can run the scripts with ~35 threads (as of early June 2020, each fasttree run takes about 10GB).
 
 To start, you will need some version of conda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/
 
@@ -70,7 +70,7 @@ Once you have that, getting all the pacakges you need is simple:
 
 ```
 # 1. Clone the repo
-git clone https://github.com/roblanf/sarscov2phylo``
+git clone https://github.com/roblanf/sarscov2phylo
 
 # 2. change to the dir
 cd sarscov2phylo/
@@ -90,7 +90,7 @@ conda activate sarscov2phylo
 
 2. Run this: `bash global_tree_gisaid.sh -i gisaid.fasta -o global.fa -t 20 -k 100`
 
-You can get more information on what is happening from the scripts themselves, and below. 
+You can get more information on what is happening from the scripts themselves, and below.
 
 ## Estimating local trees for your own data
 
@@ -137,6 +137,10 @@ This is a slightly different problem from estimating a global tree. Instead of w
 5. Re-estimates the local phylogeny around each focal sequence using `raxml-ng` with a GTR+I+G model of sequence evolution with 100 bootstraps. 
 6. Creates bootstrap support trees with standard bootstraps and the transfer bootstrap using `raxml-ng`. The latter measure is likely more appropriate for large SARS-CoV-2 trees.
 7. Attempts to make PDFs of each local tree with `Inkscape`, though you will need to install this yourself as the `conda` implementation of Inkscape seems to be dead right now.
+
+# One last thing
+
+The trees and alignments produced by the scripts here are checked regularly by eye. No matter all the clever software tools, there is no replacement for the human eye when it comes to spotting anomalies. If I find an anomaly, I go back and change the scripts to deal with it automatically (e.g. by removing a seuqence or masking a site, changing alignment or tree building parameters, etc). Rest assured that each release contains the exact code that built the trees included in that release, and also that I would not publish a release with a known anomaly. Obviously I can't guarantee to find all of the problematic sequences or sites, but I try.
  
 
 # Key tools used
