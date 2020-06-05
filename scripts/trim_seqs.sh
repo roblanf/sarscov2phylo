@@ -153,4 +153,4 @@ find $inputdir -name \*.fa_trimmed.fa -exec cat {} \; > $output_seqs
 
 #clean up
 echo "cleaning up"
-find $inputdir -maxdepth 1 -name "individual_seq*" -delete
+#find $inputdir -maxdepth 1 -name "individual_seq*" -delete
