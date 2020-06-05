@@ -6,6 +6,7 @@ channels:
   - smirarab
 dependencies:
   - bc
+  - bcftools
   - biopython=1.74
   - easel
   - iqtree>2
