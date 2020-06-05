@@ -121,7 +121,11 @@ trim_a_seq()
    for site in $MASK_SITES; do
       if (( $(bc -l <<< "$site > $TRIM_START") )); then
          if (( $(bc -l <<< "$site < $TRIM_END") )); then
-            ./goalign_amd64_linux mask -i $alfile -l 1 -s $site --ref-seq 'reference_sequence' -o $alfile
+            ./goalign_amd64_linux mask -i $alfile -l 1 -s $site --ref-seq 'reference_sequence' -o $alfile".mask"
+            
+            # cycle the file names so we can keep updating the alignment, not a beautiful solution :(
+            rm $alfile
+            mv $alfile".mask" $alfile
          fi
       fi
    done
@@ -153,4 +157,4 @@ find $inputdir -name \*.fa_trimmed.fa -exec cat {} \; > $output_seqs
 
 #clean up
 echo "cleaning up"
-#find $inputdir -maxdepth 1 -name "individual_seq*" -delete
+find $inputdir -maxdepth 1 -name "individual_seq*" -delete
