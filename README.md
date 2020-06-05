@@ -1,6 +1,6 @@
 # A global phylogeny of SARS-CoV-2
 
-This repository provides a global phylogeny of SARS-CoV-2 data from GISAID, as well as reproducile methods with which to estimate it. It also provides code that can be used to estimate local phylogenies around your own sequences, please see below for more information.
+This repository provides a regularly-updated global phylogeny of SARS-CoV-2 data from GISAID, as well as reproducile methods with which to estimate it. It also provides code that can be used to estimate local phylogenies around your own sequences, please see below for more information.
 
 We gratefully acknowledge the authors, originating and submitting laboratories of the sequences from GISAID’s EpiFlu™ Database on which this research is based. The list is detailed in [this tab-separated file](https://github.com/roblanf/sarscov2phylo/blob/master/gisaid_hcov-19_acknowledgement.tsv).
 
