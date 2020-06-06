@@ -121,6 +121,11 @@ trim_a_seq()
    for site in $MASK_SITES; do
       if (( $(bc -l <<< "$site > $TRIM_START") )); then
          if (( $(bc -l <<< "$site < $TRIM_END") )); then
+
+            # goalign works on slice indices, not site indices, so watch out...
+            # e.g. goalign mask -l 1 -s 2 from seq AAA will give AAN (mask of length 1 from second slice)
+            site=$(($site-1))
+
             ./goalign_amd64_linux mask -i $alfile -l 1 -s $site --ref-seq 'reference_sequence' -o $alfile".mask"
             
             # cycle the file names so we can keep updating the alignment, not a beautiful solution :(
