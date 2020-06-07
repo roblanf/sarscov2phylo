@@ -114,7 +114,7 @@ Here's what the code does:
 
 1. Fixes known issues with GISAID sequences, include replacing spaces in sequences with N's, and illegal characters in names. (The EPI-ID is never changed, so if you are interested in a particular sequence, it's best to search for it with the EPI-ID)
 2. Removes sequences that I or others have determined to be questionable (these are documented in [excluded_sequences.tsv](https://github.com/roblanf/sarscov2phylo/blob/master/excluded_sequences.tsv))
-3. Trims the low-quality ends from every sequence in the input file (saved as `trimmed.fa`), following advice here: http://virological.org/t/issues-with-sars-cov-2-sequencing-data/473.
+3. Masks all sites from the interior of the sequence, and trims the ends of the sequences, as suggested in [this post](http://virological.org/t/issues-with-sars-cov-2-sequencing-data/473), by using the latest (when the script is run) version of [this file](https://github.com/W-L/ProblematicSites_SARS-CoV2/blob/master/subset_vcf/problematic_sites_sarsCov2.mask.vcf)(saved as `trimmed.fa`). This step uses `goalign`, GNU parallel, EASEL tools, and `mafft`. 
 4. Makes an alignment of the 100 most dissimilar (but high-quality, namely no more than 10 ambiguous bases, filtered with `seqmagick`) sequences in the input, then filters sites with >10% gaps from this alignment using `esl-alimask` (saved as `aln_k_filtered.fa`)
 5. Creates a global alignment by aligning every sequence to `aln_k_filtered.fa` with MAFFT, parallelised with GNU parallel, and doing various format interconversions with the EASEL tools.
 6. Filters sites from the alignment with >5 % gaps using `esl-alimask`.
