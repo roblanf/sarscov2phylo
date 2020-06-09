@@ -142,7 +142,7 @@ xz -e -T $threads $aln_global
 xz -e -T $threads $aln_global"_alimask.fa"
 xz -e -T $threads $inputfasta
 xz -e -T $threads trimmed.fa
-xz -e -T $threads $ouptufasta"_ft_replicates.tree"
+xz -e -T $threads $outputfasta"_ft_replicates.tree"
 
 # delete last files
 rm rm .allseqs*
