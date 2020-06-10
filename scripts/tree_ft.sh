@@ -33,6 +33,10 @@ inputdir=$(dirname $inputfasta)
 export INPUT_FASTA=$inputfasta
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
+# make starting tree
+export START_TREE=$outputfasta"start.tree"
+fasttree -nosupport -nt -fastest $outputfasta > $START_TREE
+
 
 one_bootstrap(){
 
@@ -41,14 +45,13 @@ one_bootstrap(){
       echo ""
       echo "Making the reference tree with fasttree -fastest option"
       echo ""
-      fasttree -nosupport -nt -fastest "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
+      fasttree -nosupport -nt -fastest -intree $START_TREE "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
 
    else
 
       bootpre='boot'$1
       goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
-      fasttree -nosupport -nt -fastest $bootpre'0.fa' > $bootpre'unrooted.tree'
-      nw_reroot $bootpre'unrooted.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > $bootpre'multi.tree'
+      fasttree -nosupport -nt -fastest -intree $START_TREE $bootpre'0.fa' > $bootpre'unrooted.tree'
 
    fi   
 }
