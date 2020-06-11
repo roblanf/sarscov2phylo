@@ -33,9 +33,6 @@ inputdir=$(dirname $inputfasta)
 export INPUT_FASTA=$inputfasta
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# make starting tree
-export START_TREE=$outputfasta"start.tree"
-fasttree -nosupport -nt -fastest "$INPUT_FASTA" > "$START_TREE"
 
 one_bootstrap(){
 
@@ -44,13 +41,13 @@ one_bootstrap(){
       echo ""
       echo "Making the reference tree with fasttree -fastest option"
       echo ""
-      fasttree -nosupport -nt -fastest -intree "$START_TREE" "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
+      fasttree -nosupport -nt -fastest "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
 
    else
 
       bootpre='boot'$1
       goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
-      fasttree -nosupport -nt -fastest -intree "$START_TREE" $bootpre'0.fa' > $bootpre'unrooted.tree'
+      fasttree -nosupport -nt -fastest $bootpre'0.fa' > $bootpre'unrooted.tree'
 
    fi   
 }
@@ -64,7 +61,7 @@ boot_nums=($(seq 0 100))
 parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 
 # make the file we need and clean up
-cat boot*multi.tree > $inputfasta"_ft_replicates_multi.tree"
+cat boot*unrooted.tree > $inputfasta"_ft_replicates_multi.tree"
 
 # make all the trees bifurcating
 Rscript $DIR/bifurcate.R -i $inputfasta'multi.fasttree' -o $inputfasta'.fasttree'
