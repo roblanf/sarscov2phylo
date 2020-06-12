@@ -12,6 +12,7 @@ dependencies:
   - iqtree>2
   - fasttree
   - goalign
+  - gotree
   - mafft
   - raxml-ng
   - newick_utils
