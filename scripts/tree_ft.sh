@@ -63,28 +63,23 @@ parallel -j $threads --bar "one_bootstrap {}" ::: ${boot_nums[@]} > /dev/null
 # make the file we need and clean up
 cat boot*unrooted.tree > $inputfasta"_ft_replicates_multi.tree"
 
-# make all the trees bifurcating
-Rscript $DIR/bifurcate.R -i $inputfasta'multi.fasttree' -o $inputfasta'.fasttree'
-Rscript $DIR/bifurcate.R -i $inputfasta"_ft_replicates_multi.tree" -o $inputfasta"_ft_replicates.tree" 
-
 inputdir=$(dirname $inputfasta)
 
 find $inputdir -maxdepth 1 -name "boot*" -delete
-rm $inputfasta"_ft_replicates_multi.tree"
 
-echo ""
-echo "Running raxml to map bootstrap support to focal tree"
-raxml-ng --support --tree $inputfasta'.fasttree' --bs-trees $inputfasta"_ft_replicates.tree" --prefix $inputfasta'_ft_boot' --threads $threads --bs-metric fbp,tbe --redo
+# we hardcode 55 threads here, to keep it fast
+gotree compute support tbe -i $inputfasta"multi.fasttree" -b $inputfasta"_ft_replicates_multi.tree" -t 55 -o $inputfasta"_ft_TBE_unrooted.tree"
+gotree compute support fbp -i $inputfasta"multi.fasttree" -b $inputfasta"_ft_replicates_multi.tree" -t 55 -o $inputfasta"_ft_FBP_unrooted.tree"
 
 # re-root as per https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1
 echo ""
 echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
 echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
 echo ""
-nw_reroot $inputfasta'_ft_boot.raxml.supportFBP' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_FBP.tree'
-rm $inputfasta'_ft_boot.raxml.supportFBP'
+nw_reroot $inputfasta"_ft_FBP_unrooted.tree" 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_FBP.tree'
+rm $inputfasta"_ft_FBP_unrooted.tree"
 
-nw_reroot $inputfasta'_ft_boot.raxml.supportTBE' 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_TBE.tree'
-rm $inputfasta'_ft_boot.raxml.supportTBE'
+nw_reroot $inputfasta"_ft_TBE_unrooted.tree" 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_TBE.tree'
+$inputfasta"_ft_TBE_unrooted.tree"
 
 rm $inputfasta'_ft_boot.raxml.log'
