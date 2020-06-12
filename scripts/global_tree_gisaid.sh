@@ -55,6 +55,10 @@ echo ""
 aln_global="$inputdir/aln_global_unmasked.fa"
 bash $DIR/global_profile_alignment.sh -i $cleaned_gisaid -o $aln_global -t $threads
 
+echo "alignment stats of global alignment"
+esl-alistat $aln_global
+
+
 echo ""
 echo "Masking alignment"
 echo ""
@@ -62,28 +66,29 @@ echo ""
 aln_global_masked="$inputdir/aln_global_masked.fa"
 bash $DIR/mask_alignment.sh -i $aln_global -o $aln_global_masked -t $threads
 
+echo "alignment stats of global alignment after masking"
+esl-alistat $aln_global_masked
 
 
+aln_global_filtered="$inputdir/aln_global_filtered.fa"
 
 
-
-
-
-
-echo "alignment stats before filtering"
-esl-alistat $aln_global
-
-echo ""
-echo "Filtering sites with >5% gaps"
-esl-alimask --gapthresh 0.05 --informat afa --outformat afa --dna -o $aln_global"_alimask.fa" -g  $aln_global
 echo "Filtering sequences that are shorter than 28000 bp and/or have >1000 ambiguities"
-esl-alimanip --lmin 28000 --xambig 1000 --informat afa --outformat afa --dna -o $aln_global"_alimanip.fa" $aln_global"_alimask.fa"
-
-mv $aln_global"_alimanip.fa" $outputfasta
+esl-alimanip --lmin 28000 --xambig 1000 --informat afa --outformat afa --dna -o $aln_global_filtered $aln_global_masked
 
 echo ""
-echo "alignment stats after filtering"
+echo "alignment stats after filtering out short/ambiguous sequences"
+esl-alistat $aln_global_filtered
+
+
+echo ""
+echo "Filtering sites that are all gaps"
+esl-alimask --gapthresh 0.9999999999999 --informat afa --outformat afa --dna -o $outputfasta -g  $aln_global_filtered
+
+echo "alignment stats of global alignment after trimming sites"
 esl-alistat $outputfasta
+
+
 
 
 #### ESTIMATE THE GLOBAL TREE ######
