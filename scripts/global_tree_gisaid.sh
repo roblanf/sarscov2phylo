@@ -117,16 +117,9 @@ rm ft_TBE.tree.bak
 sed -i.bak "s/'//g" ft_FBP.tree
 rm ft_FBP.tree.bak
 
-echo "Filtering stats"
+echo "After filtering sequences with TreeShrink" >> alignments.log
+nw_stats ft_TBE.tree >> alignments.log
 
-echo "Unfiltered"
-esl-alistat $aln_global
-echo "After filtering sites with alimask"
-esl-alistat $aln_global"_alimask.fa"
-echo "After filtering sequences with alimanip"
-esl-alistat $outputfasta
-echo "After filtering sequences with TreeShrink"
-nw_stats ft_TBE.tree
 
 # zip up for easy file transfer
 xz -e -T $threads $outputfasta
@@ -135,5 +128,6 @@ xz -e -T $threads $aln_global_filtered
 xz -e -T $threads $aln_global_masked
 xz -e -T $threads $aln_global_unmasked
 xz -e -T $threads $inputfasta
+xz -e -T $threads $inputfasta"_cleaned.fa"
 xz -e -T $threads $outputfasta"_ft_replicates.tree"
 
