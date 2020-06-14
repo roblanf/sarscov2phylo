@@ -80,6 +80,5 @@ nw_reroot $inputfasta"_ft_FBP_unrooted.tree" 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_40
 rm $inputfasta"_ft_FBP_unrooted.tree"
 
 nw_reroot $inputfasta"_ft_TBE_unrooted.tree" 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_TBE.tree'
-$inputfasta"_ft_TBE_unrooted.tree"
+rm $inputfasta"_ft_TBE_unrooted.tree"
 
-rm $inputfasta'_ft_boot.raxml.log'
