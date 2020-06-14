@@ -129,5 +129,9 @@ xz -e -T $threads $aln_global_masked
 xz -e -T $threads $aln_global_unmasked
 xz -e -T $threads $inputfasta
 xz -e -T $threads $inputfasta"_cleaned.fa"
-xz -e -T $threads $outputfasta"_ft_replicates.tree"
+xz -e -T $threads $outputfasta"_ft_replicates_multi.tree"
 
+rm goalign_amd64_linux
+
+# tar up the files for easy transfer
+tar -zcvf dat.tar.gz *
