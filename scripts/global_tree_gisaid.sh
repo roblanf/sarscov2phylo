@@ -77,8 +77,8 @@ esl-alimask --gapthresh 0.5 --informat afa --outformat afa --dna -o $outputfasta
 rm tmp.aln
 
 echo "sequences downloaded from GISAID" >> alignments.log
-echo grep ">" $inuptfasta | wc -l >> alignments.log
-echo "//"
+echo $(grep ">" $inputfasta | wc -l) >> alignments.log
+echo "//" >> alignments.log
 echo "alignment stats of global alignment" >> alignments.log
 esl-alistat $aln_global >> alignments.log
 echo "alignment stats of global alignment after masking sites" >> alignments.log
