@@ -96,7 +96,7 @@ echo "Estimating trees with bootstraps using fasttree"
 echo ""
 
 # finally, we estimate a tree with 100 bootstraps using fasttree
-bash $DIR/tree_ft.sh -i $outputfasta -t 34
+bash $DIR/tree_ft.sh -i $outputfasta -t $threads
 
 
 echo ""
