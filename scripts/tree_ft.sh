@@ -38,11 +38,12 @@ one_bootstrap(){
 
    if (( $(bc -l <<< "$1 == 0") )); then
       # make the reference tree if bootstrap ref = 0
-      # GTR parameters are very stable across datasets, and are pre-calculated in IQ-TREE from 14/6/20
+      # parameters are set to be more thorough for the ML tree than for the bootstrap trees
+      # this is pure pragmatism. For reasoning behind parameters, see tree_estimation2.md in this repo
       echo ""
       echo "Making the reference tree with fasttree -fastest option"
       echo ""
-      fasttree -nosupport -nt -gamma -gtrrates 0.17383 0.75939 0.16132 0.14003 2.80597 1.00000 -gtrfreq 0.299 0.184 0.196 0.321 "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
+      fasttree -nosupport -nt -gamma -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
 
    else
 
