@@ -48,6 +48,7 @@ one_bootstrap(){
    else
 
       bootpre='boot'$1
+      sleep $[ ( $RANDOM % 300 )  + 1 ]s
       goalign build seqboot -i "$INPUT_FASTA" -t 1 -n 1 -S -o $bootpre
       fasttree -nosupport -nt -fastest $bootpre'0.fa' > $bootpre'unrooted.tree'
 
