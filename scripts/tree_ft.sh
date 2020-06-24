@@ -43,7 +43,7 @@ one_bootstrap(){
       echo ""
       echo "Making the reference tree with fasttree -fastest option"
       echo ""
-      fasttree -nosupport -nt -gamma -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
+      fasttree -nt -gamma -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
 
    else
 
