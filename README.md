@@ -12,6 +12,7 @@ For convenience, you can also get the latest results via the following links:
 
 * [Latest global phylogeny with Transfer Bootstrap Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_TBE.tree)
 * [Latest global phylogeny with Felsenstein Bootstrap Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_FBP.tree)
+* [Latest global phylogeny with fasttree SH Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_SH.tree)
 * [Acknowledgements file for those that upload to GISAID](https://github.com/roblanf/sarscov2phylo/blob/master/gisaid_hcov-19_acknowledgement.tsv)
 * [Latest version of the script to produce a global tree](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh)
 
@@ -36,13 +37,18 @@ Sequences are filtered out for a few reasons:
 
 If your sequence is in GISAID, and was submitted before the date noted in the [latest release of the repository](https://github.com/roblanf/sarscov2phylo/releases/latest), but it is not in the tree, then it was filtered for one of the above reasons.
 
-# Why are there two trees, and what are all the numbers?
+# Why are there three trees, and what are all the numbers?
 
-The topology and branch lengths of the two trees are identical. In both cases, the topology is the best topology estimated by `fasttree` using the `-fastest` option, which [I found to perform the best out of a wide range of potential approaches](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md). The branch lengths represent substitutions per site. You will see that if you multiply the branchlenghts by about 30,000 (which is roughly the length of the alignments) many of the branchlengths are close to integers. That's because there's very little variation in these sequences, meaning that many branches have some integer number of changes inferred on them.
+The topology and branch lengths of the three trees are identical. In all cases, the topology is the best topology estimated by `fasttree` with options tuned specifically for this dataset, see [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md) and [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation2.md). The branch lengths represent substitutions per site. You will see that if you multiply the branchlenghts by about 30,000 (which is roughly the length of the alignments) many of the branchlengths are close to integers. That's because there's very little variation in these sequences, meaning that many branches have some integer number of changes inferred on them.
 
-The only difference between the two trees are the support values represented for each branch. One tree (ft_FBP.tree) contains standard bootstrap values (also known as Felsenstein Bootstrap Proportions, or FBP). The other has support values calculated using the Transfer Bootstrap Expectation (or TBE). You can read more about these two values and how they differe [here](https://natureecoevocommunity.nature.com/users/87831-olivier-gascuel/posts/32426-renewing-felsenstein-s-phylogenetic-bootstrap-in-the-era-of-big-data) and [here](https://www.nature.com/articles/s41586-018-0043-0). 
+The only difference between the three trees are the support values represented for each branch. One tree (ft_FBP.tree) contains standard bootstrap values (also known as Felsenstein Bootstrap Proportions, or FBP). The next has support values calculated using the Transfer Bootstrap Expectation (or TBE). You can read more about these two values and how they differe [here](https://natureecoevocommunity.nature.com/users/87831-olivier-gascuel/posts/32426-renewing-felsenstein-s-phylogenetic-bootstrap-in-the-era-of-big-data) and [here](https://www.nature.com/articles/s41586-018-0043-0). The third tree has support values calculated by the SH test in `fasttree`.
 
-The difference is fairly simple to describe. The FBP value represents the percentage of bootstrap trees in which a split appeared. The TBE value represents the proportion of taxa in a clade that are, on average, stable across bootstrap replicates. The TBE is always at least as high as the FBP. In trees of thousands of taxa (this tree has 10s of 1000s), FBP values can often be very close to zero simply because branches are very short and some taxa can move around a lot. The TBE is more informative in this case, because it measures how many taxa have to be moved to recover a branch in a tree, rather than just the presence/absence of that branch. 
+The difference between the TBE and FBP is fairly simple to describe. The FBP value represents the percentage of bootstrap trees in which a split appeared. The TBE value represents the proportion of taxa in a clade that are, on average, stable across bootstrap replicates. The TBE is always at least as high as the FBP. In trees of thousands of taxa (this tree has 10s of 1000s), FBP values can often be very close to zero simply because branches are very short and some taxa can move around a lot. The TBE is more informative in this case, because it measures how many taxa have to be moved to recover a branch in a tree, rather than just the presence/absence of that branch.
+
+The measures are all designed to estimate a similar quantity - something related to the confidence one might have in a branch. But they take very different approaches to this. Here's a plot which shows what they look like on a tree of >30K SARS-CoV-2 sequences from 24/6/20. The plot shows clearly that FBPs tend to be the lowest, TBEs are higher, and SH values are even higher. FBPs and TBEs are well correlated, but neither correlates that well to the SH values from fasttree (there *is* a very significant correlation though, as you'd expect!). 
+
+![A comparison of support measures](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpeg)
+
 
 # Why bother?
 
