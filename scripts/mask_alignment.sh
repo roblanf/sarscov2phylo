@@ -28,6 +28,7 @@ then
 fi
 
 
+
 # download latest masking file and extract the sites to mask
 wget https://raw.githubusercontent.com/W-L/ProblematicSites_SARS-CoV2/master/subset_vcf/problematic_sites_sarsCov2.mask.vcf
 mask_sites=$(bcftools query -f '%POS\t' problematic_sites_sarsCov2.mask.vcf)
@@ -37,7 +38,6 @@ mask_sites=$(bcftools query -f '%POS\t' problematic_sites_sarsCov2.mask.vcf)
 wget https://github.com/evolbioinfo/goalign/releases/download/v0.3.3c/goalign_amd64_linux
 chmod +x goalign_amd64_linux
 
-echo "Masking all sites suggested here: https://raw.githubusercontent.com/W-L/ProblematicSites_SARS-CoV2/master/subset_vcf/problematic_sites_sarsCov2.mask.vcf"
 
 # Split GISAID data into individual sequences
 # fasplit
@@ -45,6 +45,14 @@ echo "Splitting sequences from input file into individual files"
 N=$(grep ">" $inputfasta | wc -l)
 N=$(( N*2 )) # doubling it is to ensure each record goes to one file
 faSplit sequence $inputfasta $N individual_seq
+
+
+echo "Masking any 7bp window with >=2 uninformative characters, and the first and last 30bp of every sequence"
+echo "These sites tend to have a lot more errors than other sites"
+
+export DIR="$(cd "$(dirname "$0")" && pwd)"
+
+echo "Also masking all sites suggested here: https://raw.githubusercontent.com/W-L/ProblematicSites_SARS-CoV2/master/subset_vcf/problematic_sites_sarsCov2.mask.vcf"
 
 # build the mask sites list for seqmagick
 m=""
@@ -59,6 +67,11 @@ mask_a_seq()
 
    alfile=$1
 
+   # first we edit in place to mask the first and last 30 characters
+   # and any 7bp window with >=2 uninformative characters
+   python "$DIR"'/mask_seq.py' $alfile $alfile
+
+   # next we mask the dodgy sites specifically
    seqmagick mogrify --mask $MASK_SITES $alfile 
 
 
