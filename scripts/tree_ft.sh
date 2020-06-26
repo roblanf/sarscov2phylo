@@ -41,9 +41,12 @@ one_bootstrap(){
       # parameters are set to be more thorough for the ML tree than for the bootstrap trees
       # this is pure pragmatism. For reasoning behind parameters, see tree_estimation2.md in this repo
       echo ""
-      echo "Making the reference tree with fasttree -fastest option"
+      echo "Making the reference tree with fasttree"
       echo ""
-      fasttree -nt -gamma -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
+      fasttree -nt -gamma -nosupport -sprlength 100 -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml "$INPUT_FASTA" > "$INPUT_FASTA"'1.multi.fasttree'
+      fasttree -nt -gamma -nosupport -sprlength 50  -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml -intree "$INPUT_FASTA"'1.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'2.multi.fasttree'
+      fasttree -nt -gamma -nosupport -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 -intree "$INPUT_FASTA"'2.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
+
 
    else
 
