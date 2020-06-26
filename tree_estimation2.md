@@ -18,7 +18,9 @@ I'll keep a note of the best settings in the table below. And I'll keep fully re
 Here's the best commandline for inferring the ML tree. This only has to be done once, so we can use a lot of time and memory without worrying too much. 
 
 ```
-fasttree -nosupport -nt -gamma global.fa
+fasttree -nt -gamma -nosupport -sprlength 100 -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 9.1.1.tree
+fasttree -nt -gamma -nosupport -sprlength 50  -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml -intree 9.1.1.tree global.fa > 9.1.2.tree
+fasttree -nt -gamma -nosupport -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 -intree 9.1.2.tree global.fa > 9.1.3.tree
 ```
 
 
@@ -453,6 +455,12 @@ fasttree -nt -gamma -nosupport -mllen -nome -intree 9.1.2.tree global.fa > ignor
 fasttree -nt -gamma -nosupport -mllen -nome -intree 9.1.3.tree global.fa > ignore4.tree
 ```
 
+The standard method: -330615.408
+NJ + 10 SPRs at length 100: -330871.398
++ 10 SPRs at length 50: -330862.973
++ 3 SPRs at length 20 and about 60 NNIs: -330454.343
+
+So it really looks like all those additional SPRs helped by fixing just a small number of issues.
 
 #### Iteration 10
 
