@@ -11,22 +11,6 @@ One last thing. From running replicate analyses on my server, I've noticed that 
 I'll keep a note of the best settings in the table below. And I'll keep fully reproducible notes of the commandlines lower down.
 
 
-
-
-
--nosupport vs not
-
--nocat -cat 5 10 20 50 100
-
--topm 0.1 0.2 0.5 1 2 5 10
-
--close 0.1 0.25 0.5 0.75 1.0 1.25 1.5 1.75 2.0 5.0 10.0
-
--refresh 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4
-
--sprlength 2 5 10 15 20 25 30 50 100
-
-
 ## Results
 
 ### The best commandline so far
@@ -406,3 +390,106 @@ Let's try a few more values of topm, since we didn't reach a maximum value of th
 /usr/bin/time -o 7.5.mem.txt -v fasttree -sprlength 20 -refresh 0.8 -topm 2.5 -close 0.75 -nosupport -nt -gamma global.fa > 7.5.tree
 ```
 
+The best settings are for 7.4, which is quick and gets a better likelihood.
+
+This means that the NJ tree is now fairly well optimised. So let's move on to the ME tree after trying a few more options that I'd like to see on the NJ tree.
+
+#### Iteration 8
+
+A few more random things to try on the NJ tree. Mostly because I'm curious.
+
+```
+/usr/bin/time -o 8.1.mem.txt -v fasttree -sprlength 20 -refresh 0.8 -topm 2.25 -close 0.75 -nt -gamma global.fa > 8.1.tree
+/usr/bin/time -o 8.2.mem.txt -v fasttree -sprlength 20 -refresh 0.8 -topm 2.25 -close 0.75 -bionj -nosupport -nt -gamma global.fa > 8.2.tree
+/usr/bin/time -o 8.3.mem.txt -v fasttree -sprlength 20 -refresh 0.8 -topm 2.25 -close 0.75 -2nd -nosupport -nt -gamma global.fa > 8.3.tree
+/usr/bin/time -o 8.4.mem.txt -v fasttree -sprlength 20 -refresh 0.8 -topm 2.25 -close 0.75 -bionj -2nd -nosupport -nt -gamma global.fa > 8.4.tree
+/usr/bin/time -o 8.5.mem.txt -v fasttree -sprlength 20 -refresh 0.8 -topm 2.25 -close 0.75 -fastest -bionj -nosupport -nt -gamma global.fa > 8.5.tree
+```
+
+Nothing there helped!
+
+
+#### Iteration 9
+
+Big switch here. For various reasons I decided to switch to only using alignments from GISAID that are 'complete' and 'high coverage', according to GISAID's guidlines. So I'm switching the alignment to one of those from 24/6/20. That means likelihoods from iteration 9 are not comparable to those from previous iterations.
+
+Let's start by estimating the tree using our best efforts from previous iterations.
+
+```
+/usr/bin/time -o 9.0.mem.txt -v fasttree -nt -gamma -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 global.fa > 9.0.tree
+```
+
+The likelihood of this tree is -330618.967
+
+Now I'm intersted to see if I can improve on that tree with some additional SPR moves, but this will require a little bit of hacking around with fasttree.
+
+Here's the idea. How well can we do with three rounds of fasttree, starting with two rounds of big SPR moves on the ME tree, and finishing with a standard analysis. 
+
+```
+/usr/bin/time -o 9.1.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 100 -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 9.1.1.tree
+/usr/bin/time -o 9.1.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 50  -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml -intree 9.1.1.tree global.fa > 9.1.2.tree
+/usr/bin/time -o 9.1.3.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 -intree 9.1.2.tree global.fa > 9.1.3.tree
+```
+
+
+Would it be better to start with the ML tree 9.0 instead?
+
+```
+/usr/bin/time -o 9.2.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 100 -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml -intree 9.0.tree global.fa > 9.2.1.tree
+/usr/bin/time -o 9.2.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 50  -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml -intree 9.2.1.tree global.fa > 9.2.2.tree
+/usr/bin/time -o 9.2.3.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 -intree 9.2.2.tree global.fa > 9.2.3.tree
+```
+
+The first option (starting from scratch) gives us a likelihood of -330458.212, which is a decent improvement. The second option gives us -330481.132, which is similar but not quite as good.
+
+The first option took 36259.18 seconds for the first step (long because this includes the NJ tree inference, which is slow), 13896.96 for the second step, and 13511.66 for the third step. This is fine for the ML tree, the total time is blown out a bit, but these long-range SPR moves should help avoid potentially large issues in the resulting tree. In short, additional SPR rounds do not take much time, and are certainly worth it for reducing errors.
+
+So the upshot is - extra SPR moves are a good thing. Now let's see just how much difference it made at each step, to guide our intuition about how many SPR moves we actually need.
+
+```
+fasttree -nt -gamma -nosupport -mllen -nome -intree 9.0.tree global.fa > ignore1.tree
+fasttree -nt -gamma -nosupport -mllen -nome -intree 9.1.1.tree global.fa > ignore2.tree
+fasttree -nt -gamma -nosupport -mllen -nome -intree 9.1.2.tree global.fa > ignore3.tree
+fasttree -nt -gamma -nosupport -mllen -nome -intree 9.1.3.tree global.fa > ignore4.tree
+```
+
+
+#### Iteration 10
+
+So now we know that a few extra rounds of SPR moves are a good idea, we need to figure out just how many SPR moves are worth doing, and at what range.
+
+An obvious question is whether it's just always better to have lots of very long range SPRs, so let's try that. Indeed, the range of the SPR moves didn't seem to change the execution time much, so it's feasible that increasing the range won't slow us down. Let's stick with 20 SPR moves before the final ML infernce, but adjust the range to a few different levels.
+
+And from a gut feeling, it also seems likely to improve things if we intersperse a few NNI moves between the SPR moves, so let's add two rounds of NNI moves for every round of SPR moves.
+
+Once we find the best of these options, it might be worth trying to save some execution time by reducing the number of rounds of SPR and NNI moves. 
+
+```
+/usr/bin/time -o 10.1.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 40 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 10.1.1.tree
+/usr/bin/time -o 10.1.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -intree 10.1.1.tree global.fa > 10.1.2.tree
+```
+
+```
+/usr/bin/time -o 10.2.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 200 -nni 40 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 10.2.1.tree
+/usr/bin/time -o 10.2.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 200 -intree 10.2.1.tree global.fa > 10.2.2.tree
+```
+
+```
+/usr/bin/time -o 10.3.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 100 -nni 40 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 10.3.1.tree
+/usr/bin/time -o 10.3.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 100 -intree 10.3.1.tree global.fa > 10.3.2.tree
+```
+
+```
+/usr/bin/time -o 10.4.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 50 -nni 40 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 10.4.1.tree
+/usr/bin/time -o 10.4.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 50 -intree 10.4.1.tree global.fa > 10.4.2.tree
+```
+
+```
+/usr/bin/time -o 10.5.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -nni 40 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 10.5.1.tree
+/usr/bin/time -o 10.5.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 10.5.1.tree global.fa > 10.5.2.tree
+```
+
+```
+/usr/bin/time -o 10.6.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 10 -nni 40 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 10.6.1.tree
+/usr/bin/time -o 10.6.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 10 -intree 10.6.1.tree global.fa > 10.6.2.tree
+```
