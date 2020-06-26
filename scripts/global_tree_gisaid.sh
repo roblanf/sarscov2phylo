@@ -104,6 +104,7 @@ echo "Cleaning trees with treeshrink"
 echo ""
 run_treeshrink.py -t $outputfasta'_ft_TBE.tree' -q 0.05 -c -o treeshrink_TBE
 run_treeshrink.py -t $outputfasta'_ft_FBP.tree' -q 0.05 -c -o treeshrink_FBP
+run_treeshrink.py -t $outputfasta'_ft_SH.tree' -q 0.05 -c -o treeshrink_SH
 
 
 echo ""
@@ -112,6 +113,7 @@ echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
 echo ""
 nw_reroot 'treeshrink_TBE/'$outputfasta'_ft_TBE_0.05.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > ft_TBE.tree
 nw_reroot 'treeshrink_FBP/'$outputfasta'_ft_FBP_0.05.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > ft_FBP.tree
+nw_reroot 'treeshrink_SH/'$outputfasta'_ft_SH_0.05.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > ft_SH.tree
 
 # remove quotes that treeshrink adds
 sed -i.bak "s/'//g" ft_TBE.tree
@@ -119,6 +121,10 @@ rm ft_TBE.tree.bak
 
 sed -i.bak "s/'//g" ft_FBP.tree
 rm ft_FBP.tree.bak
+
+sed -i.bak "s/'//g" ft_SH.tree
+rm ft_SH.tree.bak
+
 
 echo "After filtering sequences with TreeShrink" >> alignments.log
 nw_stats ft_TBE.tree >> alignments.log

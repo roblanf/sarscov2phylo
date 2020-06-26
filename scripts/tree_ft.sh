@@ -85,3 +85,5 @@ rm $inputfasta"_ft_FBP_unrooted.tree"
 nw_reroot $inputfasta"_ft_TBE_unrooted.tree" 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_TBE.tree'
 rm $inputfasta"_ft_TBE_unrooted.tree"
 
+nw_reroot $inputfasta"multi.fasttree" 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' > $inputfasta'_ft_SH.tree'
+
