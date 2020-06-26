@@ -30,10 +30,11 @@ The trees contain more than 30,000 sequences. If you would like to visualise the
 
 Sequences are filtered out for a few reasons:
 
-1. Shorter than 28,000 bp after alignment
-2. Contains more than 1000 ambiguities after alignment
-3. Identified as being on a long branch by TreeShrink
-4. Identified as questionable in the [excluded_sequences.tsv](https://github.com/roblanf/sarscov2phylo/blob/master/excluded_sequences.tsv) file
+1. Sequence is not marked as both 'complete' and 'high coverage' by GISAID
+2. Shorter than 28,000 bp after alignment
+3. Contains more than 1000 ambiguities after alignment
+4. Identified as being on a long branch by TreeShrink
+5. Identified as questionable in the [excluded_sequences.tsv](https://github.com/roblanf/sarscov2phylo/blob/master/excluded_sequences.tsv) file
 
 If your sequence is in GISAID, and was submitted before the date noted in the [latest release of the repository](https://github.com/roblanf/sarscov2phylo/releases/latest), but it is not in the tree, then it was filtered for one of the above reasons.
 
@@ -68,7 +69,7 @@ If you want to dig deeper into how we estimate the trees, and/or contribute by t
 
 # Installation
 
-You should be able to re-run the scripts I provide here, provided you have access to a reasonably large server (e.g. ~500GB RAM and ~50 cores). With those resources I can run the scripts with ~35 threads (as of early June 2020, each fasttree run takes about 10GB), and it will complete in around 24 hours.
+You should be able to re-run the scripts I provide here, provided you have access to a reasonably large server (e.g. ~500GB RAM and about 50 cores). With those resources I can run the scripts with ~35 threads (as of early June 2020, each fasttree run takes about 10GB), and it will complete in around 24 hours.
 
 To start, you will need some version of conda: https://docs.conda.io/projects/conda/en/latest/user-guide/install/
 
@@ -104,7 +105,7 @@ Here's what the code does:
 
 2. Creates a global sequence alignment. This is done by aligning every sequence to `NC_045512.2` from NCBI. This is achieved quickly by doing it one sequence at a time in parallel in the [global_profile_alignment.sh](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_profile_alignment.sh) script, then joining the individually-aligned sequences into a global alignment at the end. It uses the following tools: `mafft`, `faSplit`, `faSomeRecords`, `grep`, GNU `parallel`, and `find`. This creates the file `aln_global_unmasked.fa`.
 
-3. Masks sites that are likely dominated by errors of various kinds from the global alignment. Specifically, all sites suggested in [this post](http://virological.org/t/issues-with-sars-cov-2-sequencing-data/473) are masked by replacing them with gaps, by downloading the latest (when the script is run) version of [this file](https://github.com/W-L/ProblematicSites_SARS-CoV2/blob/master/subset_vcf/problematic_sites_sarsCov2.mask.vcf). Masking is performed with the [mask_alignment.sh](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/mask_alignment.sh) script, which uses the following tools: `wget`, `faSplit`, `seqmagick`, `grep`, GNU `parallel`, `find`. This creates the file `aln_global_masked.fa`.
+3. Masks sites that are likely dominated by errors of various kinds from the global alignment. Specifically, all sites suggested in [this post](http://virological.org/t/issues-with-sars-cov-2-sequencing-data/473) are masked by replacing them with gaps, by downloading the latest (when the script is run) version of [this file](https://github.com/W-L/ProblematicSites_SARS-CoV2/blob/master/subset_vcf/problematic_sites_sarsCov2.mask.vcf). Masking is performed with the [mask_alignment.sh](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/mask_alignment.sh) script, which uses the following tools: `wget`, `faSplit`, `seqmagick`, `grep`, GNU `parallel`, `find`. This creates the file `aln_global_masked.fa`. Note that this also masks the first and last 30 informative base pairs of every sequence, as well as any 7bp window which contains at least 2 uninformative characters (gaps or N's).
 
 4. Filters seuqences that are shorter than 28000 bp and/or have >1000 ambiguities. This is because both of these filters tend to be associated with lower quality sequences, and or those that tend to be missing sufficient data that it is hard to place them meaningfully in a phylogeny. This uses `esl-alimanip`, and creates the file `aln_global_filtered.fa`.
 
@@ -112,9 +113,9 @@ Here's what the code does:
 
 6. Calculates and prints to `alignments.log` the stats of all alignments, for simple sanity checking.
 
-7. Estimates a global tree from `global.fa`. This is done by using `fasttree` with the `-fastest` setting ([why's this good?](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md)) to estimate a maximum-likelihood tree, and using `goalign` to create 100 bootstrap alignments followed by re-estatimating all the ML trees with `fasttree` as before, using GNU `parallel` to manage parallelisaion. FBP and TBE values are calcualted with `gotree`, and the resulting two trees are rooted with the seuqence 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' as suggested in [this preprint](https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1), using [`nw_reroot`](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2887050/). This creates the files `global.fa_ft_TBE.tree` and `global.fa_ft_FBP.tree`.
+7. Estimates a global ML tree from `global.fa`. This is done by using `fasttree` with settings determined empirically to be the best, which are constantly updated see [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md) and [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation2.md). The scripts then use `goalign` to create 100 bootstrap alignments followed by re-estatimating all the ML trees with `fasttree` as and the `-fastest` setting, using GNU `parallel` to manage parallelisaion. FBP and TBE values are calcualted with `gotree`, and SH values are calculted with `fasttree`. The resulting three trees are rooted with the seuqence 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' as suggested in [this preprint](https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1), using [`nw_reroot`](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2887050/). This creates the files `global.fa_ft_TBE.tree`, `global.fa_ft_FBP.tree`, `global.fa_ft_SH.tree`.
 
-8. Removes sequences on very long branches from the tree using [`TreeShrink`](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4620-2). These sequences are likely to be either of poor quality and/or poorly aligned, so rather unreliable to interpret in a phylogeny with such limited variation. They are subsequently added to the list of excluded seuqences so they are not included in future iterations of the pipeline. This creates the files `ft_TBE.tree` and `ft_FBP.tree`.
+8. Removes sequences on very long branches from the tree using [`TreeShrink`](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4620-2). These sequences are likely to be either of poor quality and/or poorly aligned, so rather unreliable to interpret in a phylogeny with such limited variation. They are subsequently added to the list of excluded seuqences so they are not included in future iterations of the pipeline. This creates the files `ft_TBE.tree` and `ft_FBP.tree`, and `ft_SH.tree`.
 
 9. Roots the final two trees with [`nw_reroot`](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2887050/) as in step 7. 
 
