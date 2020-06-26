@@ -47,7 +47,7 @@ The difference between the TBE and FBP is fairly simple to describe. The FBP val
 
 The measures are all designed to estimate a similar quantity - something related to the confidence one might have in a branch. But they take very different approaches to this. Here's a plot which shows what they look like on a tree of >30K SARS-CoV-2 sequences from 24/6/20. The plot shows clearly that FBPs tend to be the lowest, TBEs are higher, and SH values are even higher. FBPs and TBEs are well correlated, but neither correlates that well to the SH values from fasttree (there *is* a very significant correlation though, as you'd expect!). 
 
-![A comparison of support measures](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpeg)
+![A comparison of support measures](https://github.com/roblanf/sarscov2phylo/blob/master/support_image.jpeg)
 
 
 # Why bother?
