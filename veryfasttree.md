@@ -4,6 +4,8 @@
 
 VeryFastTree *is* faster than single-threaded fasttree on GISAID alignments, by aout 40% if you use 5 threads. But the trees are worse and it uses 3 times the memory. 
 
+Also, you can have fun guessing what the next attempt to speed this program up will be called. Our lab Slack has been proposing things like `UltraFastTree`, `TolerablySlowTree` (this is not meant to be a dig at the software, more at naming conventions of which we are certainly guilty having between us published things like the UltraFast Bootstrap and Fast Tiger...), etc. 
+
 ### What's this?
 
 With impeccable timing, a group just released a new version of fasttree called VeryFastTree, which purports to be identical to fasttree but much faster in a few key ways, by using vectorisation and better multithreading.
