@@ -43,9 +43,10 @@ one_bootstrap(){
       echo ""
       echo "Making the reference tree with fasttree"
       echo ""
-      fasttree -nt -gamma -nosupport -sprlength 100 -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml "$INPUT_FASTA" > "$INPUT_FASTA"'1.multi.fasttree'
-      fasttree -nt -gamma -nosupport -sprlength 50  -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml -intree "$INPUT_FASTA"'1.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'2.multi.fasttree'
-      fasttree -nt -gamma -nosupport -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 -intree "$INPUT_FASTA"'2.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
+      fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 3 -refresh 0.8 -topm 1.5 -close 0.75 -noml "$INPUT_FASTA" > "$INPUT_FASTA"'1.multi.fasttree'
+      fasttree -nt -gamma -nosupport -sprlength 400 -nni 0 -spr 3 -intree "$INPUT_FASTA"'1.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'2.multi.fasttree'
+      fasttree -nt -gamma -nosupport -sprlength 300 -nni 0 -spr 3 -intree "$INPUT_FASTA"'2.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'3.multi.fasttree'
+      fasttree -nt -gamma -nosupport -sprlength 200 -nni 0 -spr 3 -intree "$INPUT_FASTA"'3.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
 
 
    else
