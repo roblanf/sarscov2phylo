@@ -18,9 +18,10 @@ I'll keep a note of the best settings in the table below. And I'll keep fully re
 Here's the best commandline for inferring the ML tree. This only has to be done once, so we can use a lot of time and memory without worrying too much. 
 
 ```
-fasttree -nt -gamma -nosupport -sprlength 100 -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 9.1.1.tree
-fasttree -nt -gamma -nosupport -sprlength 50  -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml -intree 9.1.1.tree global.fa > 9.1.2.tree
-fasttree -nt -gamma -nosupport -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 -intree 9.1.2.tree global.fa > 9.1.3.tree
+/usr/bin/time -o 11.7.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 3 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 11.7.1.tree
+/usr/bin/time -o 11.6.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 400 -nni 0 -spr 3 -intree 11.7.1.tree global.fa > 11.7.2.tree
+/usr/bin/time -o 11.6.3.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 300 -nni 0 -spr 3 -intree 11.7.2.tree global.fa > 11.7.3.tree
+/usr/bin/time -o 11.6.4.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 200 -nni 0 -spr 3 -intree 11.7.3.tree global.fa > 11.7.4.tree
 ```
 
 
@@ -418,7 +419,7 @@ Big switch here. For various reasons I decided to switch to only using alignment
 Let's start by estimating the tree using our best efforts from previous iterations.
 
 ```
-/usr/bin/time -o 9.0.mem.txt -v fasttree -nt -gamma -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 global.fa > 9.0.tree
+/usr/bin/time -o fasttree.mem.txt -v fasttree -nt -gamma -sprlength 20 -refresh 0.8 -topm 1.5 -close 0.75 global.fa > fasttree.tree
 ```
 
 The likelihood of this tree is -330618.967
@@ -501,3 +502,100 @@ Once we find the best of these options, it might be worth trying to save some ex
 /usr/bin/time -o 10.6.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 10 -nni 40 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 10.6.1.tree
 /usr/bin/time -o 10.6.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 10 -intree 10.6.1.tree global.fa > 10.6.2.tree
 ```
+
+Huh. None of that actually helped, though 500-100 length SPRs were all better than 10 or 20.
+
+
+
+#### Iteration 11
+
+With no additional SPRs, you get a lnL of -330553.152. To see how many additional initial SPRs one might need, I'll try a few different things. Note that the best so far is -330454.343, which is 10 SPRs of length 100, followed by 10 SPRs of length 50, followed by the standard analysis with 2 sprs of length 20.
+
+
+```
+/usr/bin/time -o 11.1.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 1 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 11.1.1.tree
+/usr/bin/time -o 11.1.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 11.1.1.tree global.fa > 11.1.2.tree
+```
+
+```
+/usr/bin/time -o 11.2.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 2 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 11.2.1.tree
+/usr/bin/time -o 11.2.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 11.2.1.tree global.fa > 11.2.2.tree
+```
+
+```
+/usr/bin/time -o 11.3.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 5 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 11.3.1.tree
+/usr/bin/time -o 11.3.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 11.3.1.tree global.fa > 11.3.2.tree
+```
+
+```
+/usr/bin/time -o 11.4.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 10 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 11.4.1.tree
+/usr/bin/time -o 11.4.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 11.4.1.tree global.fa > 11.4.2.tree
+```
+
+```
+/usr/bin/time -o 11.5.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 15 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 11.5.1.tree
+/usr/bin/time -o 11.5.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 11.5.1.tree global.fa > 11.5.2.tree
+```
+
+```
+/usr/bin/time -o 11.6.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 11.6.1.tree
+/usr/bin/time -o 11.6.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 11.6.1.tree global.fa > 11.6.2.tree
+```
+
+Simulated annealing's nice, eh?
+
+```
+/usr/bin/time -o 11.7.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 3 -refresh 0.8 -topm 1.5 -close 0.75 -noml global.fa > 11.7.1.tree
+/usr/bin/time -o 11.6.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 400 -nni 0 -spr 3 -intree 11.7.1.tree global.fa > 11.7.2.tree
+/usr/bin/time -o 11.6.3.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 300 -nni 0 -spr 3 -intree 11.7.2.tree global.fa > 11.7.3.tree
+/usr/bin/time -o 11.6.4.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 200 -nni 0 -spr 3 -intree 11.7.3.tree global.fa > 11.7.4.tree
+/usr/bin/time -o 11.6.5.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 100 -nni 0 -spr 3 -intree 11.7.4.tree global.fa > 11.7.5.tree
+/usr/bin/time -o 11.6.6.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 50 -nni 0 -spr 3 -intree 11.7.5.tree global.fa > 11.7.6.tree
+/usr/bin/time -o 11.6.7.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 11.7.6.tree global.fa > 11.7.7.tree
+```
+
+By mistake, I left out the `-noml` command in the last example. Turns out the ML NNIs it does every round seem to help. Here are the lnLs of the first few:
+
+11.7.2 (after 3 rounds of SPRs of length 400): -330511
+11.7.3 (after 3 rounds of SPRs of length 300): -330447
+11.7.4 (after 3 rounds of SPRs of length 200): -330438
+11.7.5 (after 3 rounds of SPRs of length 100): -330452
+
+#### Iteration 12
+
+By chance I 
+
+ME SPRs followed by ML NNIs
+
+```
+/usr/bin/time -o 12.1.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 global.fa > 12.1.1.tree
+/usr/bin/time -o 12.1.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 50 -nni 0 -spr 20 -intree 12.1.1.tree global.fa > 12.1.2.tree
+/usr/bin/time -o 12.1.3.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 12.1.2.tree global.fa > 12.1.2.tree
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
