@@ -46,7 +46,7 @@ one_bootstrap(){
       fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 3 -refresh 0.8 -topm 1.5 -close 0.75 -noml "$INPUT_FASTA" > "$INPUT_FASTA"'1.multi.fasttree'
       fasttree -nt -gamma -nosupport -sprlength 400 -nni 0 -spr 3 -intree "$INPUT_FASTA"'1.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'2.multi.fasttree'
       fasttree -nt -gamma -nosupport -sprlength 300 -nni 0 -spr 3 -intree "$INPUT_FASTA"'2.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'3.multi.fasttree'
-      fasttree -nt -gamma -nosupport -sprlength 200 -nni 0 -spr 3 -intree "$INPUT_FASTA"'3.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
+      fasttree -nt -gamma -sprlength 200 -spr 3 -intree "$INPUT_FASTA"'3.multi.fasttree' "$INPUT_FASTA" > "$INPUT_FASTA"'multi.fasttree'
 
 
    else
@@ -75,8 +75,8 @@ inputdir=$(dirname $inputfasta)
 find $inputdir -maxdepth 1 -name "boot*" -delete
 
 # we hardcode 55 threads here, to keep it fast
-gotree compute support tbe -i $inputfasta"multi.fasttree" -b $inputfasta"_ft_replicates_multi.tree" -t 55 -o $inputfasta"_ft_TBE_unrooted.tree"
-gotree compute support fbp -i $inputfasta"multi.fasttree" -b $inputfasta"_ft_replicates_multi.tree" -t 55 -o $inputfasta"_ft_FBP_unrooted.tree"
+gotree compute support tbe -i $inputfasta"multi.fasttree" -b $inputfasta"_ft_replicates_multi.tree" -t $threads -o $inputfasta"_ft_TBE_unrooted.tree"
+gotree compute support fbp -i $inputfasta"multi.fasttree" -b $inputfasta"_ft_replicates_multi.tree" -t $threads -o $inputfasta"_ft_FBP_unrooted.tree"
 
 # re-root as per https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1
 echo ""
