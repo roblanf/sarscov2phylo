@@ -2,7 +2,7 @@
 
 This repository provides a regularly-updated global phylogeny of SARS-CoV-2 data from GISAID, as well as reproducile methods with which to estimate it. 
 
-We gratefully acknowledge the authors, originating and submitting laboratories of the sequences from GISAID’s EpiFlu™ Database on which this research is based. The list is detailed in [this tab-separated file](https://github.com/roblanf/sarscov2phylo/blob/master/gisaid_hcov-19_acknowledgement.tsv).
+We gratefully acknowledge the authors, originating and submitting laboratories of the sequences from GISAID’s EpiFlu™ Database on which this research is based. The list is detailed in [this file](https://github.com/roblanf/sarscov2phylo/blob/master/acknowledgements/).
 
 # Key files
 
@@ -13,7 +13,7 @@ For convenience, you can also get the latest results via the following links:
 * [Latest global phylogeny with Transfer Bootstrap Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_TBE.tree)
 * [Latest global phylogeny with Felsenstein Bootstrap Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_FBP.tree)
 * [Latest global phylogeny with fasttree SH Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_SH.tree)
-* [Acknowledgements file for those that upload to GISAID](https://github.com/roblanf/sarscov2phylo/blob/master/gisaid_hcov-19_acknowledgement.tsv)
+* [Acknowledgements file for those that upload to GISAID](https://github.com/roblanf/sarscov2phylo/blob/master/acknowledgements/)
 * [Latest version of the script to produce a global tree](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh)
 
 Privacy rules around the alignments themselves mean that they cannot be released here. The alignments can be recreated by following the steps described below. If you are a GISAID member and would like a copy of the alignment for any specific tree in the releases, please email me and I'll share it with you.
