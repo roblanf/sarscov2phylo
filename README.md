@@ -4,6 +4,12 @@ This repository provides a regularly-updated global phylogeny of SARS-CoV-2 data
 
 We gratefully acknowledge the authors, originating and submitting laboratories of the sequences from GISAID’s EpiFlu™ Database on which this research is based. The list is detailed in [this file](https://github.com/roblanf/sarscov2phylo/blob/master/acknowledgements/).
 
+# Can I use it and cite it
+
+Yes. Every new release from 22-July-20 is available at this DOI: [![DOI](https://zenodo.org/badge/260124648.svg)](https://zenodo.org/badge/latestdoi/260124648)
+
+Citation details are provided along with every release.
+
 # Key files
 
 The latest tree with the associated code to reproduce that tree can always be obtained from the latest release of this repository [here](https://github.com/roblanf/sarscov2phylo/releases/latest). Releases are named by the date (in Australian time) on which the sequences were downloaded from GISAID.
