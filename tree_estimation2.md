@@ -561,41 +561,144 @@ By mistake, I left out the `-noml` command in the last example. Turns out the ML
 11.7.4 (after 3 rounds of SPRs of length 200): -330438
 11.7.5 (after 3 rounds of SPRs of length 100): -330452
 
+
+
+
 #### Iteration 12
 
-By chance I 
+A quick test of the latest version of IQ-TREE, which we've been working on making faster...
 
-ME SPRs followed by ML NNIs
+
 
 ```
-/usr/bin/time -o 12.1.1.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 500 -nni 0 -spr 20 -refresh 0.8 -topm 1.5 -close 0.75 global.fa > 12.1.1.tree
-/usr/bin/time -o 12.1.2.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 50 -nni 0 -spr 20 -intree 12.1.1.tree global.fa > 12.1.2.tree
-/usr/bin/time -o 12.1.3.mem.txt -v fasttree -nt -gamma -nosupport -sprlength 20 -intree 12.1.2.tree global.fa > 12.1.2.tree
+wget https://github.com/iqtree/iqtree2/releases/download/v2.0.8/iqtree-2.0.8-Linux.tar.gz
+tar -xvzf iqtree-2.0.8-Linux.tar.gz
+
+/usr/bin/time -o iqtree2.08.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t BIONJ -pre BIONJ
+
+/usr/bin/time -o iqtree2.08.NJ.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ -pre NJ
+
+/usr/bin/time -o iqtree2.08.NJ-R.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -pre NJ-R
+
+/usr/bin/time -o iqtree2.08.BIONJ-R.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t BIONJ-R -pre BIONJ-R
+
+```
+
+It works well, and fast too!!
+
+Some results with -experimental, 4 cores, on soma (lots of memory). I show both the lnL of the NJ tree, as well as the final tree (after just two rounds of NNI). All with a JC model.
+
+`-t BIONJ`
+```
+        Percent of CPU this job got: 380%
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 8:27:24
+        Maximum resident set size (kbytes): 50745644
+
+Log-likelihood of BIONJ tree: -352742.080492
+BEST SCORE FOUND : -347506.937
+```
+
+`-t NJ`
+```
+        Percent of CPU this job got: 378%
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 7:23:31
+        Maximum resident set size (kbytes): 50745304 
+
+Log-likelihood of NJ tree: -349888.823021
+BEST SCORE FOUND : -346814.328
+```
+
+`-t NJ-R`
+```
+        Percent of CPU this job got: 377%
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 4:15:14
+        Maximum resident set size (kbytes): 50746932
+
+Log-likelihood of NJ-R tree: -349910.476699
+BEST SCORE FOUND : -346885.416 
+```
+
+`-t BIONJ-R`
+```
+        Percent of CPU this job got: 381%
+        Elapsed (wall clock) time (h:mm:ss or m:ss): 6:47:39
+        Maximum resident set size (kbytes): 50746768
+
+Log-likelihood of BIONJ-R tree: -352887.323284
+BEST SCORE FOUND : -347512.641
+```
+
+NJ-R provides the best balance of speed an accuracy, so I'll go with that for now, noting though that NJ is gives very slightly higher likelihoods.
+
+
+#### Iteration 13
+
+Now I'll try to squeeze higher liklihoods out of IQ-TREE. A few obvious things to try first. 
+
+
+1. Reduce the minimum branch length (unlike fasttree, IQ-TREE doesn't have hard polytomies. Given that some polytomies in this tree have 1000's of sequences, we probably want the minimum branch length to be at most 1/10000 of a substitution. Given that the alignment is about 30,000 bases, 1 substitution would be a branch length of 1/30000, so we want a minimum of 1/10000th of this , which is 0.000000003. For convenience I'll just round this even further down to 0.0000000001)
+
+2. Better models of rates (I'll move on to molecular evolution later)
+
+```
+/usr/bin/time -o 13.1.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -blmin 0.0000000001 -pre 13.1
+
+/usr/bin/time -o 13.2.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC+G -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -blmin 0.0000000001 -pre 13.2
+
+/usr/bin/time -o 13.3.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC+G+I -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -blmin 0.0000000001 -pre 13.3
+
+/usr/bin/time -o 13.4.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC+I+R1 -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -blmin 0.0000000001 -pre 13.4
+
+/usr/bin/time -o 13.5.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC+I+R2 -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -blmin 0.0000000001 -pre 13.5
+
+/usr/bin/time -o 13.6.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC+I+R3 -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -blmin 0.0000000001 -pre 13.6
+
+/usr/bin/time -o 13.7.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC+I+R4 -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -blmin 0.0000000001 -pre 13.7
+
+/usr/bin/time -o 13.8.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC+R4 -fast -nt 4 -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -blmin 0.0000000001 -pre 13.8
 ```
 
 
+Results:
 
+13.1
+lnL_NJ-R: -346219.079852
+lnL: -345413.780
+time: 4h:5m:0s 
+mem: 50746412
 
+13.2
+lnL_NJ-R: -334571.368294
+lnL: -333702.914
+time: 16h:45m:52s
+mem: 105633656
 
+13.3
+lnl_NJ-R: -333649.112195
+lnL: -332890.756
+time: 19h:18m:2s
+mem: 106700024
 
+13.4
+lnl_NJ-R: -337466.943109
+lnL: -336651.617
+time: 10h:47m:40s
+mem: 56482076
 
+13.5
+lnl_NJ-R: -332073.220730
+lnL: -331279.983
+time: 17h:40m:5s
+mem: 75205400
 
+13.6
+lnl_NJ-R: -331545.424656
+lnL: -330704.610
+time: 30h:30m:50s
+mem: 95032788
 
+At this point it's clear that IQ-TREE has the *potential* to do just as well as fasttree. What's required are a few things though. First, we need to compare the two directly in a fair way. Second, we need to move on to new alignments since there are substantial new masking methods for the latest alignments. Finally, we need a sensible way of asking whether the huge differences in likelihood we observe here are due to improvements in the tree topology, or just the model of evolution.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+So, it's time to move on to a new setup.
 
 
