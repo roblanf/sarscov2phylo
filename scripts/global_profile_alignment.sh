@@ -3,7 +3,7 @@
 helpFunction()
 {
    echo "Align a set of sequences in parallel to WH1 seuqence NC_045512.2"
-   echo "Usage: $0 -i unaligned_fasta_path -o output_file -r reference_alignment -t threads"
+   echo "Usage: $0 -i unaligned_fasta_path -o output_file -t threads"
    echo "\t-i Full path to unaligned fasta file of SARS-CoV-2 sequences"
    echo "\t-o Output file path for aligned fasta file. New sequences will be *APPENDED* to this file"
    echo "\t-t number of threads to use"
