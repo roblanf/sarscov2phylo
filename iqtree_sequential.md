@@ -138,7 +138,7 @@ parallel -j 15 -k --bar :::: spr.txt
 | 53 | 4        | 500    | 43689.79 | -495982.737 | 5.04      | 256.35    |
 
 
-The best bang for our buck is to do just one round of SPRs (140 likelihood units per round). We get better likelihoods with more SPRs (in general) but the time penalty starts to get large. At 4 rounds of SPRs we've added 5 hrs to our analysis (meaning we're pushing our luck to get out an update every day, particularly as the dataset grows a lot in size).
+The best bang for our buck is to do just one round of SPRs (140 likelihood units per round, vs. e.g. 64 per round with 4 rounds). We get better likelihoods with more SPRs (in general) but the time penalty starts to get large. At 4 rounds of SPRs we've added 5 hrs to our analysis (meaning we're pushing our luck to get out an update every day, particularly as the dataset grows a lot in size).
 
 Of note, I should have realised that an SPR radius of 100 encompasses the entire tree, so there is no difference in likelihood between any of the different SPR lengths. Still, I'll keep it at a very large number (1000) in future, to make sure that the SPR phase allows for truly global moves even as the tree grows a lot. 
 
@@ -148,7 +148,7 @@ So, to take a starting tree of ~50K SARS-CoV-2 sequences, add ~3K new sequences 
 fasttree -nt -gamma -nni 0 -spr 1 -sprlength 1000 -boot 100 -intree iqtree_seqsadded_mp.treefile $outputfasta > 1.tree
 ```
 
-Reasoning: I leave the gamma on there purely so that as things progress it's easy to compare the lnL of different runs; reduce bootstraps to 100, becuase the SH measures of support are potentially useful (though I'm not all that sure how to interpret them yet), but the additional precision of doing 1000 bootstaps is not justified, and use X spr moves of length y because that seems to be a good balance between likelihood and execution time. Bear in mind, of course, that the plan is to run this analysis every day, so erring on the slightly lower side for the number of SPR moves seems reasonable - issues should get ironed out in time as rounds of SPR moves are done every day. Add to that the the example here is extreme (adding a week of data instead of a day's worth) and I think we have a good solution.
+Reasoning: I leave the gamma on there purely so that as things progress it's easy to compare the lnL of different runs; reduce bootstraps to 100, becuase the SH measures of support are potentially useful (though I'm not all that sure how to interpret them yet), but the additional precision of doing 1000 bootstaps is not justified, and use 1 spr move of length 1000 because that seems to be a good balance between likelihood and execution time. Though it's also tempting to consider having 4 SPR moves, because for a few additional hours it seems like we can get a higher likelihood. However, when this analysis runs every day (rather than, in this case, on 10 days worth of new sequences), I think we have a solution. 
 
 
 There is one more thing I want to try, and that's whether we can make good improvements by running the 1 SPR analysis on the starting tree twice. The reason for this - it's often useful to interleave two algorithms (like SPR and NNI moves on trees) when optimising. So it's feasible that running an analysis with 1 SPR move followed by NNI moves twice, does a better job than any of the above, and could (let's see) give a nice balance of time and accuracy. 
@@ -168,4 +168,22 @@ to this:
 
 Note that in the second version, we can skip the gamma optimisation of branch lengths and the bootstraps, so it will less than double the execution time. And in the second step fo the second version, we use the tree from the first step as the starting tree.
 
+Turns out this didn't really help much:
+
+| Iterations | time     | lnL         |
+|------------|----------|-------------|
+| 1          | 22914.02 | -496098.941 |
+| 2          | 39068.08 | -496038.076 |
+
+
+I alsmot doubled the execution time, for a marginal gain in likelihood. 
+
 ## Final conclusion
+
+This is the best solution so far. Iterated once a day with the new sequences from that day.
+
+```
+/usr/bin/time -o 91.mem.txt -v fasttree -nt -gamma -nni 0 -spr 1 -sprlength 1000 -boot 100 -intree iqtree_seqsadded_mp.treefile $outputfasta > 91.tree
+```
+
+
