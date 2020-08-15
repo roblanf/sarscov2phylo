@@ -100,7 +100,7 @@ echo ""
 echo "Removing unused sequences from input tree"
 echo ""
 grep ">" $outputfasta | cut -c 2- > alignment_names.txt
-Rscript $DIR/clean_tree.R $inputtree $outputfasta
+Rscript $DIR/clean_tree.R $inputtree alignment_names.txt
 
 echo ""
 echo "Adding new sequences to input tree with IQ-TREE"
