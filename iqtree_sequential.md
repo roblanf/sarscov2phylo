@@ -176,7 +176,7 @@ Turns out this didn't really help much:
 | 2          | 39068.08 | -496038.076 |
 
 
-I alsmot doubled the execution time, for a marginal gain in likelihood. 
+I almost doubled the execution time, for a marginal gain in likelihood. 
 
 ## Final conclusion
 
