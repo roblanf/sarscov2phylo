@@ -16,7 +16,7 @@ do
    case "$opt" in
       i ) inputfasta="$OPTARG" ;;
       o ) outputfasta="$OPTARG" ;;
-      o ) inputtree="$OPTARG" ;;
+      s ) inputtree="$OPTARG" ;;
       t ) threads="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
@@ -103,7 +103,7 @@ grep ">" $outputfasta | cut -c 2- > alignment_names.txt
 Rscript clean_tree.R $inputtree $outputfasta
 
 echo ""
-echo "Adding new seuqences to input tree with IQ-TREE"
+echo "Adding new sequences to input tree with IQ-TREE"
 echo ""
 # get the latest IQ-TREE
 wget https://github.com/iqtree/iqtree2/releases/download/v2.1.0/iqtree-2.1.0-Linux.tar.gz
@@ -113,25 +113,15 @@ tar -xvzf iqtree-2.1.0-Linux.tar.gz
 # benchmarking shows that 1 thread is optimal
 ./iqtree-2.1.0-Linux/bin/iqtree2 -s $outputfasta -g input_tree_cleaned.tree -n 0 -m JC -fixbr -nt 1 --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -pre iqtree_seqsadded_mp
 
-fasttree -nt -gamma -nome -intree iqtree_seqsadded_mp.treefile $outputfasta > $outputfasta'_ft_SH.tree'
-
-
-
+echo ""
+echo "Optimising tree with fasttree"
+echo ""
+fasttree -nt -gamma -nni 0 -spr 10 -sprlength 1000 -boot 100 -intree iqtree_seqsadded_mp.treefile $outputfasta > $outputfasta'_ft_SH.tree'
 
 
 echo ""
-echo "Estimating trees with bootstraps using fasttree"
+echo "Cleaning tree with treeshrink"
 echo ""
-
-# finally, we estimate a tree with 100 bootstraps using fasttree
-bash $DIR/tree_ft.sh -i $outputfasta -t $threads
-
-
-echo ""
-echo "Cleaning trees with treeshrink"
-echo ""
-run_treeshrink.py -t $outputfasta'_ft_TBE.tree' -q 0.05 -c -o treeshrink_TBE
-run_treeshrink.py -t $outputfasta'_ft_FBP.tree' -q 0.05 -c -o treeshrink_FBP
 run_treeshrink.py -t $outputfasta'_ft_SH.tree' -q 0.05 -c -o treeshrink_SH
 
 
@@ -139,16 +129,8 @@ echo ""
 echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
 echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
 echo ""
-nw_reroot 'treeshrink_TBE/'$outputfasta'_ft_TBE_0.05.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > ft_TBE.tree
-nw_reroot 'treeshrink_FBP/'$outputfasta'_ft_FBP_0.05.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > ft_FBP.tree
 nw_reroot 'treeshrink_SH/'$outputfasta'_ft_SH_0.05.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > ft_SH.tree
 
-# remove quotes that treeshrink adds
-sed -i.bak "s/'//g" ft_TBE.tree
-rm ft_TBE.tree.bak
-
-sed -i.bak "s/'//g" ft_FBP.tree
-rm ft_FBP.tree.bak
 
 sed -i.bak "s/'//g" ft_SH.tree
 rm ft_SH.tree.bak
@@ -166,9 +148,9 @@ xz -e -T $threads $aln_global_masked
 xz -e -T $threads $aln_global_unmasked
 xz -e -T $threads $inputfasta
 xz -e -T $threads $inputfasta"_cleaned.fa"
-xz -e -T $threads $outputfasta"_ft_replicates_multi.tree"
 
 rm goalign_amd64_linux
+rm -rf iqtree-2.1.0-Linux/
 
 # tar up the files for easy transfer
 tar -zcvf dat.tar.gz *
