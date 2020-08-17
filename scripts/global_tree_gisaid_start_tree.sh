@@ -137,7 +137,11 @@ rm ft_SH.tree.bak
 
 
 echo "After filtering sequences with TreeShrink" >> alignments.log
-nw_stats ft_TBE.tree >> alignments.log
+nw_stats ft_SH.tree >> alignments.log
+
+echo "//"
+echo "Number of new sequences added this iteration" >> alignments.log
+wc -l alignment_names_new.txt >> alignments.log
 
 
 # zip up for easy file transfer
