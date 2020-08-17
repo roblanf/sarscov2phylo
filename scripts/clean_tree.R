@@ -1,11 +1,17 @@
 #!/usr/bin/env Rscript
 
-# usage: Rscript clean_tree.R input_tree input_alignment
+# usage: Rscript clean_tree.R input_tree names_of_species_in_alignment.txt
+# the names file should be one name per line
 
 args = commandArgs(trailingOnly=TRUE)
 
 library(ape)
 library(readr)
+
+print("Input tree")
+print(t)
+print("input names")
+print(a)
 
 
 t = read.tree(args[1])
