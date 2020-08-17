@@ -8,17 +8,14 @@ args = commandArgs(trailingOnly=TRUE)
 library(ape)
 library(readr)
 
-print(args)
+print("Input tree")
+print(args[1])
+print("input names")
+print(args[2])
+
 
 t = read.tree(args[1])
-a = scan(args[2])
-
-
-print("Input tree")
-print(t)
-print("input names")
-print(a)
-
+a = readLines(args[2])
 
 drop = t$tip.label[which(t$tip.label %in% a == FALSE)]
 
