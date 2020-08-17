@@ -137,7 +137,6 @@ parallel -j 15 -k --bar :::: spr.txt
 | 52 | 4        | 200    | 43502.2  | -495982.737 | 4.99      | 256.35    |
 | 53 | 4        | 500    | 43689.79 | -495982.737 | 5.04      | 256.35    |
 
-
 The best bang for our buck is to do just one round of SPRs (140 likelihood units per round, vs. e.g. 64 per round with 4 rounds). We get better likelihoods with more SPRs (in general) but the time penalty starts to get large. At 4 rounds of SPRs we've added 5 hrs to our analysis (meaning we're pushing our luck to get out an update every day, particularly as the dataset grows a lot in size).
 
 Of note, I should have realised that an SPR radius of 100 encompasses the entire tree, so there is no difference in likelihood between any of the different SPR lengths. Still, I'll keep it at a very large number (1000) in future, to make sure that the SPR phase allows for truly global moves even as the tree grows a lot. 
@@ -185,5 +184,8 @@ This is the best solution so far. Iterated once a day with the new sequences fro
 ```
 /usr/bin/time -o 91.mem.txt -v fasttree -nt -gamma -nni 0 -spr 1 -sprlength 1000 -boot 100 -intree iqtree_seqsadded_mp.treefile $outputfasta > 91.tree
 ```
+
+P.S. In the end I decided to see what would happen if I just cranked it to do 10 SPRs, and the results were surprising. The lnL was -494195.750, which is a sizeable improvement. And the time was 11hrs. It seems worth keeping this for now, even if the 10 rounds of SPRs are not always worth it. 
+
 
 

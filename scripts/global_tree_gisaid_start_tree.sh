@@ -151,6 +151,7 @@ xz -e -T $threads $inputfasta"_cleaned.fa"
 
 rm goalign_amd64_linux
 rm -rf iqtree-2.1.0-Linux/
+rm iqtree_seqsadded_mp.uniqueseq.phy
 
 # tar up the files for easy transfer
 tar -zcvf dat.tar.gz *
