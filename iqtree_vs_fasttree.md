@@ -96,7 +96,7 @@ Final note: the memory usage for the +I+R5 model is HUGE. 175GB at the maximum (
 
 Postscript: turns out IQ-TREE has a potentially much faster algorithm for the model optimisation implemented. So let's try and compare on the +R3 and +R5 models (the former so I can compare likelihoods, the latter to see if it's quick enough to do this). The standard algorithm tends to perform better on most datasets, but it's slower. Usually that's not an issue. The standard algorithm updates the rates one at a time, jiggling that rate parameter around to improve it while holding the others constant. The alternative BFGS algorithm tries out changes to all rate parameters at once. Let's see what happens...
 
-j
+
 ```
 /usr/bin/time -o 1.5.mem.txt -v ./iqtree-2.0.8-Linux/bin/iqtree2 -s global.fa -m JC+I+R3 -fast -nt 4 -optalg 1-BFGS -experimental --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -t NJ-R --no-opt-gamma-inv -blmin 0.0000000001 -pre 1.5
 
