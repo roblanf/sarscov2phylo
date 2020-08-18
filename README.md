@@ -16,11 +16,9 @@ The latest tree with the associated code to reproduce that tree can always be ob
 
 For convenience, you can also get the latest results via the following links:
 
-* [Latest global phylogeny with Transfer Bootstrap Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_TBE.tree)
-* [Latest global phylogeny with Felsenstein Bootstrap Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_FBP.tree)
 * [Latest global phylogeny with fasttree SH Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_SH.tree)
 * [Acknowledgements file for those that upload to GISAID](https://github.com/roblanf/sarscov2phylo/blob/master/acknowledgements/)
-* [Latest version of the script to produce a global tree](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid.sh)
+* [Latest version of the script to produce a global tree](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid_start_tree.sh)
 
 Privacy rules around the alignments themselves mean that they cannot be released here. The alignments can be recreated by following the steps described below. If you are a GISAID member and would like a copy of the alignment for any specific tree in the releases, please email me and I'll share it with you.
 
@@ -44,7 +42,9 @@ Sequences are filtered out for a few reasons:
 
 If your sequence is in GISAID, and was submitted before the date noted in the [latest release of the repository](https://github.com/roblanf/sarscov2phylo/releases/latest), but it is not in the tree, then it was filtered for one of the above reasons.
 
-# Why are there three trees, and what are all the numbers?
+# Why are there three trees in some releases, and what are all the numbers?
+
+Up to and including 31-7-20, each release contains three trees. This section describes the differences between those trees. After 31-7-20 there is only one tree in each release.
 
 The topology and branch lengths of the three trees are identical. In all cases, the topology is the best topology estimated by `fasttree` with options tuned specifically for this dataset, see [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md) and [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation2.md). The branch lengths represent substitutions per site. You will see that if you multiply the branchlenghts by about 30,000 (which is roughly the length of the alignments) many of the branchlengths are close to integers. That's because there's very little variation in these sequences, meaning that many branches have some integer number of changes inferred on them.
 
@@ -119,9 +119,9 @@ Here's what the code does:
 
 6. Calculates and prints to `alignments.log` the stats of all alignments, for simple sanity checking.
 
-7. Estimates a global ML tree from `global.fa`. This is done by using `fasttree` with settings determined empirically to be the best, which are constantly updated see [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md) and [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation2.md). The scripts then use `goalign` to create 100 bootstrap alignments followed by re-estatimating all the ML trees with `fasttree` as and the `-fastest` setting, using GNU `parallel` to manage parallelisaion. FBP and TBE values are calcualted with `gotree`, and SH values are calculted with `fasttree`. The resulting three trees are rooted with the seuqence 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' as suggested in [this preprint](https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1), using [`nw_reroot`](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2887050/). This creates the files `global.fa_ft_TBE.tree`, `global.fa_ft_FBP.tree`, `global.fa_ft_SH.tree`.
+7. Estimates a global ML tree from `global.fa`. [NB: the methods here changed substantially subsequent to 31-7-20; please see previous releases for the previous methods]. This is done by using `fasttree` with settings determined empirically to be the best, which are constantly updated see [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md) and [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation2.md) and also [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md) and [here](https://github.com/roblanf/sarscov2phylo/blob/master/iqtree_sequential.md). The global tree is estimated in two steps. First, we start with the best tree from the previous release and *add* any new sequences to that tree using Maximum Parsimony in IQ-TREE (see [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md) and [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation2.md) for a demonstration that MP works extremely well with these data). Second, we further optimise that tree with a series of minimum evolution SPR moves and Maximum Likelihood NNI moves in `fasttree`. Details of the benchmarking behind these choices are [here](https://github.com/roblanf/sarscov2phylo/blob/master/tree_estimation.md) and [here](https://github.com/roblanf/sarscov2phylo/blob/master/iqtree_sequential.md). We use `fasttree` to calculate SH supports on the branches of that tree. The resulting tree is rooted with the seuqence 'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05' as suggested in [this preprint](https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1), using [`nw_reroot`](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2887050/). This creates the file `global.fa_ft_SH.tree`.
 
-8. Removes sequences on very long branches from the tree using [`TreeShrink`](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4620-2). These sequences are likely to be either of poor quality and/or poorly aligned, so rather unreliable to interpret in a phylogeny with such limited variation. They are subsequently added to the list of excluded seuqences so they are not included in future iterations of the pipeline. This creates the files `ft_TBE.tree` and `ft_FBP.tree`, and `ft_SH.tree`.
+8. Removes sequences on very long branches from the tree using [`TreeShrink`](https://bmcgenomics.biomedcentral.com/articles/10.1186/s12864-018-4620-2). These sequences are likely to be either of poor quality and/or poorly aligned, so rather unreliable to interpret in a phylogeny with such limited variation. They are subsequently added to the list of excluded seuqences so they are not included in future iterations of the pipeline. This creates the file `ft_SH.tree`.
 
 9. Roots the final two trees with [`nw_reroot`](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2887050/) as in step 7. 
 

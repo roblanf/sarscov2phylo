@@ -1,15 +1,21 @@
 #!/usr/bin/env Rscript
 
-# usage: Rscript clean_tree.R input_tree input_alignment
+# usage: Rscript clean_tree.R input_tree names_of_species_in_alignment.txt
+# the names file should be one name per line
 
 args = commandArgs(trailingOnly=TRUE)
 
 library(ape)
 library(readr)
 
+print("Input tree")
+print(args[1])
+print("input names")
+print(args[2])
+
 
 t = read.tree(args[1])
-a = scan(args[2])
+a = readLines(args[2])
 
 drop = t$tip.label[which(t$tip.label %in% a == FALSE)]
 

@@ -116,7 +116,7 @@ tar -xvzf iqtree-2.1.0-Linux.tar.gz
 echo ""
 echo "Optimising tree with fasttree"
 echo ""
-fasttree -nt -gamma -nni 0 -spr 10 -sprlength 1000 -boot 100 -intree iqtree_seqsadded_mp.treefile $outputfasta > $outputfasta'_ft_SH.tree'
+fasttree -nt -gamma -nni 0 -spr 10 -sprlength 1000 -boot 100 -log fasttree.log -intree iqtree_seqsadded_mp.treefile $outputfasta > $outputfasta'_ft_SH.tree'
 
 
 echo ""
@@ -137,7 +137,11 @@ rm ft_SH.tree.bak
 
 
 echo "After filtering sequences with TreeShrink" >> alignments.log
-nw_stats ft_TBE.tree >> alignments.log
+nw_stats ft_SH.tree >> alignments.log
+
+echo "//"
+echo "Number of new sequences added this iteration" >> alignments.log
+wc -l alignment_names_new.txt >> alignments.log
 
 
 # zip up for easy file transfer
@@ -151,6 +155,7 @@ xz -e -T $threads $inputfasta"_cleaned.fa"
 
 rm goalign_amd64_linux
 rm -rf iqtree-2.1.0-Linux/
+rm iqtree_seqsadded_mp.uniqueseq.phy
 
 # tar up the files for easy transfer
 tar -zcvf dat.tar.gz *
