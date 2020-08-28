@@ -19,6 +19,9 @@ dependencies:
   - parallel
   - pip=19.3.1
   - python=3.6
+  - r-ape
+  - r-base
+  - r-readr
   - rapidnj
   - snakemake-minimal=5.13
   - seqmagick
