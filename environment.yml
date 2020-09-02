@@ -19,6 +19,7 @@ dependencies:
   - parallel
   - pip=19.3.1
   - python=3.6
+  - r=3.6.3
   - r-ape
   - r-bms
   - r-base
