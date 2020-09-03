@@ -5,25 +5,24 @@ helpFunction()
    echo "Make an ML phylogeny from a large FASTA file of GISAID sequences"
    echo "Usage: $0 -i GISAID_fasta -o output_filename -s start_tree -t threads "
    echo "    -i Full path to unaligned fasta file of SARS-CoV-2 sequences from GISAID"
-   echo "    -o Output file path for final alignment"
-   echo "    -s Full path to input starting tree of SARS-CoV-2 sequences"
+   echo "    -p Filpath to previous iteration to be updated (must contain an ft_SH.tree file and an excluded_sequences.tsv file)"
    echo "    -t number of threads to use"
    exit 1 # Exit script after printing help
 }
 
-while getopts "i:o:s:t:" opt
+while getopts "i:p:t:" opt
 do
    case "$opt" in
       i ) inputfasta="$OPTARG" ;;
-      o ) outputfasta="$OPTARG" ;;
-      s ) inputtree="$OPTARG" ;;
+      p ) previous="$OPTARG" ;;
       t ) threads="$OPTARG" ;;
       ? ) helpFunction ;; # Print helpFunction in case parameter is non-existent
    esac
 done
 
+
 # Print helpFunction in case parameters are empty
-if [ -z "$inputfasta" ] || [ -z "$inputtree" ] || [ -z "$outputfasta" ] || [ -z "$threads" ]
+if [ -z "$inputfasta" ] || [ -z "$previous" ] || [ -z "$threads" ]
 then
    echo "Some or all of the parameters are empty";
    helpFunction
@@ -31,11 +30,18 @@ fi
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# first we trim the sequences
 inputdir=$(dirname $inputfasta)
+outputfasta=global.fa
+inputtree=previous_iteration_files/ft_SH.tree # this is copied over in a few lines
 
 cd $inputdir
 
+# first we copy over the previous iterations files for reproducibility
+mkdir previous_iteration_files
+cp $previous'/ft_SH.tree' previous_iteration_files/
+cp $previous'/excluded_sequences.tsv' previous_iteration_files/
+
+# first we trim the sequences
 echo ""
 echo "Cleaning raw data"
 echo ""

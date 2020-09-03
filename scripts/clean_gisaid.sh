@@ -45,7 +45,7 @@ sed -i.bak '/^$/d' $input_seqs
 # next we remove sequences in the excluded_sequences.tsv file
 echo "Removing sequences in excluded_sequence.tsv"
 BASEDIR=$(dirname "$0")
-exseq=$BASEDIR/../excluded_sequences.tsv
+exseq=previous_iteration_files/excluded_sequences.tsv
 cut -f1 $exseq | faSomeRecords $input_seqs /dev/stdin $input_seqs"tmp.fa" -exclude
 rm $input_seqs
 mv $input_seqs"tmp.fa" $input_seqs
