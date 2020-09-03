@@ -131,7 +131,10 @@ echo ""
 run_treeshrink.py -t $outputfasta'_ft_SH.tree' -q 0.05 -c -o treeshrink_SH
 
 # now we update the excluded sequences file
-Rscript update_excluded_seqs.R previous_iteration_files/excluded_sequences.tsv treeshrink_SH/global.fa_ft_SH_RS_0.05.txt
+echo ""
+echo "Updating excluded sequences file"
+echo ""
+Rscript $DIR/update_excluded_seqs.R previous_iteration_files/excluded_sequences.tsv treeshrink_SH/global.fa_ft_SH_RS_0.05.txt
 
 echo ""
 echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
