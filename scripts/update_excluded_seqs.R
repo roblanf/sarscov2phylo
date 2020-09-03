@@ -15,4 +15,4 @@ f = data.frame(cbind(e, "on long branch identified by treeshrink q=0.05"))
 names(f)=names(old)
 new = rbind(old, f)
 
-write.table(new, file="excluded_sequences.txv", sep="\t", col.names = F, row.names = F)
+write.table(new, file="excluded_sequences.tsv", sep="\t", col.names = F, row.names = F, quote=F)
