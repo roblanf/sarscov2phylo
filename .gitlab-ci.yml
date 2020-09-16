@@ -1,0 +1,13 @@
+stages:
+  - build_image
+  - test_env
+
+build_image:
+  stage: build_image
+  script:
+    - docker build -t sarscov2phylo:$CI_COMMIT_SHORT_SHA -f ci/Dockerfile .
+
+test_env:
+  stage: test_env
+  script:
+    - docker run sarscov2phylo:$CI_COMMIT_SHORT_SHA conda run -n sarscov2phylo esl-alimanip -h
