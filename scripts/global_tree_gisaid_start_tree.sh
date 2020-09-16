@@ -163,6 +163,7 @@ xz -e -T $threads $aln_global_masked
 xz -e -T $threads $aln_global_unmasked
 xz -e -T $threads $inputfasta
 xz -e -T $threads $inputfasta"_cleaned.fa"
+xz -e -T $threads fasttree.log
 
 rm goalign_amd64_linux
 rm -rf iqtree-2.1.0-Linux/
