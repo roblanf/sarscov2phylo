@@ -192,7 +192,7 @@ hCoV-19/pangolin/Guangdong/A22-2/2019|EPI_ISL_471467|2019	pangolin sequence
 hCoV-19/pangolin/Guangdong/SM44-9/2019|EPI_ISL_471469|2019	pangolin sequence
 hCoV-19/Bosnia_and_Herzegovina/03_Tuzla/2020|EPI_ISL_463893|2020-05-25	long branch by visual inspection on 23/6/20
 hCoV-19/Iran/PN2179/2020|EPI_ISL_463749|2020-03-26	long branch by visual inspection on 23/6/20
-hCoV-19/Mongolia/Imp3989/2020|EPI_ISL_467666|2020-03-25 long branch by visual inspection on 23/6/20
+hCoV-19/Mongolia/Imp3989/2020|EPI_ISL_467666|2020-03-25 long branch by visual inspection on 23/6/20	
 hCoV-19/Bosnia_and_Herzegovina/02-Banja_Luka/2020|EPI_ISL_462990|2020-04-29	long branch by visual inspection on 23/6/20
 hCoV-19/Spain/LaRioja201565/2020|EPI_ISL_455339|2020-03-04	long branch by visual inspection on 23/6/20
 hCoV-19/Russia/CRIE139642/2020|EPI_ISL_467775|2020-03-29	long branch by visual inspection on 23/6/20
@@ -1048,3 +1048,10 @@ hCoV-19/England/NORT-292854/2020|EPI_ISL_489121|2020-05-30	on long branch identi
 hCoV-19/Scotland/EDB6568/2020|EPI_ISL_478254|2020-05-12	on long branch identified by treeshrink q=0.05
 hCoV-19/Scotland/EDB6569/2020|EPI_ISL_478255|2020-05-14	on long branch identified by treeshrink q=0.05
 hCoV-19/Scotland/EDB6582/2020|EPI_ISL_478263|2020-05-12	on long branch identified by treeshrink q=0.05
+hCoV-19/Spain/MD-004988/2020|EPI_ISL_481085|2020-06-11	on long branch identified by treeshrink q=0.05
+hCoV-19/United_Arab_Emirates/P1/2020|EPI_ISL_463740|2020-03-30	on long branch identified by treeshrink q=0.05
+hCoV-19/Sri_Lanka/CDR-SL7066/2020|EPI_ISL_525481|2020-06-16	on long branch identified by treeshrink q=0.05
+hCoV-19/Sierra_Leone/KGH-G-8790/2020|EPI_ISL_512821|2020-04-27	on long branch identified by treeshrink q=0.05
+hCoV-19/Ireland/KE-NVRL-71IRL87592/2020|EPI_ISL_512106|2020-07-25	on long branch identified by treeshrink q=0.05
+hCoV-19/USA/OR-OHSU-1673/2020|EPI_ISL_525998|2020-07-22	on long branch identified by treeshrink q=0.05
+hCoV-19/USA/WI-UW-1120/2020|EPI_ISL_516545|2020-07-27	on long branch identified by treeshrink q=0.05
