@@ -117,7 +117,7 @@ tar -xvzf iqtree-2.1.0-Linux.tar.gz
 
 # this just adds the new sequences with parsimony
 # benchmarking shows that 1 thread is optimal
-./iqtree-2.1.0-Linux/bin/iqtree2 -s $outputfasta -g input_tree_cleaned.tree -n 0 -m JC -fixbr -nt 1 --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -pre iqtree_seqsadded_mp
+./iqtree-2.1.0-Linux/bin/iqtree2 -seed 1729 -s $outputfasta -g input_tree_cleaned.tree -n 0 -m JC -fixbr -nt 1 --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -pre iqtree_seqsadded_mp
 
 echo ""
 echo "Optimising tree with fasttree"
