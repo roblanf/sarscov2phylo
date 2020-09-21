@@ -122,7 +122,7 @@ tar -xvzf iqtree-2.1.0-Linux.tar.gz
 echo ""
 echo "Optimising tree with fasttree"
 echo ""
-fasttree -nt -gamma -nni 0 -spr 10 -sprlength 1000 -boot 100 -log fasttree.log -intree iqtree_seqsadded_mp.treefile $outputfasta > $outputfasta'_ft_SH.tree'
+fasttree -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree iqtree_seqsadded_mp.treefile $outputfasta > $outputfasta'_ft_SH.tree'
 
 
 echo ""
