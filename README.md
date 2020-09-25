@@ -95,6 +95,8 @@ conda env create -f environment.yml
 conda activate sarscov2phylo
 ```
 
+Finally you will need to compile and install the MP version of FastTree from here: http://www.microbesonline.org/fasttree/#Install
+
 # Quickstart
 
 1. Get the latest [GISAID data](https://www.gisaid.org/) in a single fasta file, e.g. `gisaid.fa`, you can do this via the batch download feature on [GISAID](https://www.gisaid.org/), though you will have to become a member to do this.

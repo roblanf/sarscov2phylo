@@ -120,10 +120,15 @@ tar -xvzf iqtree-2.1.0-Linux.tar.gz
 ./iqtree-2.1.0-Linux/bin/iqtree2 -seed 1729 -s $outputfasta -g input_tree_cleaned.tree -n 0 -m JC -fixbr -nt 1 --suppress-zero-distance --suppress-list-of-sequences --suppress-duplicate-sequence -pre iqtree_seqsadded_mp
 
 echo ""
-echo "Optimising tree with fasttree"
+echo "Optimising tree with fasttree MP"
 echo ""
-fasttree -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree iqtree_seqsadded_mp.treefile $outputfasta > $outputfasta'_ft_SH.tree'
-
+# we have to do some contortions to set the optimal number of threads for fasttree, which is 3 (see fasttreeOMP.md)
+env > old_env.txt
+old_threads=$(grep -hoP '^OMP_NUM_THREADS=\K\d+' old_env.txt)
+rm env.txt
+export OMP_NUM_THREADS=3
+FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree iqtree_seqsadded_mp.treefile $outputfasta > $outputfasta'_ft_SH.tree'
+export OMP_NUM_THREADS=$old_threads
 
 echo ""
 echo "Cleaning tree with treeshrink"
