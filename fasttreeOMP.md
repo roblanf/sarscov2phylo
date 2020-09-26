@@ -111,5 +111,60 @@ So it's the final settings by a meaningless whisker. Now let's run the analyses
 
 ## Results
 
+TL;DR: veryfasttree is a lot slower than fasttree, and gives worse trees (!). FastTreeMP works fastest with 10 threads, which is a bit odd. 
 
+| wut          | threads | time (h:m:s) | %CPU | efficiency (%) | lnL         |
+|--------------|---------|--------------|------|----------------|-------------|
+| fasttree     | 1       | 8:51:47      | 99   | 99.0           | -640122.657 |
+| fasttree_omp | 1       | 9:06:28      | 99   | 99.0           | -640114.204 |
+| fasttree_omp | 2       | 7:43:12      | 127  | 63.5           | -640114.204 |
+| fasttree_omp | 3       | 6:52:53      | 144  | 48.0           | -640114.204 |
+| fasttree_omp | 4       | 6:53:48      | 156  | 39.0           | -640114.204 |
+| fasttree_omp | 5       | 6:55:20      | 168  | 33.6           | -640114.204 |
+| fasttree_omp | 6       | 7:21:00      | 177  | 29.5           | -640114.204 |
+| fasttree_omp | 7       | 7:14:02      | 190  | 27.1           | -640114.204 |
+| fasttree_omp | 8       | 7:05:57      | 203  | 25.3           | -640114.204 |
+| fasttree_omp | 9       | 7:20:56      | 211  | 23.4           | -640114.204 |
+| fasttree_omp | 10      | 6:20:57      | 238  | 23.8           | -640114.204 |
+| fasttree_omp | 20      | 7:10:58      | 347  | 17.3           | -640114.204 |
+| fasttree_omp | 50      | 7:17:07      | 723  | 14.4           | -640114.204 |
+| fasttree_omp | 100     | 7:15:18      | 1385 | 13.8           | -640114.204 |
+| veryfasttree | 1       | 12:30:28     | 99   | 99.0           | -640671.012 |
+| veryfasttree | 2       | 12:21:46     | 103  | 51.5           | -640671.012 |
+| veryfasttree | 3       | 11:05:24     | 118  | 39.3           | -640670.422 |
+| veryfasttree | 4       | 11:04:09     | 120  | 30.0           | -640669.088 |
+| veryfasttree | 5       | 11:05:58     | 122  | 24.4           | -640669.088 |
+| veryfasttree | 6       | 9:49:00      | 141  | 23.5           | -640669.088 |
+| veryfasttree | 7       | 9:43:35      | 149  | 21.2           | -640669.089 |
+| veryfasttree | 8       | 9:28:12      | 153  | 19.1           | -640669.088 |
+| veryfasttree | 9       | 9:19:24      | 159  | 17.6           | -640669.088 |
+| veryfasttree | 10      | 9:21:32      | 163  | 16.3           | -640668.681 |
+| veryfasttree | 20      | 8:36:04      | 205  | 10.2           | -640655.452 |
+| veryfasttree | 50      | 8:36:26      | 320  | 6.4            | -640626.579 |
+| veryfasttree | 100     | 8:53:03      | 484  | 4.8            | -640626.579 |
+
+
+The 10 threads thing doesn't make much sense. Up to 10 threads it all seems sensible - 3 threads is best, and it gets gradually worse the more you add (I assume because the cost of cross-talk outweighs the benefits of parallelisation). But then there's this jump at 10 threads. 
+
+To double check what might be happening here and to see what happens above 10 threads, I'm going to re-run 3, 8, 9, 10, 11, and 12 threads. 
+
+```
+export OMP_NUM_THREADS=3
+/usr/bin/time -o r3threads.txt -v ../FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log 3threads.log -intree iqtree_seqsadded_mp.treefile global.fa > 3thread.tree
+
+export OMP_NUM_THREADS=8
+/usr/bin/time -o r8threads.txt -v ../FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log 4threads.log -intree iqtree_seqsadded_mp.treefile global.fa > 4thread.tree
+
+export OMP_NUM_THREADS=9
+/usr/bin/time -o r9threads.txt -v ../FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log 6threads.log -intree iqtree_seqsadded_mp.treefile global.fa > 6thread.tree
+
+export OMP_NUM_THREADS=10
+/usr/bin/time -o r10threads.txt -v ../FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log 7threads.log -intree iqtree_seqsadded_mp.treefile global.fa > 7thread.tree
+
+export OMP_NUM_THREADS=11
+/usr/bin/time -o r11threads.txt -v ../FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log 8threads.log -intree iqtree_seqsadded_mp.treefile global.fa > 8thread.tree
+
+export OMP_NUM_THREADS=12
+/usr/bin/time -o r12threads.txt -v ../FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log 9threads.log -intree iqtree_seqsadded_mp.treefile global.fa > 9thread.tree
+```
 
