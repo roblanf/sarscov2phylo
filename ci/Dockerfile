@@ -12,5 +12,5 @@ USER user
 
 RUN conda env create -n sarscov2phylo -f /tmp/environment.yml
 
-ADD . /work/sarscov2phylo
+COPY scripts /work/sarscov2phylo/scripts
 WORKDIR /work/sarscov2phylo
