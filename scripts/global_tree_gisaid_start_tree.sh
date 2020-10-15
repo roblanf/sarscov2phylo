@@ -145,7 +145,7 @@ echo ""
 echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
 echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
 echo ""
-nw_reroot 'treeshrink_SH/'$outputfasta'_ft_SH_0.05.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > ft_SH.tree
+nw_reroot 'treeshrink_SH/'$outputfasta'_ft_SH_0.05.tree' "'EPI_ISL_406801'" > ft_SH.tree
 
 
 sed -i.bak "s/'//g" ft_SH.tree
@@ -174,6 +174,3 @@ xz -e -T $threads iqtree_seqsadded_mp.iqtree
 rm goalign_amd64_linux
 rm -rf iqtree-2.1.0-Linux/
 rm iqtree_seqsadded_mp.uniqueseq.phy
-
-# tar up the files for easy transfer
-tar -zcvf dat.tar.gz *
