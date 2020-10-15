@@ -125,10 +125,14 @@ echo ""
 # we have to do some contortions to set the optimal number of threads for fasttree, which is 3 (see fasttreeOMP.md)
 env > old_env.txt
 old_threads=$(grep -hoP '^OMP_NUM_THREADS=\K\d+' old_env.txt)
-rm env.txt
+rm old_env.txt
 export OMP_NUM_THREADS=3
 FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree iqtree_seqsadded_mp.treefile $outputfasta > $outputfasta'_ft_SH.tree'
-export OMP_NUM_THREADS=$old_threads
+if [ -n "$old_threads" ]; then
+    export OMP_NUM_THREADS=$old_threads
+else
+    unset OMP_NUM_THREADS
+fi
 
 echo ""
 echo "Cleaning tree with treeshrink"
