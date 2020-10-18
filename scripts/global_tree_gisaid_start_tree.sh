@@ -5,7 +5,7 @@ helpFunction()
    echo "Make an ML phylogeny from a large FASTA file of GISAID sequences"
    echo "Usage: $0 -i GISAID_fasta -o output_filename -s start_tree -t threads "
    echo "    -i Full path to unaligned fasta file of SARS-CoV-2 sequences from GISAID"
-   echo "    -p Filpath to previous iteration to be updated (must contain an ft_SH.tree file and an excluded_sequences.tsv file)"
+   echo "    -p Filepath to previous iteration to be updated (must contain an ft_SH.tree file)"
    echo "    -t number of threads to use"
    exit 1 # Exit script after printing help
 }
@@ -74,7 +74,6 @@ esl-alimanip --lmin 28000 --xambig 1000 --informat afa --outformat afa --dna -o 
 echo ""
 echo "Removing sites that are >50% gaps, after converting N's to gaps"
 echo ""
-
 cp $aln_global_filtered tmp.aln
 sed -i.bak '/^[^>]/s/N/-/g' tmp.aln
 rm tmp.aln.bak
@@ -122,8 +121,7 @@ echo "Tree stats after adding sequences with IQ-TREE" >> alignments.log
 nw_stats iqtree_seqsadded_mp.treefile >> alignments.log
 
 
-
-###  now we run treeshrink and remove those sequences from the alignment
+###  now we run treeshrink and remove those sequences from the alignment that treeshrink identifies as problematic
 
 # Run TreeShrink to identify sequences on long branches
 echo ""
@@ -169,7 +167,7 @@ echo ""
 echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
 echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
 echo ""
-nw_reroot 'treeshrink_SH/'$outputfasta'_ft_SH.tree' "'hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05'" > ft_SH.tree
+nw_reroot $outputfasta'_ft_SH.tree' "'EPI_ISL_406801'" > ft_SH.tree
 
 sed -i.bak "s/'//g" ft_SH.tree
 rm ft_SH.tree.bak
@@ -197,6 +195,3 @@ xz -e -T $threads iqtree_seqsadded_mp.iqtree
 rm goalign_amd64_linux
 rm -rf iqtree-2.1.0-Linux/
 rm iqtree_seqsadded_mp.uniqueseq.phy
-
-# tar up the files for easy transfer
-tar -zcvf dat.tar.gz *
