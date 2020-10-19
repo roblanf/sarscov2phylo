@@ -121,22 +121,36 @@ echo "Tree stats after adding sequences with IQ-TREE" >> alignments.log
 nw_stats iqtree_seqsadded_mp.treefile >> alignments.log
 
 
-###  now we run treeshrink and remove those sequences from the alignment that treeshrink identifies as problematic
+# 2. Clean the tree by removing long terminals then running treeshrink
 
-# Run TreeShrink to identify sequences on long branches
+# Iteratively remove terminal branches that are >=5 mutations long until there are none such
+# this also writes de-novo an exlucded_sequences.tsv file
+echo ""
+echo "Cleaning tree by removing long terminal branches"
+echo ""
+Rscript $DIR/prune_terminals.R iqtree_seqsadded_mp.treefile iqtree_pruned_terminals.tree
+
+echo "Tree stats after pruning branches with >5 mutations" >> alignments.log
+nw_stats iqtree_pruned_terminals.tree >> alignments.log
+
+
+# Run TreeShrink to identify sequences on long branches that were not already pruned
 echo ""
 echo "Cleaning tree with treeshrink"
 echo ""
-run_treeshrink.py -t iqtree_seqsadded_mp.treefile -q 0.05 -c -o treeshrink
+run_treeshrink.py -t iqtree_pruned_terminals.tree -q 0.05 -c -o treeshrink
+
+echo "Tree stats after pruning branches with >5 mutations" >> alignments.log
+nw_stats treeshrink/iqtree_pruned_terminals_0.05.tree >> alignments.log
 
 # now we update the excluded sequences file
 echo ""
-echo "Updating excluded sequences file"
+echo "Updating excluded sequences file with sequences exluded by TreeShrink"
 echo ""
-Rscript $DIR/update_excluded_seqs.R treeshrink/iqtree_seqsadded_mp_RS_0.05.txt
+Rscript $DIR/update_excluded_seqs.R excluded_sequences.tsv treeshrink_SH/iqtree_pruned_terminals_RS_0.05.txt
 
-# Remove from the alignment the sequences that treeshrink identified as problematic
-echo "Removing sequences in excluded_sequence.tsv"
+
+
 exseq=excluded_sequences.tsv
 cut -f1 $exseq | faSomeRecords $aln_4 /dev/stdin $outputfasta -exclude
 
@@ -155,7 +169,7 @@ old_threads=$(grep -hoP '^OMP_NUM_THREADS=\K\d+' old_env.txt)
 rm old_env.txt
 export OMP_NUM_THREADS=3
 
-FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree treeshrink/iqtree_seqsadded_mp_0.05.tree $outputfasta > $outputfasta'_ft_SH.tree'
+FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree treeshrink/iqtree_pruned_terminals_0.05.tree $outputfasta > $outputfasta'_ft_SH.tree'
 
 if [ -n "$old_threads" ]; then
     export OMP_NUM_THREADS=$old_threads
