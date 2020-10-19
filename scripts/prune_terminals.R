@@ -56,7 +56,7 @@ dropped.tips$length = paste("terminal branch length of ~", as.integer(dropped.ti
 
 print(args[2])
 
-write.tree(newtree, file=args[2])
+write.tree(newtree, file=as.character(args[2]))
 
 print("c")
 
