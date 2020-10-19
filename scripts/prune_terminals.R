@@ -7,6 +7,11 @@ library(ape)
 
 tree = read.tree(args[1])
 
+
+# TODO: add in a section to prune anything >??? mutations from the WH4 reference
+# this to catch and remove both crazy and outgroup sequences.
+# to do this I'll need to look at a tree WITH those outgroups first.
+
 drop.terminals <- function(tree, mutations=5){
     
     # iteratively drops terminal branch lengths with >mutation mutations
