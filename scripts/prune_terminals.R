@@ -7,8 +7,6 @@ library(ape)
 
 tree = read.tree(args[1])
 
-print(tree)
-
 drop.terminals <- function(tree, mutations=5){
     
     # iteratively drops terminal branch lengths with >mutation mutations
@@ -48,6 +46,7 @@ dropped.tips$length = paste("terminal branch length of ~", as.integer(dropped.ti
 
 #?
 t2 = drop.tip(tree, dropped.tips$name)
-write.tree(t2, args[2])
+print(t2)
+write.tree(t2, "test.tree")
 
 write.table(dropped.tips, file="excluded_sequences.tsv", sep="\t", col.names = F, row.names = F, quote=F)
