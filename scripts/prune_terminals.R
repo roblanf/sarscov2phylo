@@ -30,7 +30,7 @@ drop.terminals <- function(tree, mutations=5){
         newdropped = data.frame(name = newtree$tip.label[long.terminals], length = terminal.edgelengths[long.terminals]*30000)
         dropped = rbind(dropped, newdropped)
 
-        print(head(dropped))
+        print(tail(dropped))
         print(i)
         i=i+1
         
