@@ -46,11 +46,18 @@ drop.terminals <- function(tree, mutations=5){
 }
 
 r = drop.terminals(tree)
+print("-1")
 newtree = r[[1]]
+print("0")
 dropped.tips = r[[2]]
+
+print("a")
 dropped.tips$length = paste("terminal branch length of ~", as.integer(dropped.tips[,2]), " mutations", sep="")
 
+print("b")
 
 write.tree(newtree, args[2])
+
+print("c")
 
 write.table(dropped.tips, file="excluded_sequences.tsv", sep="\t", col.names = F, row.names = F, quote=F)
