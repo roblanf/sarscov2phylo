@@ -128,6 +128,8 @@ nw_stats iqtree_seqsadded_mp.treefile >> alignments.log
 echo ""
 echo "Cleaning tree by removing long terminal branches"
 echo ""
+# memory insurance, was hitting odd issues on CentOS that seemed to be due to this
+ulimit -s 64000
 Rscript $DIR/prune_terminals.R iqtree_seqsadded_mp.treefile iqtree_pruned_terminals.tree
 
 echo "Tree stats after pruning branches with >5 mutations" >> alignments.log
