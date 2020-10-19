@@ -7,6 +7,8 @@ library(ape)
 
 tree = read.tree(args[1])
 
+print(tree)
+
 drop.terminals <- function(tree, mutations=5){
     
     # iteratively drops terminal branch lengths with >mutation mutations
@@ -22,10 +24,13 @@ drop.terminals <- function(tree, mutations=5){
     while(max(terminal.edgelengths*30000 > mutations)){
         # the true alignment length is just under 30K, so this is equivalent to
         # getting all branches >=mutations mutations
+        print(newtree)
         long.terminals = which(terminal.edgelengths*30000 > mutations)
-        
+
         newdropped = data.frame(name = newtree$tip.label[long.terminals], length = terminal.edgelengths[long.terminals]*30000)
         dropped = rbind(dropped, newdropped)
+
+        print(dropped)
         
         # the indices of terminal.edgelengths and tree$tip.label are the same, meaning this works
         newtree = drop.tip(newtree, long.terminals)
