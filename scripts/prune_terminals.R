@@ -55,8 +55,9 @@ print("a")
 dropped.tips$length = paste("terminal branch length of ~", as.integer(dropped.tips[,2]), " mutations", sep="")
 
 print(args[2])
+print(newtree)
 
-write.tree(newtree, file=as.character(args[2]))
+write.tree(newtree, "test123.tree")
 
 print("c")
 
