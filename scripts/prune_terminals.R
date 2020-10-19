@@ -42,7 +42,9 @@ r = drop.terminals(tree)
 newtree = r[[1]]
 dropped.tips = r[[2]]
 
-dropped.tips$length = paste("terminal branch length of ~", as.integer(dropped.tips[,2]), " mutations", sep="")
+if(nrow(dropped.tips)>0){
+	dropped.tips$length = paste("terminal branch length of ~", as.integer(dropped.tips[,2]), " mutations", sep="")
+}
 
 write.tree(newtree, "newtest.tree")
 
