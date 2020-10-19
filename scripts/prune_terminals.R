@@ -3,6 +3,7 @@
 # usage: Rscript prune_terminals.R input_tree output_tree
 args = commandArgs(trailingOnly=TRUE)
 
+library(ape)
 
 tree = read.tree(args[1])
 
