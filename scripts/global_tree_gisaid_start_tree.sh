@@ -171,7 +171,7 @@ old_threads=$(grep -hoP '^OMP_NUM_THREADS=\K\d+' old_env.txt)
 rm old_env.txt
 export OMP_NUM_THREADS=3
 
-FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree treeshrink/iqtree_pruned_terminals_0.05.tree $outputfasta > $outputfasta'_ft_SH.tree'
+FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree iqtree_pruned_terminals.tree $outputfasta > $outputfasta'_ft_SH.tree'
 
 if [ -n "$old_threads" ]; then
     export OMP_NUM_THREADS=$old_threads
