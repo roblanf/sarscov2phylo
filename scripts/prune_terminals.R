@@ -20,7 +20,7 @@ drop.terminals <- function(tree, mutations=5){
     terminal.edgelengths = tree$edge.length[branchSel]
     
     newtree=tree
-    
+    i=1
     while(max(terminal.edgelengths*30000 > mutations)){
         # the true alignment length is just under 30K, so this is equivalent to
         # getting all branches >=mutations mutations
@@ -30,7 +30,9 @@ drop.terminals <- function(tree, mutations=5){
         newdropped = data.frame(name = newtree$tip.label[long.terminals], length = terminal.edgelengths[long.terminals]*30000)
         dropped = rbind(dropped, newdropped)
 
-        print(dropped)
+        print(head(dropped))
+        print(i)
+        i=i+1
         
         # the indices of terminal.edgelengths and tree$tip.label are the same, meaning this works
         newtree = drop.tip(newtree, long.terminals)
