@@ -46,6 +46,6 @@ if(nrow(dropped.tips)>0){
 	dropped.tips$length = paste("terminal branch length of ~", as.integer(dropped.tips[,2]), " mutations", sep="")
 }
 
-write.tree(newtree, "newtest.tree")
+write.tree(newtree, file=args[2])
 
 write.table(dropped.tips, file="excluded_sequences.tsv", sep="\t", col.names = F, row.names = F, quote=F)
