@@ -136,23 +136,7 @@ echo "Tree stats after pruning branches with >5 mutations" >> alignments.log
 nw_stats iqtree_pruned_terminals.tree >> alignments.log
 
 
-# Run TreeShrink to identify sequences on long branches that were not already pruned
-echo ""
-echo "Cleaning tree with treeshrink"
-echo ""
-run_treeshrink.py -t iqtree_pruned_terminals.tree -q 0.05 -c -o treeshrink
-
-echo "Tree stats after pruning branches with >5 mutations" >> alignments.log
-nw_stats treeshrink/iqtree_pruned_terminals_0.05.tree >> alignments.log
-
-# now we update the excluded sequences file
-echo ""
-echo "Updating excluded sequences file with sequences exluded by TreeShrink"
-echo ""
-Rscript $DIR/update_excluded_seqs.R excluded_sequences.tsv treeshrink_SH/iqtree_pruned_terminals_RS_0.05.txt
-
-
-
+# remove from the alignment sequences we removed from the tree
 exseq=excluded_sequences.tsv
 cut -f1 $exseq | faSomeRecords $aln_4 /dev/stdin $outputfasta -exclude
 
@@ -160,9 +144,9 @@ echo "alignment stats of global alignment after removing sequences with treeshri
 esl-alistat $outputfasta >> alignments.log
 
 
-# Run FastTree on the new alignmnet and the tree from TreeShrink...
+# 3. Run FastTree on the new alignmnet and the tree after pruning...
 echo ""
-echo "Optimising treeshrink-ed tree with fasttree MP"
+echo "Optimising pruned tree with fasttree MP"
 echo ""
 
 # we have to do some contortions to set the optimal number of threads for fasttree, which is 3 (see fasttreeOMP.md)
@@ -171,7 +155,7 @@ old_threads=$(grep -hoP '^OMP_NUM_THREADS=\K\d+' old_env.txt)
 rm old_env.txt
 export OMP_NUM_THREADS=3
 
-FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree iqtree_pruned_terminals.tree $outputfasta > $outputfasta'_ft_SH.tree'
+FastTreeMP -nt -gamma -nni 0 -spr 2 -sprlength 1000 -boot 100 -log fasttree.log -intree iqtree_pruned_terminals.tree $outputfasta > ft_unrooted_SH.tree
 
 if [ -n "$old_threads" ]; then
     export OMP_NUM_THREADS=$old_threads
@@ -179,19 +163,35 @@ else
     unset OMP_NUM_THREADS
 fi
 
+# Run TreeShrink to identify sequences on long branches that were not already pruned
+# note that if this fails it can be safely removed, the R script does most of the heavy lifting now
+echo ""
+echo "Cleaning tree with treeshrink"
+echo ""
+
+nw_reroot ft_unrooted_SH.tree "EPI_ISL_406801" > ft_rooted_SH.tree
+run_treeshrink.py -t ft_rooted_SH.tree -q 0.05 -c -o treeshrink
+
+echo "Tree stats after pruning branches with treeshrink" >> alignments.log
+nw_stats treeshrink/ft_rooted_SH_0.05.tree >> alignments.log
+
+# now we update the excluded sequences file
+echo ""
+echo "Updating excluded sequences file with sequences exluded by TreeShrink"
+echo ""
+Rscript $DIR/update_excluded_seqs.R treeshrink/ft_rooted_SH_RS_0.05.txt
+
+
 echo ""
 echo "Re-rooting tree on hCoV-19/Wuhan/WH04/2020|EPI_ISL_406801|2020-01-05"
 echo "see https://www.biorxiv.org/content/10.1101/2020.04.17.046086v1"
 echo ""
-nw_reroot $outputfasta'_ft_SH.tree' "'EPI_ISL_406801'" > ft_SH.tree
-
+# we need quotes because treeshrink adds them, then we remove them after rerooting
+nw_reroot treeshrink/ft_rooted_SH_0.05.tree "'EPI_ISL_406801'" > ft_SH.tree
 sed -i.bak "s/'//g" ft_SH.tree
 rm ft_SH.tree.bak
 
-echo "Tree stats after re-optimising tree with FastTree" >> alignments.log
-nw_stats ft_SH.tree >> alignments.log
-
-echo "//"
+echo "//" >> alignments.log
 echo "Number of new sequences added this iteration" >> alignments.log
 wc -l alignment_names_new.txt >> alignments.log
 
