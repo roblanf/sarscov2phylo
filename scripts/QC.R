@@ -114,7 +114,7 @@ clustering[num] <- sapply(clustering[num],as.numeric)
 
 # only keep the ones where we can reasonably estimate clustering
 # so 5 or more members of a lineage
-clustering = subset(clustering, n>4)
+clustering = subset(clustering, n_tips>4)
 
 #### Write out a log file ####
 dir.create("./QC")
