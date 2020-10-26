@@ -106,16 +106,16 @@ clustering = mclapply(levels(f$covv_lineage), get_signal, tree=new, data=f$covv_
 clustering = as.data.frame(do.call(rbind, clustering))
 
 #### Write out a log file ####
-mkdir("QC")
-write.csv(clustering, "QC/lineage_clustering.csv")
-write.csv(dists, "QC/topological_distances_randomNNI.csv")
+dir.create("./QC")
+write.csv(clustering, "./QC/lineage_clustering.csv")
+write.csv(dists, "./QC/topological_distances_randomNNI.csv")
 
-pdf("QC/tree_comparison_plot.pdf")
+pdf("./QC/tree_comparison_plot.pdf")
 print(p1)
 dev.off()
 
 
-fileConn = file("QC/QC_report.md")
+fileConn = file("./QC/QC_report.md")
 
 writeLines("# QC Report for the phylogenetic tree")
 writeLines("")
