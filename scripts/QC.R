@@ -102,8 +102,6 @@ get_signal = function(trait, tree, data){
     
 }
 
-get_signal("B.1", new, f$covv_lineage)
-
 clustering = mclapply(levels(f$covv_lineage), get_signal, tree=new, data=f$covv_lineage, mc.cores=threads)
 clustering = as.data.frame(do.call(rbind, clustering))
 
