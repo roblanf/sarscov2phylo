@@ -93,6 +93,7 @@ get_signal = function(trait, tree, data){
     return(list(trait=as.character(trait), 
                 obs = as.numeric(obs_l), 
                 p = as.numeric(p_value), 
+                n_tips = as.numeric(n),
                 rep_Min = as.numeric(rep_lt[1]),
                 rep_1stQu = as.numeric(rep_lt[2]),
                 rep_Median = as.numeric(rep_lt[3]),
