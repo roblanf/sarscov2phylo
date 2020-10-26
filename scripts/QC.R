@@ -61,7 +61,7 @@ p1 = ggplot(dists, aes(x=n, y = dist)) +
 # we do this by
 # 1. getting the observed tree length of each lineage
 # 2. doing the same for 100 random sets of the same number of tips of each lineage
-d = read.csv("~/Desktop/metadata.csv")
+d = read.csv("metadata.csv")
 
 e = subset(d, subset = d$covv_accession_id %in% new$tip.label)
 f = e[match(new$tip.label, e$covv_accession_id),]
