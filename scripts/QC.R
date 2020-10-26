@@ -80,7 +80,8 @@ get_signal = function(trait, tree, data){
     # trait is the specific trait in the 'data' vector you want to measure
     
     obs_t = drop.tip(tree, which(data!=trait))
-    n = length(obs_t$tip.label) 
+    n = length(obs_t$tip.label)
+
     obs_l = sum(obs_t$edge.length)
     
     rep_l = sort(replicate(99, random_treelen(tree, n)))
@@ -89,7 +90,7 @@ get_signal = function(trait, tree, data){
     
     # p value is the position in a ranked list
     p_value = (sum(obs_l>rep_l)+1)/(length(rep_l)+1)
-    
+
     return(list(trait=as.character(trait), 
                 obs = as.numeric(obs_l), 
                 p = as.numeric(p_value), 
@@ -100,6 +101,7 @@ get_signal = function(trait, tree, data){
                 rep_Mean = as.numeric(rep_lt[4]),
                 rep_3rdQu = as.numeric(rep_lt[5]),
                 rep_Max = as.numeric(rep_lt[6])))
+
     
 }
 
@@ -109,6 +111,10 @@ clustering$trait = as.character(clustering$trait)
 
 num = 2:ncol(clustering)
 clustering[num] <- sapply(clustering[num],as.numeric)
+
+# only keep the ones where we can reasonably estimate clustering
+# so 5 or more members of a lineage
+clustering = subset(clustering, n>4)
 
 #### Write out a log file ####
 dir.create("./QC")
