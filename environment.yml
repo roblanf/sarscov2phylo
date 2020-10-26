@@ -23,6 +23,8 @@ dependencies:
   - r-ape
   - r-bms
   - r-base=3.6.3
+  - r-ggplot2
+  - r-phangorn
   - r-readr
   - rapidnj
   - snakemake-minimal=5.13
