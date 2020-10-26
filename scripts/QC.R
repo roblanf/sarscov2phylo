@@ -133,7 +133,8 @@ writeLines("## Clustering of Pangolin lineages")
 writeLines(paste(sum(clustering$p<0.5), "out of", nrow(clustering), "Pangolin lineages show significant clustering"))
 writeLines("")
 writeLines("#### Summary of p values")
-writeLines(summary(clustering$p))
-
 close(fileConn)
 
+sink("./QC/QC_report.md", append=TRUE)
+print(summary(clustering$p))
+sink()
