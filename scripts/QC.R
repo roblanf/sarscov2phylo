@@ -83,7 +83,7 @@ get_signal = function(trait, tree, data){
     n = length(obs_t$tip.label) 
     obs_l = sum(obs_t$edge.length)
     
-    rep_l = sort(replicate(19, random_treelen(tree, n)))
+    rep_l = sort(replicate(99, random_treelen(tree, n)))
     
     rep_lt = summary(rep_l)
     
