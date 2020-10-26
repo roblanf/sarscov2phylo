@@ -133,7 +133,6 @@ cat("\n")
 cat("## Comparison to previous iteration's tree\n")
 cat(paste("wRF distance between previous and new iteration's trees:", obs, "\n"))
 cat(paste("This is equivalent to a number of random NNIs equal to roughly:", thresh, "\n"))
-cat(paste("This is equivalent to a number of random NNIs equal to roughly:", thresh, "\n"))
 cat("\n")
 
 cat("## Clustering of Pangolin lineages\n")
