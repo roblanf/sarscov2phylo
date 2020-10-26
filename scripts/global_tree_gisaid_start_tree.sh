@@ -163,6 +163,8 @@ echo "//"
 echo "Number of new sequences added this iteration" >> alignments.log
 wc -l alignment_names_new.txt >> alignments.log
 
+# run QC
+Rscript $DIR/QC.R previous_iteration_files/ft_SH.tree ft_SH.tree $threads
 
 # zip up for easy file transfer
 xz -e -T $threads $outputfasta
