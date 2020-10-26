@@ -104,6 +104,10 @@ get_signal = function(trait, tree, data){
 
 clustering = mclapply(levels(f$covv_lineage), get_signal, tree=new, data=f$covv_lineage, mc.cores=threads)
 clustering = as.data.frame(do.call(rbind, clustering))
+clustering$trait = as.character(clustering$trait)
+
+num = 2:ncol(clustering)
+clustering[num] <- sapply(clustering[num],as.numeric)
 
 #### Write out a log file ####
 dir.create("./QC")
