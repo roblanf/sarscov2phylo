@@ -90,15 +90,15 @@ get_signal = function(trait, tree, data){
     # p value is the position in a ranked list
     p_value = (sum(obs_l>rep_l)+1)/(length(rep_l)+1)
     
-    return(list(trait=trait, 
-                obs = obs_l, 
-                p = p_value, 
-                rep_Min = rep_lt[1],
-                rep_1stQu = rep_lt[2],
-                rep_Median = rep_lt[3],
-                rep_Mean = rep_lt[4],
-                rep_3rdQu = rep_lt[5],
-                rep_Max = rep_lt[6]))
+    return(list(trait=as.character(trait), 
+                obs = as.numeric(obs_l), 
+                p = as.numeric(p_value), 
+                rep_Min = as.numeric(rep_lt[1]),
+                rep_1stQu = as.numeric(rep_lt[2]),
+                rep_Median = as.numeric(rep_lt[3]),
+                rep_Mean = as.numeric(rep_lt[4]),
+                rep_3rdQu = as.numeric(rep_lt[5]),
+                rep_Max = as.numeric(rep_lt[6])))
     
 }
 
