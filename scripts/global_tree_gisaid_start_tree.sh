@@ -166,9 +166,6 @@ wc -l alignment_names_new.txt >> alignments.log
 # run QC
 Rscript $DIR/QC.R previous_iteration_files/ft_SH.tree ft_SH.tree $threads
 
-# we don't need to keep this around
-rm -rf metadata.csv
-
 # zip up for easy file transfer
 xz -e -T $threads $outputfasta
 xz -e -T $threads $aln_global
@@ -183,3 +180,8 @@ xz -e -T $threads iqtree_seqsadded_mp.iqtree
 rm goalign_amd64_linux
 rm -rf iqtree-2.1.0-Linux/
 rm iqtree_seqsadded_mp.uniqueseq.phy
+rm iqtree_seqsadded_mp.parstree
+rm iqtree-2.1.0-Linux.tar.gz
+rm iqtree_seqsadded_mp.ckp.gz
+rm metadata.csv
+rm reference.fa
