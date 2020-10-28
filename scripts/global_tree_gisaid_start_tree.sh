@@ -166,6 +166,9 @@ wc -l alignment_names_new.txt >> alignments.log
 # run QC
 Rscript $DIR/QC.R previous_iteration_files/ft_SH.tree ft_SH.tree $threads
 
+# we don't need to keep this around
+rm -rf metadata.csv
+
 # zip up for easy file transfer
 xz -e -T $threads $outputfasta
 xz -e -T $threads $aln_global
