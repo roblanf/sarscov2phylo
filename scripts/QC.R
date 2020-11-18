@@ -136,7 +136,7 @@ cat(paste("This is equivalent to a number of random NNIs equal to roughly:", thr
 cat("\n")
 
 cat("## Clustering of Pangolin lineages\n")
-cat(paste(sum(clustering$p<0.5), "out of", nrow(clustering), "Pangolin lineages show significant clustering\n"))
+cat(paste(sum(clustering$p<0.05), "out of", nrow(clustering), "Pangolin lineages show significant clustering\n"))
 cat("\n")
 cat("#### Summary of p values\n")
 
