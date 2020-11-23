@@ -41,6 +41,22 @@ mkdir previous_iteration_files
 cp $previous'/ft_SH.tree' previous_iteration_files/
 cp $previous'/excluded_sequences.tsv' previous_iteration_files/
 
+#check the copying worked
+if [ -f "previous_iteration_files/ft_SH.tree" ]; then
+    echo "previous_iteration_files/ft_SH.tree exists."
+else 
+    echo "previous_iteration_files/ft_SH.tree does not exist. Something's wrong. Exiting."
+    exit 1
+fi
+
+if [ -f "previous_iteration_files/excluded_sequences.tsv" ]; then
+    echo "previous_iteration_files/excluded_sequences.tsv exists."
+else 
+    echo "previous_iteration_files/excluded_sequences.tsv does not exist. Something's wrong. Exiting."
+    exit 1
+fi
+
+
 # first we trim the sequences
 echo ""
 echo "Cleaning raw data"
