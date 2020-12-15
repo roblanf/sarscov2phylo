@@ -6,23 +6,20 @@ We gratefully acknowledge the authors, originating and submitting laboratories o
 
 # Can I use it and cite it
 
-Yes. Every new release from 22-July-20 is available at this DOI: [![DOI](https://zenodo.org/badge/260124648.svg)](https://zenodo.org/badge/latestdoi/260124648)
+Yes. Every new release from 22-July-20 to 13-November-20 is available at this DOI: [![DOI](https://zenodo.org/badge/260124648.svg)](https://zenodo.org/badge/latestdoi/260124648)
 
-Citation details are provided along with every release.
+Releases subsequent to 13-November-20 are available on the GISAID website. To obtain the trees and alignments from GISAID you'll need a membership, but this is free and new requests are processed quickly. Once you have a GISAID membership, follow these steps to get the tree and the corresponding alignment:
+
+1. Log in to GISAID
+2. In the top menu bar, click the "EpiCoV" tab
+3. Click the "Audacity" tile (with a big rainbow tree on it, near the bottom) to get the tree
+4. Click the "Downloads" link just under the "EpiCoV" tab, then choose the alignment you want to download
+
+The alignment that is used to make the tree is the one labelled "MSA masked" followed by the date. Older alignments are in the 'Archive' box.
 
 # Key files
 
-The latest tree with the associated code to reproduce that tree can always be obtained from the latest release of this repository [here](https://github.com/roblanf/sarscov2phylo/releases/latest). Releases are named by the date (in Australian time) on which the sequences were downloaded from GISAID.
-
-For convenience, you can also get the latest results via the following links:
-
-* [Latest global phylogeny with fasttree SH Supports](https://github.com/roblanf/sarscov2phylo/blob/master/ft_SH.tree)
-* [Acknowledgements file for those that upload to GISAID](https://github.com/roblanf/sarscov2phylo/blob/master/acknowledgements/)
-* [Latest version of the script to produce a global tree](https://github.com/roblanf/sarscov2phylo/blob/master/scripts/global_tree_gisaid_start_tree.sh)
-
-Privacy rules around the alignments themselves mean that they cannot be released here. The alignments can be recreated by following the steps described below. If you are a GISAID member and would like a copy of the alignment for any specific tree in the releases, please email me and I'll share it with you.
-
-Also, please note that the script to produce the global tree is continually modified as new data are released, so if you are looking at the master branch it may be the case that the latest code will not exactly reproduce the latest tree. If you would like to reproduce the latest tree, please head over to the [latest release](https://github.com/roblanf/sarscov2phylo/releases/latest), which contains the latest tree and the version of the code used to produce it.
+The latest tree and alignment, with the associated code to reproduce that tree can always be obtained from GISAID (see above) 
 
 ![Part of global SARS-CoV-2 phylogeny](https://github.com/roblanf/sarscov2phylo/blob/master/tree_image.jpg)
 
