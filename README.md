@@ -1,6 +1,30 @@
+# Before you start - know that this code is not state of the art
+
+This repository is no longer maintained. I leave it here for reference only (the rest of this readme is pretty much unchanged).
+
+If you want to estimate your own trees of SARS-CoV-2, please look into:
+
+* UShER and matOptimize: https://usher-wiki.readthedocs.io/en/latest/matOptimize.html
+* MAPLE: https://github.com/NicolaDM/MAPLE
+* Anything even better which might have come along since I wrote this (May 8th 2023)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # A global phylogeny of SARS-CoV-2
 
-This repository provides a regularly-updated global phylogeny of SARS-CoV-2 data from GISAID, as well as reproducile methods with which to estimate it. 
+This repository used to provide a regularly-updated global phylogeny of SARS-CoV-2 data from GISAID, as well as reproducile methods with which to estimate it. 
 
 We gratefully acknowledge the authors, originating and submitting laboratories of the sequences from GISAID’s EpiFlu™ Database on which this research is based. The list is detailed in [this file](https://github.com/roblanf/sarscov2phylo/blob/master/acknowledgements/).
 
