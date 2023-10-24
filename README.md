@@ -34,7 +34,7 @@ Yes. Every new release from 22-July-20 to 13-November-20 is available at this DO
 
 Releases subsequent to 13-November-20 are available on the GISAID website. To obtain the trees and alignments from GISAID you'll need a membership, but this is free and new requests are processed quickly. Once you have a GISAID membership, follow these steps to get the tree and the corresponding alignment:
 
-1. Log in to GISAID
+1. Log in to GISAID using your GISAID login
 2. In the top menu bar, click the "EpiCoV" tab
 3. Click the "Audacity" tile (with a big rainbow tree on it, near the bottom) to get the tree
 4. Click the "Downloads" link just under the "EpiCoV" tab, then choose the alignment you want to download
