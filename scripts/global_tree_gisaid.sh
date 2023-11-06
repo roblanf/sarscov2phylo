@@ -27,6 +27,15 @@ then
    helpFunction
 fi
 
+# Check for important dependencies in PATH
+for exe in fasttree goalign nw_reroot esl-alimask faSomeRecords mysql_config mafft faSplit grep parallel find sed seqmagick grep wget gotree; do
+  which $exe;
+  if [[ $? -gt 0 ]]; then
+    echo "ERROR: not in path: $exe";
+    exit 1
+  fi
+done
+
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # first we trim the sequences
