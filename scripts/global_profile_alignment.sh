@@ -43,7 +43,9 @@ echo ""
 echo "Splitting unaligned input sequences into individual files"
 N=$(grep ">" $inputfasta | wc -l)
 N=$(( N*2 )) # doubling it is to ensure each record goes to one file
-faSplit sequence $inputfasta $N individual_seq
+rm -rf tmp_split_seq
+mkdir tmp_split_seq
+faSplit -outDirDepth=3 sequence $inputfasta $N tmp_split_seq/individual_seq
 
 
 echo ""
@@ -72,10 +74,9 @@ profile_align()
 
 export -f profile_align
 
-inputdir=$(dirname $inputfasta)
-ls $inputdir | grep individual_seq | parallel -j $threads --bar "profile_align {}" > /dev/null
+find tmp_split_seq -name individual_seq\* | parallel -j $threads --bar "profile_align {}" > /dev/null
 
 # join it all together and clean up
 # note that here we *APPEND* to the global alignment, which allows us to add small batches of new stuff whenever we like
-find $inputdir -name \*.fa_ind_aligned.fa -exec cat {} \; >> $outputfasta
-find $inputdir -maxdepth 1 -name "individual_seq*" -delete
+find tmp_split_seq -name \*.fa_ind_aligned.fa -exec cat {} \; >> $outputfasta
+rm -rf tmp_split_seq
